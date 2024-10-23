@@ -10,7 +10,7 @@
 
 - VSCode / Neovim
 - DBeaver
-- Postman / swagger
+- Swagger
 
 ### General Online Research Tools:
 
@@ -24,10 +24,6 @@
 
 - Golang
 
-### Frontend Development:
-
-- TypeScript (React Framework)
-
 ### Database Management:
 
 - PostgreSQL
@@ -40,5 +36,3 @@
 ### CI/CD Pipeline:
 
 - GitHub Actions
-
----
