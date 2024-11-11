@@ -1,6 +1,6 @@
 services:
   db:
-    container_name: postgres-test
+    container_name: ${CONTAINER_NAME}
     image: postgres
     environment:
       POSTGRES_USER: ${DB_USER}
