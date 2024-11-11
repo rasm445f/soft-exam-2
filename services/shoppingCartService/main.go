@@ -114,9 +114,9 @@ func main() {
 
 	fmt.Printf("Cart items for user1: %+v\n", items)
 
-	if err := service.ClearCart("user1"); err != nil {
-		log.Fatalf("Could not clear cart: %v", err)
-	}
-
-	fmt.Println("Cart cleared for user1")
+	// if err := service.ClearCart("user1"); err != nil {
+	// 	log.Fatalf("Could not clear cart: %v", err)
+	// }
+	//
+	// fmt.Println("Cart cleared for user1")
 }

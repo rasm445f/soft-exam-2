@@ -31,7 +31,7 @@ CREATE TABLE "Order" (
     DeliveryAgentID int,
     PaymentID int REFERENCES Payment (ID),
     BonusID int REFERENCES Bonus (ID),
-    FeedbackID int
+    FeeID int REFERENCES Fee (ID)
 );
 
 CREATE TABLE OrderItem (
@@ -45,8 +45,6 @@ CREATE TABLE OrderItem (
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE OrderItem;
-
 DROP TABLE Fee;
 
 DROP TABLE Payment;
@@ -54,5 +52,7 @@ DROP TABLE Payment;
 DROP TABLE Bonus;
 
 DROP TABLE "Order";
+
+DROP TABLE OrderItem;
 
 -- +goose StatementEnd
