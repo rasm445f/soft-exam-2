@@ -1,0 +1,5 @@
+connections:
+  - alias: test
+    driver: postgresql
+    # TODO: read dbstring from environment or create this file with a shell script
+    dataSourceName: "postgres://postgres:test@127.0.0.1:5432/todo?sslmode=disable"

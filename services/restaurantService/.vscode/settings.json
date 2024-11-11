@@ -1,0 +1,8 @@
+{
+  "editor.formatOnSave": true,
+  // for sqls language server
+  // "sqls.languageServerFlags": [
+  //   "-config",
+  //   "./sql-lsp-config.yaml"
+  // ],
+}
