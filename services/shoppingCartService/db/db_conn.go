@@ -1,29 +1,30 @@
 package db
 
 import (
-	"context"
 	"fmt"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/go-redis/redis/v8"
 )
 
-func ConnectDB() (*pgx.Conn, error) {
+func Redis_conn() *redis.Client {
+	redisPassword := os.Getenv("REDIS_PASSWORD")
+	redisHost := os.Getenv("REDIS_HOST")
+	redisPort := os.Getenv("REDIS_PORT")
 
-	connStr := os.Getenv("DBSTRING")
-	ctx := context.Background()
-
-	db, err := pgx.Connect(ctx, connStr)
-
-	if err != nil {
-		return nil, err
+	// TODO: simplify this
+	if redisHost == "" {
+		redisHost = "localhost"
+	}
+	if redisPort == "" {
+		redisPort = "6379"
 	}
 
-	err = db.Ping(ctx)
-	if err != nil {
-		return nil, err
-	}
-	fmt.Println("Successfully connected to the database!")
-
-	return db, nil
+	// Create a Redis client
+	client := redis.NewClient(&redis.Options{
+		Addr:     fmt.Sprintf("%s:%s", redisHost, redisPort),
+		Password: redisPassword,
+		DB:       0,
+	})
+	return client
 }
