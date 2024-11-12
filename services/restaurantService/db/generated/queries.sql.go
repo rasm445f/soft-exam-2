@@ -7,75 +7,73 @@ package generated
 
 import (
 	"context"
-	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createTodo = `-- name: CreateTodo :one
-INSERT INTO todo (title, text, iscompleted, category, deadline)
-    VALUES ($1, $2, $3, $4, $5)
-RETURNING
-    id
+const createMenuItem = `-- name: CreateMenuItem :one
+INSERT INTO menuitem (name, description, price, restaurantid)
+VALUES ($1, $2, $3, $4)
+RETURNING id
 `
 
-type CreateTodoParams struct {
-	Title       string     `json:"title"`
-	Text        string     `json:"text"`
-	Iscompleted bool       `json:"iscompleted"`
-	Category    *string    `json:"category"`
-	Deadline    *time.Time `json:"deadline"`
+type CreateMenuItemParams struct {
+	Name         string         `json:"name"`
+	Description  *string        `json:"description"`
+	Price        pgtype.Numeric `json:"price"`
+	Restaurantid int32          `json:"restaurantid"`
 }
 
-func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (int64, error) {
-	row := q.db.QueryRow(ctx, createTodo,
-		arg.Title,
-		arg.Text,
-		arg.Iscompleted,
-		arg.Category,
-		arg.Deadline,
+func (q *Queries) CreateMenuItem(ctx context.Context, arg CreateMenuItemParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createMenuItem,
+		arg.Name,
+		arg.Description,
+		arg.Price,
+		arg.Restaurantid,
 	)
-	var id int64
+	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
 
-const deleteTodoById = `-- name: DeleteTodoById :exec
-DELETE FROM todo
-WHERE id = $1
+const createRestaurant = `-- name: CreateRestaurant :one
+INSERT INTO restaurant (name, address, rating)
+VALUES ($1, $2, $3)
+RETURNING id
 `
 
-func (q *Queries) DeleteTodoById(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deleteTodoById, id)
-	return err
+type CreateRestaurantParams struct {
+	Name    string         `json:"name"`
+	Address string         `json:"address"`
+	Rating  pgtype.Numeric `json:"rating"`
 }
 
-const fetchAllTodos = `-- name: FetchAllTodos :many
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo
+func (q *Queries) CreateRestaurant(ctx context.Context, arg CreateRestaurantParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createRestaurant, arg.Name, arg.Address, arg.Rating)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const fetchAllRestaurants = `-- name: FetchAllRestaurants :many
+SELECT id, name, address, rating
+FROM restaurant
 `
 
-func (q *Queries) FetchAllTodos(ctx context.Context) ([]Todo, error) {
-	rows, err := q.db.Query(ctx, fetchAllTodos)
+func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]Restaurant, error) {
+	rows, err := q.db.Query(ctx, fetchAllRestaurants)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Todo
+	var items []Restaurant
 	for rows.Next() {
-		var i Todo
+		var i Restaurant
 		if err := rows.Scan(
 			&i.ID,
-			&i.Title,
-			&i.Text,
-			&i.Iscompleted,
-			&i.Category,
-			&i.Deadline,
+			&i.Name,
+			&i.Address,
+			&i.Rating,
 		); err != nil {
 			return nil, err
 		}
@@ -87,30 +85,60 @@ func (q *Queries) FetchAllTodos(ctx context.Context) ([]Todo, error) {
 	return items, nil
 }
 
-const getTodoById = `-- name: GetTodoById :one
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo
-WHERE
-    id = $1
+const fetchMenuItemsByRestaurantId = `-- name: FetchMenuItemsByRestaurantId :many
+SELECT id, name, description, price, restaurantid
+from menuitem
+WHERE restaurantid = $1
 `
 
-func (q *Queries) GetTodoById(ctx context.Context, id int64) (Todo, error) {
-	row := q.db.QueryRow(ctx, getTodoById, id)
-	var i Todo
+type FetchMenuItemsByRestaurantIdRow struct {
+	ID           int32          `json:"id"`
+	Name         string         `json:"name"`
+	Description  *string        `json:"description"`
+	Price        pgtype.Numeric `json:"price"`
+	Restaurantid int32          `json:"restaurantid"`
+}
+
+func (q *Queries) FetchMenuItemsByRestaurantId(ctx context.Context, restaurantid int32) ([]FetchMenuItemsByRestaurantIdRow, error) {
+	rows, err := q.db.Query(ctx, fetchMenuItemsByRestaurantId, restaurantid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []FetchMenuItemsByRestaurantIdRow
+	for rows.Next() {
+		var i FetchMenuItemsByRestaurantIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Description,
+			&i.Price,
+			&i.Restaurantid,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getRestaurantById = `-- name: GetRestaurantById :one
+SELECT id, name, address, rating
+FROM restaurant
+WHERE id = $1
+`
+
+func (q *Queries) GetRestaurantById(ctx context.Context, id int32) (Restaurant, error) {
+	row := q.db.QueryRow(ctx, getRestaurantById, id)
+	var i Restaurant
 	err := row.Scan(
 		&i.ID,
-		&i.Title,
-		&i.Text,
-		&i.Iscompleted,
-		&i.Category,
-		&i.Deadline,
+		&i.Name,
+		&i.Address,
+		&i.Rating,
 	)
 	return i, err
 }

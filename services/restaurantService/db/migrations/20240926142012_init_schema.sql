@@ -18,8 +18,8 @@ CREATE TABLE MenuItem (
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
+DROP TABLE MenuItem;
 DROP TABLE Restaurant;
 
-DROP TABLE MenuItem;
 
 -- +goose StatementEnd

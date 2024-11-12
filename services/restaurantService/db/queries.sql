@@ -1,34 +1,24 @@
--- name: FetchAllTodos :many
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo;
+-- name: FetchAllRestaurants :many
+SELECT id, name, address, rating
+FROM restaurant;
 
--- name: GetTodoById :one
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo
-WHERE
-    id = $1;
-
--- name: DeleteTodoById :exec
-DELETE FROM todo
+-- name: GetRestaurantById :one
+SELECT id, name, address, rating
+FROM restaurant
 WHERE id = $1;
 
--- name: CreateTodo :one
-INSERT INTO todo (title, text, iscompleted, category, deadline)
-    VALUES ($1, $2, $3, $4, $5)
-RETURNING
-    id;
+-- name: FetchMenuItemsByRestaurantId :many
+SELECT id, name, description, price, restaurantid
+from menuitem
+WHERE restaurantid = $1;
+
+-- name: CreateRestaurant :one
+INSERT INTO restaurant (name, address, rating)
+VALUES ($1, $2, $3)
+RETURNING id;
+
+-- name: CreateMenuItem :one
+INSERT INTO menuitem (name, description, price, restaurantid)
+VALUES ($1, $2, $3, $4)
+RETURNING id;
 

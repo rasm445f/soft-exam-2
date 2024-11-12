@@ -5,14 +5,20 @@
 package generated
 
 import (
-	"time"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Todo struct {
-	ID          int64      `json:"id"`
-	Title       string     `json:"title"`
-	Text        string     `json:"text"`
-	Iscompleted bool       `json:"iscompleted"`
-	Category    *string    `json:"category"`
-	Deadline    *time.Time `json:"deadline"`
+type Menuitem struct {
+	ID           int32          `json:"id"`
+	Restaurantid int32          `json:"restaurantid"`
+	Name         string         `json:"name"`
+	Price        pgtype.Numeric `json:"price"`
+	Description  *string        `json:"description"`
+}
+
+type Restaurant struct {
+	ID      int32          `json:"id"`
+	Name    string         `json:"name"`
+	Address string         `json:"address"`
+	Rating  pgtype.Numeric `json:"rating"`
 }
