@@ -12,7 +12,7 @@ import (
 const createCustomer = `-- name: CreateCustomer :one
 INSERT INTO customer (name, email, phonenumber, address, password)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING id
+RETURNING id, name, email, phonenumber, address, password
 `
 
 type CreateCustomerParams struct {
@@ -23,7 +23,16 @@ type CreateCustomerParams struct {
 	Password    string  `json:"password"`
 }
 
-func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (int32, error) {
+type CreateCustomerRow struct {
+	ID          int32   `json:"id"`
+	Name        string  `json:"name"`
+	Email       string  `json:"email"`
+	Phonenumber *string `json:"phonenumber"`
+	Address     *string `json:"address"`
+	Password    string  `json:"password"`
+}
+
+func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (CreateCustomerRow, error) {
 	row := q.db.QueryRow(ctx, createCustomer,
 		arg.Name,
 		arg.Email,
@@ -31,9 +40,16 @@ func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) 
 		arg.Address,
 		arg.Password,
 	)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
+	var i CreateCustomerRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Phonenumber,
+		&i.Address,
+		&i.Password,
+	)
+	return i, err
 }
 
 const deleteCustomer = `-- name: DeleteCustomer :exec

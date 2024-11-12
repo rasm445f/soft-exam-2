@@ -15,9 +15,30 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/todo": {
+        "/api/customer": {
+            "get": {
+                "description": "Fetches a list of all customers from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Get all customers",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Customer"
+                            }
+                        }
+                    }
+                }
+            },
             "post": {
-                "description": "Create a new todo entry in the database",
+                "description": "Creates a new customer entry in the database",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,17 +46,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "customers"
                 ],
-                "summary": "Create a new todo",
+                "summary": "Create a new customer",
                 "parameters": [
                     {
-                        "description": "Todo object",
-                        "name": "todo",
+                        "description": "Customer object",
+                        "name": "customer",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
+                            "$ref": "#/definitions/generated.CreateCustomerParams"
                         }
                     }
                 ],
@@ -43,7 +64,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
+                            "$ref": "#/definitions/generated.Customer"
                         }
                     },
                     "400": {
@@ -61,20 +82,20 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/todo/{id}": {
+        "/api/customer/{id}": {
             "get": {
-                "description": "Fetches a todo based on the id from the database",
+                "description": "Fetches a customer based on the id from the database",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "customers"
                 ],
-                "summary": "Get todo",
+                "summary": "Get customer",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Todo ID",
+                        "description": "Customer ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -84,24 +105,24 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/generated.Todo"
+                            "$ref": "#/definitions/generated.Customer"
                         }
                     }
                 }
             },
             "delete": {
-                "description": "Delete a todo based on the id from the database",
+                "description": "Deletes a customer based on the id from the database",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "customers"
                 ],
-                "summary": "Delete todo",
+                "summary": "Delete customer",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Todo ID",
+                        "description": "Customer ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -109,9 +130,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Customer deleted",
                         "schema": {
-                            "$ref": "#/definitions/generated.Todo"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -121,32 +142,9 @@ const docTemplate = `{
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Customer not found",
                         "schema": {
                             "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/todos": {
-            "get": {
-                "description": "Fetches a list of all todos from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Get all todos",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/generated.Todo"
-                            }
                         }
                     }
                 }
@@ -154,45 +152,45 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "generated.CreateTodoParams": {
+        "generated.CreateCustomerParams": {
             "type": "object",
             "properties": {
-                "category": {
+                "address": {
                     "type": "string"
                 },
-                "deadline": {
+                "email": {
                     "type": "string"
                 },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
+                "name": {
                     "type": "string"
                 },
-                "title": {
+                "password": {
+                    "type": "string"
+                },
+                "phonenumber": {
                     "type": "string"
                 }
             }
         },
-        "generated.Todo": {
+        "generated.Customer": {
             "type": "object",
             "properties": {
-                "category": {
+                "address": {
                     "type": "string"
                 },
-                "deadline": {
+                "email": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
+                "name": {
                     "type": "string"
                 },
-                "title": {
+                "password": {
+                    "type": "string"
+                },
+                "phonenumber": {
                     "type": "string"
                 }
             }

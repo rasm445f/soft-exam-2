@@ -1,7 +1,7 @@
 -- name: CreateCustomer :one
 INSERT INTO customer (name, email, phonenumber, address, password)
 VALUES ($1, $2, $3, $4, $5)
-RETURNING id;
+RETURNING id, name, email, phonenumber, address, password;
 
 -- name: GetCustomerByID :one
 SELECT * FROM customer WHERE id = $1;
