@@ -4,15 +4,11 @@
 
 package generated
 
-import (
-	"time"
-)
-
-type Todo struct {
-	ID          int64      `json:"id"`
-	Title       string     `json:"title"`
-	Text        string     `json:"text"`
-	Iscompleted bool       `json:"iscompleted"`
-	Category    *string    `json:"category"`
-	Deadline    *time.Time `json:"deadline"`
+type Customer struct {
+	ID          int32   `json:"id"`
+	Name        string  `json:"name"`
+	Email       string  `json:"email"`
+	Password    string  `json:"password"`
+	Phonenumber *string `json:"phonenumber"`
+	Address     *string `json:"address"`
 }
