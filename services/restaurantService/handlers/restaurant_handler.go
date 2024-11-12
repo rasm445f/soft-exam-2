@@ -26,6 +26,7 @@ func GetAllRestaurants(queries *generated.Queries) http.HandlerFunc {
 			log.Println(err)
 			return
 		}
+
 		res, _ := json.Marshal(restaurants)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -45,7 +46,7 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		idStr := r.URL.Query().Get("id")
+		idStr := r.URL.Path[len("/api/restaurants/"):]
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
@@ -66,11 +67,22 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 	}
 }
 
+
+// GetMenuItemsByRestaurant godoc
+// @Summary Get menu items by restaurant ID
+// @Description Fetches all menu items associated with a specific restaurant ID
+// @Tags menu_items
+// @Produce application/json
+// @Param restaurantId query string true "Restaurant ID"
+// @Success 200 {array} generated.MenuItem
+// @Failure 400 {string} string "Invalid Rastaurant ID"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /api/restaurant/{restaurantId}/menu-items [get]
 func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		restaurantIdStr := r.URL.Query().Get("restaurantId")
+		restaurantIdStr := r.URL.Path[len("/api/restaurants/"):len(r.URL.Path)-len("/menu-items")]
 		restaurantId, err := strconv.Atoi(restaurantIdStr)
 		if err != nil {
 			http.Error(w, "Invalid Restaurant ID", http.StatusBadRequest)
