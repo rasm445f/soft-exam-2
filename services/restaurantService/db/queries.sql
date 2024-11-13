@@ -7,6 +7,11 @@ SELECT id, name, address, rating
 FROM restaurant
 WHERE id = $1;
 
+-- name: GetMenuItemByRestaurantAndId :one
+SELECT id, name, description, price, restaurantid
+FROM menuitem
+WHERE restaurantid = $1 AND id = $2;
+
 -- name: FetchMenuItemsByRestaurantId :many
 SELECT id, name, description, price, restaurantid
 from menuitem

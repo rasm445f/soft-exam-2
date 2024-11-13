@@ -68,6 +68,37 @@
 				}
 			}
 		},
+		"/api/restaurants/{restaurantId}/menu-items/{menuitemId}": {
+			"get": {
+				"summary": "Fetch menu item by restaurant and menu item ID",
+				"tags": ["menu-items"],
+				"parameters": [
+					{
+						"name": "restaurantId",
+						"in": "path",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"name": "menuitemId",
+						"in": "path",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/MenuItem"
+							}
+						}
+					}
+				}
+			}
+		},
 		"definitions": {
 			"Restaurant": {
 				"type": "object",
