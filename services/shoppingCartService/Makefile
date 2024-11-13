@@ -50,11 +50,11 @@ test-verbose:
 	go test ./... -v
 
 test-cover:
-	go test -coverprofile=coverage.out
+	go test -coverprofile=coverage.out ./...
 	go tool cover -func=coverage.out
 
 test-cover-html:
-	go test -coverprofile=coverage.out
+	go test -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
 
 test-mutation:
