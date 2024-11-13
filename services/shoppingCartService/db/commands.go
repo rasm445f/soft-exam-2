@@ -13,7 +13,7 @@ type AddItemParams struct {
 	Quantity int     `json:"quantity"`
 }
 
-func (s *ShoppingCartService) AddItem(ctx context.Context, item AddItemParams) error {
+func (s *ShoppingCartRepository) AddItem(ctx context.Context, item AddItemParams) error {
 	// use the userid as key for future retrieval
 	key := fmt.Sprintf("cart:%s", item.UserId)
 
@@ -43,7 +43,7 @@ func (s *ShoppingCartService) AddItem(ctx context.Context, item AddItemParams) e
 	return s.redisClient.HSet(ctx, key, fmt.Sprintf("%d", itemId), itemData).Err()
 }
 
-func (s *ShoppingCartService) ViewCart(ctx context.Context, userID string) ([]ShoppingCartItem, error) {
+func (s *ShoppingCartRepository) ViewCart(ctx context.Context, userID string) ([]ShoppingCartItem, error) {
 	key := fmt.Sprintf("cart:%s", userID)
 	itemsData, err := s.redisClient.HGetAll(ctx, key).Result()
 	if err != nil {
@@ -63,7 +63,7 @@ func (s *ShoppingCartService) ViewCart(ctx context.Context, userID string) ([]Sh
 	return items, nil
 }
 
-func (s *ShoppingCartService) ClearCart(ctx context.Context, userID string) error {
+func (s *ShoppingCartRepository) ClearCart(ctx context.Context, userID string) error {
 	key := fmt.Sprintf("cart:%s", userID)
 	return s.redisClient.Del(ctx, key).Err()
 	// 	cartKey := fmt.Sprintf("cart:%s", userID)

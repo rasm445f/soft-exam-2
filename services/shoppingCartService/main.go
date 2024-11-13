@@ -16,7 +16,7 @@ import (
 func run() (http.Handler, error) {
 	redisClient := db.Redis_conn()
 
-	commands := db.NewShoppingCartService(redisClient)
+	commands := db.NewShoppingCartRepository(redisClient)
 
 	mux := http.NewServeMux()
 

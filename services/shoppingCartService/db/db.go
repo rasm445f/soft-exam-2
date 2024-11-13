@@ -4,10 +4,10 @@ import (
 	"github.com/go-redis/redis/v8"
 )
 
-type ShoppingCartService struct {
+type ShoppingCartRepository struct {
 	redisClient *redis.Client
 }
 
-func NewShoppingCartService(client *redis.Client) *ShoppingCartService {
-	return &ShoppingCartService{redisClient: client}
+func NewShoppingCartRepository(client *redis.Client) *ShoppingCartRepository {
+	return &ShoppingCartRepository{redisClient: client}
 }

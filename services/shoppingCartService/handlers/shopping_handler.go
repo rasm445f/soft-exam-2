@@ -18,7 +18,7 @@ import (
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/shopping [post]
-func AddItemHandler(commands *db.ShoppingCartService) http.HandlerFunc {
+func AddItemHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		var shoppingCartItem db.AddItemParams
