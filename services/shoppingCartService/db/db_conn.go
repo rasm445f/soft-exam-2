@@ -26,5 +26,14 @@ func Redis_conn() *redis.Client {
 		Password: redisPassword,
 		DB:       0,
 	})
+
+	// maybe using url can simplify connection stuff
+	//  url := "redis://user:password@localhost:6379/0?protocol=3"
+	// opts, err := redis.ParseURL(url)
+	// if err != nil {
+	//     panic(err)
+	// }
+	//
+	// return redis.NewClient(opts)
 	return client
 }
