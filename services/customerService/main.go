@@ -26,7 +26,7 @@ func run() (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	// Routes
-	mux.HandleFunc("/api/docs/", httpSwagger.WrapHandler)
+	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
 	mux.HandleFunc("GET /api/customer", handlers.GetAllCustomers(queries))
 	mux.HandleFunc("GET /api/customer/{id}", handlers.GetCustomerById(queries))
 	mux.HandleFunc("DELETE /api/customer/{id}", handlers.DeleteCustomer(queries))
