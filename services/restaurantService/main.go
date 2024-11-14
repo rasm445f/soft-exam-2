@@ -28,8 +28,8 @@ func run() (http.Handler, error) {
 	// Routes
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
 	mux.HandleFunc("GET /api/restaurants", handlers.GetAllRestaurants(queries))
-	mux.HandleFunc("GET /api/restaurants/{id}", handlers.GetRestaurantById(queries))
-	mux.HandleFunc("GET /api/restaurants/{id}/menu-items", handlers.GetMenuItemsByRestaurant(queries))
+	mux.HandleFunc("GET /api/restaurants/{restaurantId}", handlers.GetRestaurantById(queries))
+	mux.HandleFunc("GET /api/restaurants/{restaurantId}/menu-items", handlers.GetMenuItemsByRestaurant(queries))
 	mux.HandleFunc("GET /api/restaurants/{restaurantId}/menu-items/{menuitemId}", handlers.GetMenuItemByRestaurantAndId(queries))
 
 	//CORS stuff

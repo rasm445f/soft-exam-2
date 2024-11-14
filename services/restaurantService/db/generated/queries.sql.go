@@ -60,15 +60,22 @@ SELECT id, name, address, rating
 FROM restaurant
 `
 
-func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]Restaurant, error) {
+type FetchAllRestaurantsRow struct {
+	ID      int32          `json:"id"`
+	Name    string         `json:"name"`
+	Address string         `json:"address"`
+	Rating  pgtype.Numeric `json:"rating"`
+}
+
+func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]FetchAllRestaurantsRow, error) {
 	rows, err := q.db.Query(ctx, fetchAllRestaurants)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Restaurant
+	var items []FetchAllRestaurantsRow
 	for rows.Next() {
-		var i Restaurant
+		var i FetchAllRestaurantsRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
@@ -163,9 +170,16 @@ FROM restaurant
 WHERE id = $1
 `
 
-func (q *Queries) GetRestaurantById(ctx context.Context, id int32) (Restaurant, error) {
+type GetRestaurantByIdRow struct {
+	ID      int32          `json:"id"`
+	Name    string         `json:"name"`
+	Address string         `json:"address"`
+	Rating  pgtype.Numeric `json:"rating"`
+}
+
+func (q *Queries) GetRestaurantById(ctx context.Context, id int32) (GetRestaurantByIdRow, error) {
 	row := q.db.QueryRow(ctx, getRestaurantById, id)
-	var i Restaurant
+	var i GetRestaurantByIdRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,

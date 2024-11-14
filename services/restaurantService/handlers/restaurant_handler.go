@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -47,14 +46,19 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		idStr := r.URL.Path[len("/api/restaurants/"):]
-		id, err := strconv.Atoi(idStr)
-		if err != nil {
-			http.Error(w, "Invalid ID", http.StatusBadRequest)
+		restaurantIdStr := r.PathValue("restaurantId")
+		if restaurantIdStr == "" {
+			http.Error(w, "Missing restaurantId query parameter", http.StatusBadRequest)
 			return
 		}
 
-		restaurant, err := queries.GetRestaurantById(ctx, int32(id))
+		restaurantId, err := strconv.Atoi(restaurantIdStr)
+		if err != nil {
+			http.Error(w, "Invalid Restaurant ID", http.StatusBadRequest)
+			return
+		}
+
+		restaurant, err := queries.GetRestaurantById(ctx, int32(restaurantId))
 		if err != nil {
 			http.Error(w, "Restaurant not found", http.StatusNotFound)
 			log.Println(err)
@@ -67,7 +71,6 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 		w.Write(res)
 	}
 }
-
 
 // GetMenuItemsByRestaurant godoc
 // @Summary Get menu items by restaurant ID
@@ -83,7 +86,13 @@ func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		restaurantIdStr := r.URL.Path[len("/api/restaurants/"):len(r.URL.Path)-len("/menu-items")]
+		// restaurantIdStr := r.URL.Path[len("/api/restaurants/") : len(r.URL.Path)-len("/menu-items")]
+		restaurantIdStr := r.PathValue("restaurantId")
+		if restaurantIdStr == "" {
+			http.Error(w, "Missing restaurantId path parameter", http.StatusBadRequest)
+			return
+		}
+
 		restaurantId, err := strconv.Atoi(restaurantIdStr)
 		if err != nil {
 			http.Error(w, "Invalid Restaurant ID", http.StatusBadRequest)
@@ -116,21 +125,28 @@ func GetMenuItemByRestaurantAndId(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		// Extract restaurantId and menuitemId from URL
-		path := r.URL.Path
-		basePath := "/api/restaurants/"
-		parts := path[len(basePath):]
+		restaurantIdStr := r.PathValue("restaurantId")
+		menuitemIdStr := r.PathValue("menuitemId")
 
-		var restaurantId, menuitemId int
-		n, err := fmt.Sscanf(parts, "%d/menu-items/%d", &restaurantId, &menuitemId)
-		if err != nil || n != 2 {
-			http.Error(w, "Invalid URL format", http.StatusBadRequest)
+		if restaurantIdStr == "" || menuitemIdStr == "" {
+			http.Error(w, "Missing path parameters (restaurantId, menuitemId)", http.StatusBadRequest)
+			return
+		}
+
+		restaurantId, err := strconv.Atoi(restaurantIdStr)
+		if err != nil {
+			http.Error(w, "Invalid Restaurant ID", http.StatusBadRequest)
+			return
+		}
+		menuitemId, err := strconv.Atoi(menuitemIdStr)
+		if err != nil {
+			http.Error(w, "Invalid Restaurant ID", http.StatusBadRequest)
 			return
 		}
 
 		params := generated.GetMenuItemByRestaurantAndIdParams{
 			Restaurantid: int32(restaurantId),
-			ID: int32(menuitemId),
+			ID:           int32(menuitemId),
 		}
 
 		menuItem, err := queries.GetMenuItemByRestaurantAndId(ctx, params)
