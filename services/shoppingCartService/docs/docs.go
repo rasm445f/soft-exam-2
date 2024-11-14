@@ -15,9 +15,9 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/todo": {
+        "/api/shopping": {
             "post": {
-                "description": "Create a new todo entry in the database",
+                "description": "Add an item to the shopping cart",
                 "consumes": [
                     "application/json"
                 ],
@@ -25,17 +25,17 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "shoppingCart"
                 ],
-                "summary": "Create a new todo",
+                "summary": "Add an item",
                 "parameters": [
                     {
-                        "description": "Todo object",
-                        "name": "todo",
+                        "description": "item object",
+                        "name": "item",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
+                            "$ref": "#/definitions/db.AddItemParams"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
+                            "$ref": "#/definitions/db.AddItemParams"
                         }
                     },
                     "400": {
@@ -60,139 +60,22 @@ const docTemplate = `{
                     }
                 }
             }
-        },
-        "/api/todo/{id}": {
-            "get": {
-                "description": "Fetches a todo based on the id from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Get todo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a todo based on the id from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Delete todo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/todos": {
-            "get": {
-                "description": "Fetches a list of all todos from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Get all todos",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/generated.Todo"
-                            }
-                        }
-                    }
-                }
-            }
         }
     },
     "definitions": {
-        "generated.CreateTodoParams": {
+        "db.AddItemParams": {
             "type": "object",
             "properties": {
-                "category": {
+                "name": {
                     "type": "string"
                 },
-                "deadline": {
-                    "type": "string"
+                "price": {
+                    "type": "number"
                 },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "generated.Todo": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
-                "id": {
+                "quantity": {
                     "type": "integer"
                 },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
+                "user_id": {
                     "type": "string"
                 }
             }

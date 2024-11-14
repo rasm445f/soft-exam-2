@@ -1,54 +1,37 @@
 definitions:
-  generated.CreateTodoParams:
+  db.AddItemParams:
     properties:
-      category:
+      name:
         type: string
-      deadline:
-        type: string
-      iscompleted:
-        type: boolean
-      text:
-        type: string
-      title:
-        type: string
-    type: object
-  generated.Todo:
-    properties:
-      category:
-        type: string
-      deadline:
-        type: string
-      id:
+      price:
+        type: number
+      quantity:
         type: integer
-      iscompleted:
-        type: boolean
-      text:
-        type: string
-      title:
+      user_id:
         type: string
     type: object
 info:
   contact: {}
 paths:
-  /api/todo:
+  /api/shopping:
     post:
       consumes:
       - application/json
-      description: Create a new todo entry in the database
+      description: Add an item to the shopping cart
       parameters:
-      - description: Todo object
+      - description: item object
         in: body
-        name: todo
+        name: item
         required: true
         schema:
-          $ref: '#/definitions/generated.CreateTodoParams'
+          $ref: '#/definitions/db.AddItemParams'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/generated.CreateTodoParams'
+            $ref: '#/definitions/db.AddItemParams'
         "400":
           description: Bad request
           schema:
@@ -57,67 +40,7 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Create a new todo
+      summary: Add an item
       tags:
-      - todos
-  /api/todo/{id}:
-    delete:
-      description: Delete a todo based on the id from the database
-      parameters:
-      - description: Todo ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/generated.Todo'
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "404":
-          description: Not found
-          schema:
-            type: string
-      summary: Delete todo
-      tags:
-      - todos
-    get:
-      description: Fetches a todo based on the id from the database
-      parameters:
-      - description: Todo ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/generated.Todo'
-      summary: Get todo
-      tags:
-      - todos
-  /api/todos:
-    get:
-      description: Fetches a list of all todos from the database
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            items:
-              $ref: '#/definitions/generated.Todo'
-            type: array
-      summary: Get all todos
-      tags:
-      - todos
+      - shoppingCart
 swagger: "2.0"
