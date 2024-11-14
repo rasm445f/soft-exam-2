@@ -53,6 +53,42 @@ definitions:
 info:
   contact: {}
 paths:
+  /api/categories:
+    get:
+      description: Fetches a list of all unique categories from the restaurant
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              type: string
+            type: array
+      summary: Get all categories
+      tags:
+      - categories
+  /api/filter/{category}:
+    get:
+      description: Fetches all restaurants for a given category
+      parameters:
+      - description: Restaurant Category
+        in: path
+        name: category
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/generated.Restaurant'
+            type: array
+      summary: Filter restaurants by category
+      tags:
+      - categories
   /api/restaurants:
     get:
       description: Fetches a list of all restaurants from the database
@@ -105,14 +141,6 @@ paths:
             items:
               $ref: '#/definitions/generated.Menuitem'
             type: array
-        "400":
-          description: Invalid Rastaurant ID
-          schema:
-            type: string
-        "500":
-          description: Internal Server Error
-          schema:
-            type: string
       summary: Get menu items by restaurant ID
       tags:
       - menu_items

@@ -15,6 +15,61 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/categories": {
+            "get": {
+                "description": "Fetches a list of all unique categories from the restaurant",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Get all categories",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/filter/{category}": {
+            "get": {
+                "description": "Fetches all restaurants for a given category",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Filter restaurants by category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Restaurant Category",
+                        "name": "category",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Restaurant"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/restaurants": {
             "get": {
                 "description": "Fetches a list of all restaurants from the database",
@@ -94,18 +149,6 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/generated.Menuitem"
                             }
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid Rastaurant ID",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {
-                            "type": "string"
                         }
                     }
                 }

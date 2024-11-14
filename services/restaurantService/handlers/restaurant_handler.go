@@ -79,8 +79,6 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 // @Produce application/json
 // @Param restaurantId path string true "Restaurant ID"
 // @Success 200 {array} generated.Menuitem
-// @Failure 400 {string} string "Invalid Rastaurant ID"
-// @Failure 500 {string} string "Internal Server Error"
 // @Router /api/restaurants/{restaurantId}/menu-items [get]
 func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -157,6 +155,66 @@ func GetMenuItemByRestaurantAndId(queries *generated.Queries) http.HandlerFunc {
 		}
 
 		res, _ := json.Marshal(menuItem)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+	}
+}
+
+
+// Categories
+
+// GetAllCategories godoc
+// @Summary Get all categories
+// @Description Fetches a list of all unique categories from the restaurant
+// @Tags categories
+// @Produce application/json
+// @Success 200 {array} string
+// @Router /api/categories [get]
+func GetAllCategories(queries *generated.Queries) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		categories, err := queries.FetchAllCategories(ctx)
+		if err != nil {
+			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		res, _ := json.Marshal(categories)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+	}
+}
+
+// FilterRestaurantByCategory godoc
+// @Summary Filter restaurants by category
+// @Description Fetches all restaurants for a given category
+// @Tags categories
+// @Produce application/json
+// @Param category path string true "Restaurant Category"
+// @Success 200 {array} generated.Restaurant
+// @Router /api/filter/{category} [get]
+func FilterRestaurantByCategory(queries *generated.Queries) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		category := r.PathValue("category")
+		if category == "" {
+			http.Error(w, "Missing category path parameter", http.StatusBadRequest)
+			return
+		}
+
+		restaurants, err := queries.FilterRestaurantsByCategory(ctx, &category)
+		if err != nil {
+			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		res, _ := json.Marshal(restaurants)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)

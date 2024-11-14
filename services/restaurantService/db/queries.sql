@@ -27,3 +27,14 @@ INSERT INTO menuitem (name, description, price, restaurantid)
 VALUES ($1, $2, $3, $4)
 RETURNING id;
 
+-- name: FetchAllCategories :many
+SELECT DISTINCT category
+FROM restaurant
+WHERE category IS NOT NULL
+ORDER BY category;
+
+-- name: FilterRestaurantsByCategory :many
+SELECT id, name, address, rating, category
+FROM restaurant
+WHERE category ILIKE $1;
+

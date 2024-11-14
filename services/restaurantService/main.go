@@ -31,6 +31,8 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("GET /api/restaurants/{restaurantId}", handlers.GetRestaurantById(queries))
 	mux.HandleFunc("GET /api/restaurants/{restaurantId}/menu-items", handlers.GetMenuItemsByRestaurant(queries))
 	mux.HandleFunc("GET /api/restaurants/{restaurantId}/menu-items/{menuitemId}", handlers.GetMenuItemByRestaurantAndId(queries))
+	mux.HandleFunc("GET /api/categories", handlers.GetAllCategories(queries))
+	mux.HandleFunc("GET /api/filter/{category}", handlers.FilterRestaurantByCategory(queries))
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)
