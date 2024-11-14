@@ -7,75 +7,80 @@ package generated
 
 import (
 	"context"
-	"time"
 )
 
-const createTodo = `-- name: CreateTodo :one
-INSERT INTO todo (title, text, iscompleted, category, deadline)
-    VALUES ($1, $2, $3, $4, $5)
-RETURNING
-    id
+const createCustomer = `-- name: CreateCustomer :one
+INSERT INTO customer (name, email, phonenumber, address, password)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING id, name, email, phonenumber, address, password
 `
 
-type CreateTodoParams struct {
-	Title       string     `json:"title"`
-	Text        string     `json:"text"`
-	Iscompleted bool       `json:"iscompleted"`
-	Category    *string    `json:"category"`
-	Deadline    *time.Time `json:"deadline"`
+type CreateCustomerParams struct {
+	Name        string  `json:"name"`
+	Email       string  `json:"email"`
+	Phonenumber *string `json:"phonenumber"`
+	Address     *string `json:"address"`
+	Password    string  `json:"password"`
 }
 
-func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (int64, error) {
-	row := q.db.QueryRow(ctx, createTodo,
-		arg.Title,
-		arg.Text,
-		arg.Iscompleted,
-		arg.Category,
-		arg.Deadline,
+type CreateCustomerRow struct {
+	ID          int32   `json:"id"`
+	Name        string  `json:"name"`
+	Email       string  `json:"email"`
+	Phonenumber *string `json:"phonenumber"`
+	Address     *string `json:"address"`
+	Password    string  `json:"password"`
+}
+
+func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (CreateCustomerRow, error) {
+	row := q.db.QueryRow(ctx, createCustomer,
+		arg.Name,
+		arg.Email,
+		arg.Phonenumber,
+		arg.Address,
+		arg.Password,
 	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+	var i CreateCustomerRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Phonenumber,
+		&i.Address,
+		&i.Password,
+	)
+	return i, err
 }
 
-const deleteTodoById = `-- name: DeleteTodoById :exec
-DELETE FROM todo
-WHERE id = $1
+const deleteCustomer = `-- name: DeleteCustomer :exec
+DELETE FROM customer WHERE id = $1
 `
 
-func (q *Queries) DeleteTodoById(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deleteTodoById, id)
+func (q *Queries) DeleteCustomer(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteCustomer, id)
 	return err
 }
 
-const fetchAllTodos = `-- name: FetchAllTodos :many
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo
+const getAllCustomers = `-- name: GetAllCustomers :many
+SELECT id, name, email, password, phonenumber, address FROM customer ORDER BY name
 `
 
-func (q *Queries) FetchAllTodos(ctx context.Context) ([]Todo, error) {
-	rows, err := q.db.Query(ctx, fetchAllTodos)
+func (q *Queries) GetAllCustomers(ctx context.Context) ([]Customer, error) {
+	rows, err := q.db.Query(ctx, getAllCustomers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Todo
+	var items []Customer
 	for rows.Next() {
-		var i Todo
+		var i Customer
 		if err := rows.Scan(
 			&i.ID,
-			&i.Title,
-			&i.Text,
-			&i.Iscompleted,
-			&i.Category,
-			&i.Deadline,
+			&i.Name,
+			&i.Email,
+			&i.Password,
+			&i.Phonenumber,
+			&i.Address,
 		); err != nil {
 			return nil, err
 		}
@@ -87,30 +92,57 @@ func (q *Queries) FetchAllTodos(ctx context.Context) ([]Todo, error) {
 	return items, nil
 }
 
-const getTodoById = `-- name: GetTodoById :one
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo
-WHERE
-    id = $1
+const getCustomerByID = `-- name: GetCustomerByID :one
+SELECT id, name, email, password, phonenumber, address FROM customer WHERE id = $1
 `
 
-func (q *Queries) GetTodoById(ctx context.Context, id int64) (Todo, error) {
-	row := q.db.QueryRow(ctx, getTodoById, id)
-	var i Todo
+func (q *Queries) GetCustomerByID(ctx context.Context, id int32) (Customer, error) {
+	row := q.db.QueryRow(ctx, getCustomerByID, id)
+	var i Customer
 	err := row.Scan(
 		&i.ID,
-		&i.Title,
-		&i.Text,
-		&i.Iscompleted,
-		&i.Category,
-		&i.Deadline,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.Phonenumber,
+		&i.Address,
+	)
+	return i, err
+}
+
+const updateCustomer = `-- name: UpdateCustomer :one
+UPDATE customer
+SET name = $2, email = $3, phonenumber = $4, address = $5, password = $6
+WHERE id = $1
+RETURNING id, name, email, password, phonenumber, address
+`
+
+type UpdateCustomerParams struct {
+	ID          int32   `json:"id"`
+	Name        string  `json:"name"`
+	Email       string  `json:"email"`
+	Phonenumber *string `json:"phonenumber"`
+	Address     *string `json:"address"`
+	Password    string  `json:"password"`
+}
+
+func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (Customer, error) {
+	row := q.db.QueryRow(ctx, updateCustomer,
+		arg.ID,
+		arg.Name,
+		arg.Email,
+		arg.Phonenumber,
+		arg.Address,
+		arg.Password,
+	)
+	var i Customer
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.Phonenumber,
+		&i.Address,
 	)
 	return i, err
 }
