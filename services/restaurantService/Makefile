@@ -33,7 +33,7 @@ build:
 	go build -o bin/api
 
 docs:
-	swag init
+	swag init --parseDependency --parseInternal
 sqlc:
 	sqlc generate
 

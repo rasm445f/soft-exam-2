@@ -15,7 +15,7 @@ import (
 // @Tags restaurants
 // @Produce application/json
 // @Success 200 {array} generated.Restaurant
-// @Router /api/restaurant [get]
+// @Router /api/restaurants [get]
 func GetAllRestaurants(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -41,7 +41,7 @@ func GetAllRestaurants(queries *generated.Queries) http.HandlerFunc {
 // @Produce application/json
 // @Param id path string true "Restaurant ID"
 // @Success 200 {object} generated.Restaurant
-// @Router /api/restaurant/{id} [get]
+// @Router /api/restaurants/{id} [get]
 func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
@@ -77,16 +77,15 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 // @Description Fetches all menu items associated with a specific restaurant ID
 // @Tags menu_items
 // @Produce application/json
-// @Param restaurantId query string true "Restaurant ID"
-// @Success 200 {array} generated.MenuItem
+// @Param restaurantId path string true "Restaurant ID"
+// @Success 200 {array} generated.Menuitem
 // @Failure 400 {string} string "Invalid Rastaurant ID"
 // @Failure 500 {string} string "Internal Server Error"
-// @Router /api/restaurant/{restaurantId}/menu-items [get]
+// @Router /api/restaurants/{restaurantId}/menu-items [get]
 func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		// restaurantIdStr := r.URL.Path[len("/api/restaurants/") : len(r.URL.Path)-len("/menu-items")]
 		restaurantIdStr := r.PathValue("restaurantId")
 		if restaurantIdStr == "" {
 			http.Error(w, "Missing restaurantId path parameter", http.StatusBadRequest)
@@ -118,9 +117,10 @@ func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 // @Description Fetches a menu item based on the restaurant and id from the database
 // @Tags menu_items
 // @Produce application/json
-// @Param id path string true "Menu Item ID"
-// @Success 200 {object} generated.MenuItem
-// @Router /api/restaurant/{restaurantId}/menu-items/{menuitemId} [get]
+// @Param restaurantId path string true "Restaurant ID"
+// @Param menuitemId path string true "Menu Item ID"
+// @Success 200 {object} generated.Menuitem
+// @Router /api/restaurants/{restaurantId}/menu-items/{menuitemId} [get]
 func GetMenuItemByRestaurantAndId(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
