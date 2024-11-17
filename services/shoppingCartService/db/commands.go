@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
+	"github.com/go-redis/redis/v8"
 )
 
 type AddItemParams struct {
@@ -61,6 +63,51 @@ func (s *ShoppingCartRepository) ViewCart(ctx context.Context, userID string) ([
 	}
 
 	return items, nil
+}
+
+func (s *ShoppingCartRepository) UpdateCart(ctx context.Context, userID string, itemID string, newQuantity int) error {
+	// The key for the user's cart
+	cartKey := fmt.Sprintf("cart:%s", userID)
+
+	// Fetch the item from the cart
+	itemData, err := s.redisClient.HGet(ctx, cartKey, itemID).Result()
+	if err != nil {
+		// If the item does not exist
+		if err == redis.Nil {
+			return fmt.Errorf("item with ID %s does not exist in the cart", itemID)
+		}
+		return fmt.Errorf("failed to fetch item: %w", err)
+	}
+
+	// Deserialize the item JSON into a ShoppingCartItem
+	var item ShoppingCartItem
+	if err := json.Unmarshal([]byte(itemData), &item); err != nil {
+		return fmt.Errorf("failed to unmarshal item data: %w", err)
+	}
+
+	// Update or remove the item based on newQuantity
+	if newQuantity > 0 {
+		// Update the item's quantity
+		item.Quantity = newQuantity
+
+		// Serialize the updated item back to JSON
+		updatedItemData, err := json.Marshal(item)
+		if err != nil {
+			return fmt.Errorf("failed to marshal updated item: %w", err)
+		}
+
+		// Store the updated item in Redis
+		if err := s.redisClient.HSet(ctx, cartKey, itemID, updatedItemData).Err(); err != nil {
+			return fmt.Errorf("failed to update item in cart: %w", err)
+		}
+	} else {
+		// Remove the item from the cart if newQuantity <= 0
+		if err := s.redisClient.HDel(ctx, cartKey, itemID).Err(); err != nil {
+			return fmt.Errorf("failed to remove item from cart: %w", err)
+		}
+	}
+
+	return nil
 }
 
 func (s *ShoppingCartRepository) ClearCart(ctx context.Context, userID string) error {
