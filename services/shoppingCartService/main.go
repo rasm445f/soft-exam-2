@@ -23,6 +23,7 @@ func run() (http.Handler, error) {
 	// Routes
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
 	mux.HandleFunc("POST /api/shopping", handlers.AddItemHandler(commands))
+	mux.HandleFunc("GET /api/shopping/{userId}", handlers.ViewItemHandler(commands))
 	// TODO: implement the rest of the necessary endpoints
 	// mux.HandleFunc("GET /api/todo/{id}", handlers.GetTodo(commands))
 	// mux.HandleFunc("DELETE /api/todo/{id}", handlers.DeleteTodo(commands))

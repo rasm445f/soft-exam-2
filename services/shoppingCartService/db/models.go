@@ -1,6 +1,6 @@
 package db
 
-// shopping cart new restaurantid
+// TODO: implement the shoppingCart model as it is needed when creating a order
 type ShoppingCart struct {
 	Id           string             `json:"id"`
 	UserId       int                `json:"user_id"`
@@ -12,7 +12,7 @@ type ShoppingCart struct {
 }
 
 type ShoppingCartItem struct {
-	Id       string  `json:"id"`
+	Id       int     `json:"id"`
 	Name     string  `json:"name"`
 	Price    float64 `json:"price"`
 	Quantity int     `json:"quantity"`
