@@ -61,6 +61,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/shopping/{id}": {
+            "get": {
+                "description": "Fetches a list of items based on the userId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shoppingCart"
+                ],
+                "summary": "View items for a user",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.ShoppingCartItem"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/shopping/{userId}/{itemId}": {
             "patch": {
                 "description": "Update the quantity of an existing item in the shopping cart. If the quantity is set to 0, the item will be removed.",
@@ -143,6 +175,23 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "db.ShoppingCartItem": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "quantity": {
+                    "type": "integer"
                 }
             }
         },
