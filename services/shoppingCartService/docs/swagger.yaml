@@ -10,6 +10,11 @@ definitions:
       user_id:
         type: string
     type: object
+  handlers.UpdateQuantityRequest:
+    properties:
+      quantity:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -41,6 +46,51 @@ paths:
           schema:
             type: string
       summary: Add an item
+      tags:
+      - shoppingCart
+  /api/shopping/{userId}/{itemId}:
+    patch:
+      consumes:
+      - application/json
+      description: Update the quantity of an existing item in the shopping cart. If
+        the quantity is set to 0, the item will be removed.
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: Item ID
+        in: path
+        name: itemId
+        required: true
+        type: string
+      - description: New quantity for the item
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateQuantityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Item updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "404":
+          description: Item not found
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Update an item in the cart
       tags:
       - shoppingCart
 swagger: "2.0"
