@@ -5,7 +5,16 @@ import (
 	"net/http"
 
 	"github.com/oTuff/go-startkode/db"
+	"github.com/oTuff/go-startkode/domain"
 )
+
+type ShoppingCartHandler struct {
+	domain *domain.ShoppingCartDomain
+}
+
+func NewShoppingCartHandler(domain *domain.ShoppingCartDomain) *ShoppingCartHandler {
+	return &ShoppingCartHandler{domain: domain}
+}
 
 // AddItemHandler godoc
 // @Summary Add an item
@@ -18,20 +27,17 @@ import (
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/shopping [post]
-func AddItemHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
+func (h *ShoppingCartHandler) AddItem() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		var shoppingCartItem db.AddItemParams
+		var item db.AddItemParams
 
-		err := json.NewDecoder(r.Body).Decode(&shoppingCartItem)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 
-		err = commands.AddItem(ctx, shoppingCartItem)
-
-		if err != nil {
+		if err := h.domain.AddItem(ctx, item); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -58,7 +64,7 @@ type UpdateQuantityRequest struct {
 // @Failure 404 {string} string "Item not found"
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/shopping/{userId}/{itemId} [patch]
-func UpdateCartHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
+func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -70,9 +76,8 @@ func UpdateCartHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
 			http.Error(w, "Invalid input", http.StatusBadRequest)
 			return
 		}
-		err := commands.UpdateCart(ctx, userId, itemIdStr, req.Quantity)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+		if err := h.domain.UpdateCart(ctx, userId, itemIdStr, req.Quantity); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
@@ -87,21 +92,21 @@ func UpdateCartHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
 // @Param id path string true "User ID"
 // @Success 200 {array} db.ShoppingCartItem
 // @Router /api/shopping/{id} [get]
-func ViewItemHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
+func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
+		userId := r.PathValue("userId")
 
-		id := r.PathValue("userId")
-		items, err := commands.ViewCart(ctx, id)
+		items, err := h.domain.ViewCart(ctx, userId)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		res, _ := json.Marshal(items)
 		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(res)
-
+		if err := json.NewEncoder(w).Encode(items); err != nil {
+			http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+			return
+		}
 	}
 }
