@@ -7,7 +7,7 @@ import (
 	"github.com/oTuff/go-startkode/db"
 )
 
-// CreateTodo godoc
+// AddItemHandler godoc
 // @Summary Add an item
 // @Description Add an item to the shopping cart
 // @Tags shoppingCart
@@ -37,5 +37,31 @@ func AddItemHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusCreated)
+	}
+}
+
+// GetTodo godoc
+// @Summary View items for a user
+// @Description Fetches a list of items based on the userId
+// @Tags shoppingCart
+// @Produce application/json
+// @Param id path string true "User ID"
+// @Success 200 {array} db.ShoppingCartItem
+// @Router /api/shopping/{id} [get]
+func ViewItemHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		id := r.PathValue("userId")
+		items, err := commands.ViewCart(ctx, id)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		res, _ := json.Marshal(items)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+
 	}
 }

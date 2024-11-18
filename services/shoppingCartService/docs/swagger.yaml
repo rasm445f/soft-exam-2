@@ -10,6 +10,17 @@ definitions:
       user_id:
         type: string
     type: object
+  db.ShoppingCartItem:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      price:
+        type: number
+      quantity:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -41,6 +52,27 @@ paths:
           schema:
             type: string
       summary: Add an item
+      tags:
+      - shoppingCart
+  /api/shopping/{id}:
+    get:
+      description: Fetches a list of items based on the userId
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/db.ShoppingCartItem'
+            type: array
+      summary: View items for a user
       tags:
       - shoppingCart
 swagger: "2.0"
