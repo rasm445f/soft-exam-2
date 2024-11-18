@@ -83,8 +83,8 @@ func TestViewCart(t *testing.T) {
 
 	// Define multiple items expected in the user's cart
 	items := []ShoppingCartItem{
-		{Id: "1", Name: "Item 1", Quantity: 2, Price: 29.0},
-		{Id: "2", Name: "Item 2", Quantity: 1, Price: 15.5},
+		{Id: 1, Name: "Item 1", Quantity: 2, Price: 29.0},
+		{Id: 2, Name: "Item 2", Quantity: 1, Price: 15.5},
 	}
 
 	// Serialize each item as it would be stored in Redis
