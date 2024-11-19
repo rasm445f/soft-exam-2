@@ -1,9 +1,9 @@
 -- name: FetchAllRestaurants :many
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant;
 
 -- name: GetRestaurantById :one
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant
 WHERE id = $1;
 

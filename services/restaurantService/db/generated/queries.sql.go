@@ -83,31 +83,25 @@ func (q *Queries) FetchAllCategories(ctx context.Context) ([]*string, error) {
 }
 
 const fetchAllRestaurants = `-- name: FetchAllRestaurants :many
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant
 `
 
-type FetchAllRestaurantsRow struct {
-	ID      int32          `json:"id"`
-	Name    string         `json:"name"`
-	Address string         `json:"address"`
-	Rating  pgtype.Numeric `json:"rating"`
-}
-
-func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]FetchAllRestaurantsRow, error) {
+func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]Restaurant, error) {
 	rows, err := q.db.Query(ctx, fetchAllRestaurants)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []FetchAllRestaurantsRow
+	var items []Restaurant
 	for rows.Next() {
-		var i FetchAllRestaurantsRow
+		var i Restaurant
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Address,
 			&i.Rating,
+			&i.Category,
 		); err != nil {
 			return nil, err
 		}
@@ -224,26 +218,20 @@ func (q *Queries) GetMenuItemByRestaurantAndId(ctx context.Context, arg GetMenuI
 }
 
 const getRestaurantById = `-- name: GetRestaurantById :one
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant
 WHERE id = $1
 `
 
-type GetRestaurantByIdRow struct {
-	ID      int32          `json:"id"`
-	Name    string         `json:"name"`
-	Address string         `json:"address"`
-	Rating  pgtype.Numeric `json:"rating"`
-}
-
-func (q *Queries) GetRestaurantById(ctx context.Context, id int32) (GetRestaurantByIdRow, error) {
+func (q *Queries) GetRestaurantById(ctx context.Context, id int32) (Restaurant, error) {
 	row := q.db.QueryRow(ctx, getRestaurantById, id)
-	var i GetRestaurantByIdRow
+	var i Restaurant
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Address,
 		&i.Rating,
+		&i.Category,
 	)
 	return i, err
 }

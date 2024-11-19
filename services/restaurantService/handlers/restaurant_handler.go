@@ -7,7 +7,17 @@ import (
 	"strconv"
 
 	"github.com/rasm445f/soft-exam-2/db/generated"
+	"github.com/rasm445f/soft-exam-2/domain"
 )
+
+type RestaurantHandler struct {
+	domain *domain.RestaurantDomain
+}
+
+func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
+	return &RestaurantHandler{domain: domain}
+}
+
 
 // GetAllRestaurants godoc
 // @Summary Get all restaurants
@@ -16,11 +26,11 @@ import (
 // @Produce application/json
 // @Success 200 {array} generated.Restaurant
 // @Router /api/restaurants [get]
-func GetAllRestaurants(queries *generated.Queries) http.HandlerFunc {
+func (h *RestaurantHandler) GetAllRestaurants() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		restaurants, err := queries.FetchAllRestaurants(ctx)
+		restaurants, err := h.domain.FetchAllRestaurants(ctx)
 		if err != nil {
 			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
 			log.Println(err)
@@ -42,7 +52,7 @@ func GetAllRestaurants(queries *generated.Queries) http.HandlerFunc {
 // @Param id path string true "Restaurant ID"
 // @Success 200 {object} generated.Restaurant
 // @Router /api/restaurants/{id} [get]
-func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
+func (h *RestaurantHandler) GetRestaurantById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -58,7 +68,7 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 			return
 		}
 
-		restaurant, err := queries.GetRestaurantById(ctx, int32(restaurantId))
+		restaurant, err := h.domain.GetRestaurantById(ctx, int32(restaurantId))
 		if err != nil {
 			http.Error(w, "Restaurant not found", http.StatusNotFound)
 			log.Println(err)
@@ -80,7 +90,7 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 // @Param restaurantId path string true "Restaurant ID"
 // @Success 200 {array} generated.Menuitem
 // @Router /api/restaurants/{restaurantId}/menu-items [get]
-func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
+func (h *RestaurantHandler) GetMenuItemsByRestaurant() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -96,7 +106,7 @@ func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 			return
 		}
 
-		menuItems, err := queries.FetchMenuItemsByRestaurantId(ctx, int32(restaurantId))
+		menuItems, err := h.domain.FetchMenuItemsByRestaurantId(ctx, int32(restaurantId))
 		if err != nil {
 			http.Error(w, "Failed to fetch menu items", http.StatusInternalServerError)
 			log.Println(err)
@@ -119,7 +129,7 @@ func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 // @Param menuitemId path string true "Menu Item ID"
 // @Success 200 {object} generated.Menuitem
 // @Router /api/restaurants/{restaurantId}/menu-items/{menuitemId} [get]
-func GetMenuItemByRestaurantAndId(queries *generated.Queries) http.HandlerFunc {
+func (h *RestaurantHandler) GetMenuItemByRestaurantAndId() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -147,7 +157,7 @@ func GetMenuItemByRestaurantAndId(queries *generated.Queries) http.HandlerFunc {
 			ID:           int32(menuitemId),
 		}
 
-		menuItem, err := queries.GetMenuItemByRestaurantAndId(ctx, params)
+		menuItem, err := h.domain.GetMenuItemByRestaurantAndId(ctx, params)
 		if err != nil {
 			http.Error(w, "Menu Item not found", http.StatusNotFound)
 			log.Println(err)
@@ -171,11 +181,11 @@ func GetMenuItemByRestaurantAndId(queries *generated.Queries) http.HandlerFunc {
 // @Produce application/json
 // @Success 200 {array} string
 // @Router /api/categories [get]
-func GetAllCategories(queries *generated.Queries) http.HandlerFunc {
+func (h *RestaurantHandler) GetAllCategories() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		categories, err := queries.FetchAllCategories(ctx)
+		categories, err := h.domain.FetchAllCategories(ctx)
 		if err != nil {
 			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
 			log.Println(err)
@@ -197,7 +207,7 @@ func GetAllCategories(queries *generated.Queries) http.HandlerFunc {
 // @Param category path string true "Restaurant Category"
 // @Success 200 {array} generated.Restaurant
 // @Router /api/filter/{category} [get]
-func FilterRestaurantByCategory(queries *generated.Queries) http.HandlerFunc {
+func (h *RestaurantHandler) FilterRestaurantByCategory() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -207,7 +217,7 @@ func FilterRestaurantByCategory(queries *generated.Queries) http.HandlerFunc {
 			return
 		}
 
-		restaurants, err := queries.FilterRestaurantsByCategory(ctx, &category)
+		restaurants, err := h.domain.FilterRestaurantsByCategory(ctx, category)
 		if err != nil {
 			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
 			log.Println(err)
