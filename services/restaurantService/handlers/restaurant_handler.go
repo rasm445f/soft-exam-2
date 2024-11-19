@@ -1,23 +1,31 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/rasm445f/soft-exam-2/db/generated"
-	"github.com/rasm445f/soft-exam-2/domain"
 )
 
-type RestaurantHandler struct {
-	domain *domain.RestaurantDomain
+type RestaurantDomainInterface interface {
+	FetchAllRestaurants(ctx context.Context) ([]generated.Restaurant, error)
+	GetRestaurantById(ctx context.Context, restaurantId int32) (*generated.Restaurant, error) 
+	FetchMenuItemsByRestaurantId(ctx context.Context, restaurantId int32) ([]generated.FetchMenuItemsByRestaurantIdRow, error)
+	GetMenuItemByRestaurantAndId(ctx context.Context, params generated.GetMenuItemByRestaurantAndIdParams) (*generated.Menuitem, error)
+	FetchAllCategories(ctx context.Context) ([]string, error)
+	FilterRestaurantsByCategory(ctx context.Context, category string) ([]generated.Restaurant, error)
 }
 
-func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
+type RestaurantHandler struct {
+	domain RestaurantDomainInterface
+}
+
+func NewRestaurantHandler(domain RestaurantDomainInterface) *RestaurantHandler {
 	return &RestaurantHandler{domain: domain}
 }
-
 
 // GetAllRestaurants godoc
 // @Summary Get all restaurants
