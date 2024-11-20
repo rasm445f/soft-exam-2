@@ -27,6 +27,21 @@ definitions:
       phonenumber:
         type: string
     type: object
+  generated.UpdateCustomerParams:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      phonenumber:
+        type: string
+    type: object
 info:
   contact: {}
 paths:
@@ -117,6 +132,40 @@ paths:
           schema:
             $ref: '#/definitions/generated.Customer'
       summary: Get customer
+      tags:
+      - customers
+    patch:
+      consumes:
+      - application/json
+      description: Updates a customer's details based on the ID from the database
+      parameters:
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated customer details
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/generated.UpdateCustomerParams'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Customer updated successfully
+          schema:
+            type: string
+        "400":
+          description: Invalid input
+          schema:
+            type: string
+        "404":
+          description: Customer not found
+          schema:
+            type: string
+      summary: Update customer
       tags:
       - customers
 swagger: "2.0"

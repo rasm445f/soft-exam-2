@@ -160,15 +160,15 @@ func CreateCustomer(queries *generated.Queries) http.HandlerFunc {
 			return
 		}
 
-		if customer.Name == "" || customer.Email == "" || customer.Password == "" {
+		if *customer.Name == "" || *customer.Email == "" || *customer.Password == "" {
 			http.Error(w, "All required fields must be filled", http.StatusBadRequest)
 			return
 		}
 
-		// if err := ValidatePassword(customer.Password); err != nil {
-		// 	http.Error(w, err.Error(), http.StatusBadRequest)
-		// 	return
-		// }
+		if err := ValidatePassword(*customer.Password); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 
 		createdCustomer, err := queries.CreateCustomer(ctx, customer)
 		if err != nil {
@@ -177,14 +177,14 @@ func CreateCustomer(queries *generated.Queries) http.HandlerFunc {
 			return
 		}
 
-		subject := "Welcome to MTOGO, " + customer.Name + "!"
+		subject := "Welcome to MTOGO, " + *customer.Name + "!"
 
 		body := `
     <html>
         <body style="font-family: Arial, sans-serif; color: #333;">
-            <h1 style="color: #4CAF50;">Welcome to [Your Service Name]!</h1>
-            <p>Hi ` + customer.Name + `,</p>
-            <p>We're thrilled to have you join our community! Thank you for signing up with [Your Service Name].</p>
+            <h1 style="color: #4CAF50;">Welcome to MTOGO!</h1>
+            <p>Hi ` + *customer.Name + `,</p>
+            <p>We're thrilled to have you join our community! Thank you for signing up with MTOGO.</p>
             
             <p>Here’s what you can look forward to as a new member:</p>
             <ul>
@@ -205,7 +205,7 @@ func CreateCustomer(queries *generated.Queries) http.HandlerFunc {
     </html>
 `
 
-		err = mailer.SendMailWithGomail(customer.Email, subject, body)
+		err = mailer.SendMailWithGomail(*customer.Email, subject, body)
 		if err != nil {
 			log.Println("Failed to send email:", err)
 		}
@@ -214,5 +214,55 @@ func CreateCustomer(queries *generated.Queries) http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
 		w.Write(res)
+	}
+}
+
+// UpdateCustomer godoc
+// @Summary Update customer
+// @Description Updates a customer's details based on the ID from the database
+// @Tags customers
+// @Accept application/json
+// @Produce application/json
+// @Param id path string true "Customer ID"
+// @Param customer body generated.UpdateCustomerParams true "Updated customer details"
+// @Success 200 {string} string "Customer updated successfully"
+// @Failure 400 {string} string "Invalid input"
+// @Failure 404 {string} string "Customer not found"
+// @Router /api/customer/{id} [patch]
+func UpdateCustomer(queries *generated.Queries) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		idStr := r.PathValue("id")
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, "Invalid customer ID", http.StatusBadRequest)
+			log.Println("Error parsing customer ID:", err)
+			return
+		}
+
+		// Decode the incoming JSON request
+		var customerUpdates generated.UpdateCustomerParams
+		if err := json.NewDecoder(r.Body).Decode(&customerUpdates); err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			log.Println("Error decoding request body:", err)
+			return
+		}
+
+		// Ensure the ID matches the customer's ID being updated
+		customerUpdates.ID = int32(id)
+
+		// Call the query to update the customer in the database
+		err = queries.UpdateCustomer(ctx, customerUpdates)
+		if err != nil {
+			http.Error(w, "Failed to update customer or customer not found", http.StatusInternalServerError)
+			log.Println("Error updating customer:", err)
+			return
+		}
+
+		// Return a success response
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Customer updated successfully"}`))
 	}
 }

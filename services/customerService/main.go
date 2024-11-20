@@ -31,6 +31,7 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("GET /api/customer/{id}", handlers.GetCustomerById(queries))
 	mux.HandleFunc("DELETE /api/customer/{id}", handlers.DeleteCustomer(queries))
 	mux.HandleFunc("POST /api/customer", handlers.CreateCustomer(queries))
+	mux.HandleFunc("PATCH /api/customer/{id}", handlers.UpdateCustomer(queries))
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)
