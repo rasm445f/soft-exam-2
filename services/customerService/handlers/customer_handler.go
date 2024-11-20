@@ -10,7 +10,40 @@ import (
 
 	"github.com/oTuff/go-startkode/db/generated"
 	"github.com/oTuff/go-startkode/mailer"
+	"github.com/oTuff/go-startkode/broker"
 )
+
+type MenuItemSelection struct {
+	CustomerID string `json:"customerId"`
+	MenuItemId string `json:"menuItemId"`
+	Quantity int `json:"quantity"`
+}
+
+func SelectMenuItemHandler() http.HandlerFunc {
+	return func (w http.ResponseWriter, r *http.Request) {
+		var selection MenuItemSelection
+		err := json.NewDecoder(r.Body).Decode(&selection)
+		if err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+
+		// Publish event to RabbitMQ
+		event := broker.Event{
+			Type: broker.MenuItemSelected,
+			Payload: selection,
+		}
+		err = broker.Publish("menu_item_selected_queue", event)
+		if err != nil {
+			log.Printf("Failed to publish event: %v", err)
+			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Menu item selected successfully}`))
+	}
+}
 
 // GetAllCustomers godoc
 // @Summary Get all customers

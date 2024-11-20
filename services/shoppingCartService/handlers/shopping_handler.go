@@ -1,11 +1,72 @@
 package handlers
 
 import (
+	"log"
 	"encoding/json"
 	"net/http"
 
 	"github.com/oTuff/go-startkode/db"
+	"github.com/oTuff/go-startkode/broker"
 )
+
+type ShoppingCart struct {
+	CustomerID string `json:"customerId"`
+	Items []db.ShoppingCartItem `json:"items"`
+}
+
+// PublishUpdatedCart publishes the updated shopping cart to RabbitMQ
+func PublishUpdatedCart(cart ShoppingCart) {
+	event := broker.Event{
+		Type: broker.CartUpdated,
+		Payload: cart,
+	}
+	err := broker.Publish("cart_updated_queue", event)
+		if err != nil {
+			log.Printf("Failed to publish cart update: %v", err)
+		}
+}
+
+// AddItemHandler processes menu_item_selected events and updates the cart
+func AddItemHandler(commands *db.ShoppingCartRepository) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		var selection broker.Event
+
+		// Decode the RabbitMQ event
+		err := json.NewDecoder(r.Body).Decode(&selection)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+		// Add item to the shopping cart
+		var cartItem db.AddItemParams
+		json.Unmarshal(selection.Payload, &cartItem)
+
+		err = commands.AddItem(ctx, cartItem)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// Fetch the updated cart
+		cart, err := commands.ViewCart(ctx, cartItem.CustomerID)
+		if err != nil {
+			http.Error(w, "Failed to fetch updated cart", http.StatusInternalServerError)
+			return
+		}
+
+		// Publish the updated cart to RabbitMQ
+		updatedCart := ShoppingCart{
+			CustomerID: cartItem.CustomerID,
+			Items: cart,
+		}
+		PublishUpdatedCart(updatedCart)
+
+		w.WriteHeader(http.StatusOK)
+	}
+}
+
 
 // AddItemHandler godoc
 // @Summary Add an item
