@@ -17,8 +17,9 @@ type Menuitem struct {
 }
 
 type Restaurant struct {
-	ID      int32          `json:"id"`
-	Name    string         `json:"name"`
-	Address string         `json:"address"`
-	Rating  pgtype.Numeric `json:"rating"`
+	ID       int32          `json:"id"`
+	Name     string         `json:"name"`
+	Address  string         `json:"address"`
+	Rating   pgtype.Numeric `json:"rating"`
+	Category *string        `json:"category"`
 }

@@ -1,9 +1,9 @@
 -- name: FetchAllRestaurants :many
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant;
 
 -- name: GetRestaurantById :one
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant
 WHERE id = $1;
 
@@ -26,4 +26,15 @@ RETURNING id;
 INSERT INTO menuitem (name, description, price, restaurantid)
 VALUES ($1, $2, $3, $4)
 RETURNING id;
+
+-- name: FetchAllCategories :many
+SELECT DISTINCT category
+FROM restaurant
+WHERE category IS NOT NULL
+ORDER BY category;
+
+-- name: FilterRestaurantsByCategory :many
+SELECT id, name, address, rating, category
+FROM restaurant
+WHERE category ILIKE $1;
 

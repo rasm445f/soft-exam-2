@@ -55,8 +55,35 @@ func (q *Queries) CreateRestaurant(ctx context.Context, arg CreateRestaurantPara
 	return id, err
 }
 
+const fetchAllCategories = `-- name: FetchAllCategories :many
+SELECT DISTINCT category
+FROM restaurant
+WHERE category IS NOT NULL
+ORDER BY category
+`
+
+func (q *Queries) FetchAllCategories(ctx context.Context) ([]*string, error) {
+	rows, err := q.db.Query(ctx, fetchAllCategories)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []*string
+	for rows.Next() {
+		var category *string
+		if err := rows.Scan(&category); err != nil {
+			return nil, err
+		}
+		items = append(items, category)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const fetchAllRestaurants = `-- name: FetchAllRestaurants :many
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant
 `
 
@@ -74,6 +101,7 @@ func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]Restaurant, error)
 			&i.Name,
 			&i.Address,
 			&i.Rating,
+			&i.Category,
 		); err != nil {
 			return nil, err
 		}
@@ -125,6 +153,38 @@ func (q *Queries) FetchMenuItemsByRestaurantId(ctx context.Context, restaurantid
 	return items, nil
 }
 
+const filterRestaurantsByCategory = `-- name: FilterRestaurantsByCategory :many
+SELECT id, name, address, rating, category
+FROM restaurant
+WHERE category ILIKE $1
+`
+
+func (q *Queries) FilterRestaurantsByCategory(ctx context.Context, category *string) ([]Restaurant, error) {
+	rows, err := q.db.Query(ctx, filterRestaurantsByCategory, category)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Restaurant
+	for rows.Next() {
+		var i Restaurant
+		if err := rows.Scan(
+			&i.ID,
+			&i.Name,
+			&i.Address,
+			&i.Rating,
+			&i.Category,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getMenuItemByRestaurantAndId = `-- name: GetMenuItemByRestaurantAndId :one
 SELECT id, name, description, price, restaurantid
 FROM menuitem
@@ -158,7 +218,7 @@ func (q *Queries) GetMenuItemByRestaurantAndId(ctx context.Context, arg GetMenuI
 }
 
 const getRestaurantById = `-- name: GetRestaurantById :one
-SELECT id, name, address, rating
+SELECT id, name, address, rating, category
 FROM restaurant
 WHERE id = $1
 `
@@ -171,6 +231,7 @@ func (q *Queries) GetRestaurantById(ctx context.Context, id int32) (Restaurant, 
 		&i.Name,
 		&i.Address,
 		&i.Rating,
+		&i.Category,
 	)
 	return i, err
 }
