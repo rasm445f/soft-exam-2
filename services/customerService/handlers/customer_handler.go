@@ -10,15 +10,27 @@ import (
 
 	"github.com/oTuff/go-startkode/db/generated"
 	"github.com/oTuff/go-startkode/mailer"
-	"github.com/oTuff/go-startkode/broker"
+	"github.com/rasm445f/soft-exam-2/broker"
 )
 
 type MenuItemSelection struct {
-	CustomerID string `json:"customerId"`
-	MenuItemId string `json:"menuItemId"`
+	CustomerID int32 `json:"customerId"`
+	MenuItemId int32 `json:"menuItemId"`
 	Quantity int `json:"quantity"`
 }
 
+
+// SelectMenuItem godoc
+// @Summary Select Menuitem
+// @Description Select Menu Item
+// @Tags customers
+// @Accept  application/json
+// @Produce application/json
+// @Param customer body MenuItemSelection true "Customer object"
+// @Success 201 {object} generated.Customer
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /api/customer/menu/select [post]
 func SelectMenuItemHandler() http.HandlerFunc {
 	return func (w http.ResponseWriter, r *http.Request) {
 		var selection MenuItemSelection

@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/rasm445f/soft-exam-2/broker v0.0.0
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
@@ -28,3 +29,5 @@ require (
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
+
+replace github.com/rasm445f/soft-exam-2/broker => ../../broker

@@ -9,6 +9,7 @@ import (
 	"github.com/oTuff/go-startkode/db/generated"
 	_ "github.com/oTuff/go-startkode/docs"
 	"github.com/oTuff/go-startkode/handlers"
+	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rs/cors"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -40,6 +41,10 @@ func run() (http.Handler, error) {
 }
 
 func main() {
+	// Initialize RabbitMQ
+	broker.InitRabbitMQ()
+	defer broker.CloseRabbitMQ()
+	
 	mux, err := run()
 	if err != nil {
 		log.Fatal(err)

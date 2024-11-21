@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
-	"github.com/rabbitmq/amqp091-go"
+	// "github.com/rabbitmq/amqp091-go"
 )
 
 // Consume listens for messages on the specified queue and handles them using the provided handler.

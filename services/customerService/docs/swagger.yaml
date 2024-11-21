@@ -27,6 +27,15 @@ definitions:
       phonenumber:
         type: string
     type: object
+  handlers.MenuItemSelection:
+    properties:
+      customerId:
+        type: integer
+      menuItemId:
+        type: integer
+      quantity:
+        type: integer
+    type: object
 info:
   contact: {}
 paths:
@@ -117,6 +126,36 @@ paths:
           schema:
             $ref: '#/definitions/generated.Customer'
       summary: Get customer
+      tags:
+      - customers
+  /api/customer/menu/select:
+    post:
+      consumes:
+      - application/json
+      description: Select Menu Item
+      parameters:
+      - description: Customer object
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.MenuItemSelection'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/generated.Customer'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Select Menuitem
       tags:
       - customers
 swagger: "2.0"

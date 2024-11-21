@@ -22,8 +22,11 @@ default:
 	@echo "  test-mutation		# Run mutation testing with gremlins"
 
 
+# run:
+# 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
 run:
-	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
+	DBSTRING="postgres://postgres:test@127.0.0.1:5432/customer?sslmode=disable" \
+		air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
 
 build:
 	go build -o bin/api
