@@ -21,53 +21,124 @@
 				}
 			}
 		},
-        "/api/restaurants/{id}": {
-            "get": {
-                "summary": "Get restaurant by ID",
-                "tags": ["restaurants"],
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/Restaurant"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/restaurants/{id}/menu-items": {
-            "get": {
-                "summary": "Fetch menu items by restaurant ID",
-                "tags": ["menu-items"],
-                "parameters": [
-                    {
-                        "name": "restaurantId",
-                        "in": "path",
-                        "required": true,
-                        "type": "integer"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/Restaurant"
-                            }
-                        }
-                    }
-                }
-
-            }
-        }
+		"/api/restaurants/{id}": {
+			"get": {
+				"summary": "Get restaurant by ID",
+				"tags": ["restaurants"],
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/Restaurant"
+						}
+					}
+				}
+			}
+		},
+		"/api/restaurants/{id}/menu-items": {
+			"get": {
+				"summary": "Fetch menu items by restaurant ID",
+				"tags": ["menu-items"],
+				"parameters": [
+					{
+						"name": "restaurantId",
+						"in": "path",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/Restaurant"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/restaurants/{restaurantId}/menu-items/{menuitemId}": {
+			"get": {
+				"summary": "Fetch menu item by restaurant and menu item ID",
+				"tags": ["menu-items"],
+				"parameters": [
+					{
+						"name": "restaurantId",
+						"in": "path",
+						"required": true,
+						"type": "integer"
+					},
+					{
+						"name": "menuitemId",
+						"in": "path",
+						"required": true,
+						"type": "integer"
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "array",
+							"items": {
+								"$ref": "#/definitions/MenuItem"
+							}
+						}
+					}
+				}
+			}
+		},
+		"definitions": {
+			"Restaurant": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer"
+					},
+					"name": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					},
+					"rating": {
+						"type": "number",
+						"format": "float"
+					}
+				}
+			},
+			"MenuItem": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer"
+					},
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"price": {
+						"type": "number",
+						"format": "float"
+					},
+					"restaurant_id": {
+						"type": "integer"
+					}
+				}
+			}
+		}
 	}
 }

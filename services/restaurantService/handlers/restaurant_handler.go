@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -26,6 +27,7 @@ func GetAllRestaurants(queries *generated.Queries) http.HandlerFunc {
 			log.Println(err)
 			return
 		}
+
 		res, _ := json.Marshal(restaurants)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
@@ -45,7 +47,7 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		idStr := r.URL.Query().Get("id")
+		idStr := r.URL.Path[len("/api/restaurants/"):]
 		id, err := strconv.Atoi(idStr)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
@@ -66,11 +68,22 @@ func GetRestaurantById(queries *generated.Queries) http.HandlerFunc {
 	}
 }
 
+
+// GetMenuItemsByRestaurant godoc
+// @Summary Get menu items by restaurant ID
+// @Description Fetches all menu items associated with a specific restaurant ID
+// @Tags menu_items
+// @Produce application/json
+// @Param restaurantId query string true "Restaurant ID"
+// @Success 200 {array} generated.MenuItem
+// @Failure 400 {string} string "Invalid Rastaurant ID"
+// @Failure 500 {string} string "Internal Server Error"
+// @Router /api/restaurant/{restaurantId}/menu-items [get]
 func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		restaurantIdStr := r.URL.Query().Get("restaurantId")
+		restaurantIdStr := r.URL.Path[len("/api/restaurants/"):len(r.URL.Path)-len("/menu-items")]
 		restaurantId, err := strconv.Atoi(restaurantIdStr)
 		if err != nil {
 			http.Error(w, "Invalid Restaurant ID", http.StatusBadRequest)
@@ -85,6 +98,49 @@ func GetMenuItemsByRestaurant(queries *generated.Queries) http.HandlerFunc {
 		}
 
 		res, _ := json.Marshal(menuItems)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+	}
+}
+
+// GetMenuItemByRestaurantAndId godoc
+// @Summary Get menu item by restaurant and id
+// @Description Fetches a menu item based on the restaurant and id from the database
+// @Tags menu_items
+// @Produce application/json
+// @Param id path string true "Menu Item ID"
+// @Success 200 {object} generated.MenuItem
+// @Router /api/restaurant/{restaurantId}/menu-items/{menuitemId} [get]
+func GetMenuItemByRestaurantAndId(queries *generated.Queries) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		// Extract restaurantId and menuitemId from URL
+		path := r.URL.Path
+		basePath := "/api/restaurants/"
+		parts := path[len(basePath):]
+
+		var restaurantId, menuitemId int
+		n, err := fmt.Sscanf(parts, "%d/menu-items/%d", &restaurantId, &menuitemId)
+		if err != nil || n != 2 {
+			http.Error(w, "Invalid URL format", http.StatusBadRequest)
+			return
+		}
+
+		params := generated.GetMenuItemByRestaurantAndIdParams{
+			Restaurantid: int32(restaurantId),
+			ID: int32(menuitemId),
+		}
+
+		menuItem, err := queries.GetMenuItemByRestaurantAndId(ctx, params)
+		if err != nil {
+			http.Error(w, "Menu Item not found", http.StatusNotFound)
+			log.Println(err)
+			return
+		}
+
+		res, _ := json.Marshal(menuItem)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)

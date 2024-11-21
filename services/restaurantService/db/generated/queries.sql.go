@@ -125,6 +125,38 @@ func (q *Queries) FetchMenuItemsByRestaurantId(ctx context.Context, restaurantid
 	return items, nil
 }
 
+const getMenuItemByRestaurantAndId = `-- name: GetMenuItemByRestaurantAndId :one
+SELECT id, name, description, price, restaurantid
+FROM menuitem
+WHERE restaurantid = $1 AND id = $2
+`
+
+type GetMenuItemByRestaurantAndIdParams struct {
+	Restaurantid int32 `json:"restaurantid"`
+	ID           int32 `json:"id"`
+}
+
+type GetMenuItemByRestaurantAndIdRow struct {
+	ID           int32          `json:"id"`
+	Name         string         `json:"name"`
+	Description  *string        `json:"description"`
+	Price        pgtype.Numeric `json:"price"`
+	Restaurantid int32          `json:"restaurantid"`
+}
+
+func (q *Queries) GetMenuItemByRestaurantAndId(ctx context.Context, arg GetMenuItemByRestaurantAndIdParams) (GetMenuItemByRestaurantAndIdRow, error) {
+	row := q.db.QueryRow(ctx, getMenuItemByRestaurantAndId, arg.Restaurantid, arg.ID)
+	var i GetMenuItemByRestaurantAndIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.Description,
+		&i.Price,
+		&i.Restaurantid,
+	)
+	return i, err
+}
+
 const getRestaurantById = `-- name: GetRestaurantById :one
 SELECT id, name, address, rating
 FROM restaurant
