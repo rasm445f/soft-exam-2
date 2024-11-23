@@ -15,7 +15,10 @@ import (
 )
 
 func run() (http.Handler, error) {
-	redisClient := db.Redis_conn()
+	redisClient, err := db.Redis_conn()
+	if err != nil {
+		return nil, err
+	}
 
 	repo := db.NewShoppingCartRepository(redisClient)
 	shoppingDomain := domain.NewShoppingCartDomain(repo)
@@ -26,13 +29,14 @@ func run() (http.Handler, error) {
 	// Routes
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
 	mux.HandleFunc("POST /api/shopping", shoppingHandler.AddItem())
-	mux.HandleFunc("PATCH /api/shopping/{userId}/{itemId}", shoppingHandler.UpdateCart())
-	mux.HandleFunc("GET /api/shopping/{userId}", shoppingHandler.ViewCart())
+	mux.HandleFunc("PATCH /api/shopping/{customerId}/{itemId}", shoppingHandler.UpdateCart())
+	mux.HandleFunc("GET /api/shopping/{customerId}", shoppingHandler.ViewCart())
+	// mux.HandleFunc("DEL /api/shopping/{customerId}", shoppingHandler.ClearCart())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)
 
-	return handler, nil // TODO: should there be a possible error value?
+	return handler, nil
 }
 
 func main() {
@@ -40,7 +44,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	// defer redisClient.Close()
 
 	fmt.Println("Running server on port 8080")
 	log.Fatal(http.ListenAndServe(":8080", mux))

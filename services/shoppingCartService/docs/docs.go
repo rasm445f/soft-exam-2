@@ -61,39 +61,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/shopping/{id}": {
-            "get": {
-                "description": "Fetches a list of items based on the userId",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "shoppingCart"
-                ],
-                "summary": "View items for a user",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.ShoppingCartItem"
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/shopping/{userId}/{itemId}": {
+        "/api/shopping/{customerId}/{itemId}": {
             "patch": {
                 "description": "Update the quantity of an existing item in the shopping cart. If the quantity is set to 0, the item will be removed.",
                 "consumes": [
@@ -108,14 +76,14 @@ const docTemplate = `{
                 "summary": "Update an item in the cart",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "User ID",
-                        "name": "userId",
+                        "type": "integer",
+                        "description": "customer ID",
+                        "name": "customerId",
                         "in": "path",
                         "required": true
                     },
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Item ID",
                         "name": "itemId",
                         "in": "path",
@@ -158,12 +126,47 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/api/shopping/{id}": {
+            "get": {
+                "description": "Fetches a list of items based on the customerId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shoppingCart"
+                ],
+                "summary": "View items for a customer",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "customer ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.ShoppingCartItem"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
         "db.AddItemParams": {
             "type": "object",
             "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -173,8 +176,8 @@ const docTemplate = `{
                 "quantity": {
                     "type": "integer"
                 },
-                "user_id": {
-                    "type": "string"
+                "restaurant_id": {
+                    "type": "integer"
                 }
             }
         },

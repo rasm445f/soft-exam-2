@@ -25,19 +25,19 @@ func (d *ShoppingCartDomain) AddItem(ctx context.Context, item db.AddItemParams)
 	return d.repo.AddItem(ctx, item)
 }
 
-func (d *ShoppingCartDomain) UpdateCart(ctx context.Context, userID string, itemID string, quantity int) error {
+func (d *ShoppingCartDomain) UpdateCart(ctx context.Context, customerId int, itemID int, quantity int) error {
 	// Business validation
 	if quantity < 0 {
 		return errors.New("quantity cannot be negative")
 	}
 
-	return d.repo.UpdateCart(ctx, userID, itemID, quantity)
+	return d.repo.UpdateCart(ctx, customerId, itemID, quantity)
 }
 
-func (d *ShoppingCartDomain) ViewCart(ctx context.Context, userID string) ([]db.ShoppingCartItem, error) {
-	if len(userID) == 0 {
-		return nil, errors.New("userID cannot be empty")
-	}
+func (d *ShoppingCartDomain) ViewCart(ctx context.Context, costumerId int) (*db.ShoppingCart, error) {
+	// if costumerId == nil {
+	// 	return nil, errors.New("customerId cannot be empty")
+	// }
 
-	return d.repo.ViewCart(ctx, userID)
+	return d.repo.ViewCart(ctx, costumerId)
 }
