@@ -17,10 +17,8 @@ type AddItemParams struct {
 }
 
 func (s *ShoppingCartRepository) AddItem(ctx context.Context, params AddItemParams) error {
-	// Cart key based on the customerId
 	cartKey := fmt.Sprintf("cart:%d", params.CustomerId)
 
-	// Attempt to fetch the cart from Redis
 	cartData, err := s.redisClient.Get(ctx, cartKey).Result()
 	var cart ShoppingCart
 
@@ -172,6 +170,14 @@ func (s *ShoppingCartRepository) ClearCart(ctx context.Context, customerId int) 
 	cartKey := fmt.Sprintf("cart:%d", customerId)
 	nextIdKey := fmt.Sprintf("cart:%d:nextId", customerId)
 
-	// Delete both keys atomically
-	return s.redisClient.Del(ctx, cartKey, nextIdKey).Err()
+	deletedCount, err := s.redisClient.Del(ctx, cartKey, nextIdKey).Result()
+	if err != nil {
+		return fmt.Errorf("failed to clear cart: %w", err)
+	}
+
+	if deletedCount == 0 {
+		return fmt.Errorf("cart for customer ID %d does not exist", customerId)
+	}
+
+	return nil
 }

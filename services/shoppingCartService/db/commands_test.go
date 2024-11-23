@@ -75,6 +75,7 @@ func TestAddItem(t *testing.T) {
 	}
 }
 
+// TODO: test!
 // func TestViewCart(t *testing.T) {
 // 	// Create a new mock Redis client
 // 	db, mock := redismock.NewClientMock()

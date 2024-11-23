@@ -17,7 +17,7 @@ func NewShoppingCartHandler(domain *domain.ShoppingCartDomain) *ShoppingCartHand
 	return &ShoppingCartHandler{domain: domain}
 }
 
-// AddItemHandler godoc
+// AddItem godoc
 //
 //	@Summary		Add an item
 //	@Description	Add an item to the shopping cart
@@ -48,6 +48,7 @@ func (h *ShoppingCartHandler) AddItem() http.HandlerFunc {
 	}
 }
 
+// Seperate struct needed for swagger documentation
 type UpdateQuantityRequest struct {
 	Quantity int `json:"quantity"`
 }
@@ -60,12 +61,12 @@ type UpdateQuantityRequest struct {
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int						true	"customer ID"
-//	@Param			itemId	path		int						true	"Item ID"
-//	@Param			body	body		UpdateQuantityRequest	true	"New quantity for the item"
-//	@Success		200		{string}	string					"Item updated successfully"
-//	@Failure		400		{string}	string					"Invalid input"
-//	@Failure		404		{string}	string					"Item not found"
-//	@Failure		500		{string}	string					"Internal server error"
+//	@Param			itemId		path		int						true	"Item ID"
+//	@Param			body		body		UpdateQuantityRequest	true	"New quantity for the item"
+//	@Success		200			{string}	string					"Item updated successfully"
+//	@Failure		400			{string}	string					"Invalid input"
+//	@Failure		404			{string}	string					"Item not found"
+//	@Failure		500			{string}	string					"Internal server error"
 //	@Router			/api/shopping/{customerId}/{itemId} [patch]
 func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -101,8 +102,10 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 //	@Description	Fetches a list of items based on the customerId
 //	@Tags			shoppingCart
 //	@Produce		application/json
-//	@Param			id	path	string	true	"customer ID"
-//	@Success		200		{string}	string					"Cart cleared"
+//	@Param			id	path		string	true	"customer ID"
+//	@Success		200	{string}	string	"Cart cleared"
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/api/shopping/{id} [get]
 func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -134,8 +137,10 @@ func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 //	@Tags			shoppingCart
 //	@Accept			application/json
 //	@Produce		application/json
-//	@Param			customerId	path		int						true	"customer ID"
-//	@Success		200		{string}	string					"cart cleared"
+//	@Param			customerId	path		int		true	"customer ID"
+//	@Success		200			{string}	string	"cart cleared"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/api/shopping/{customerId} [delete]
 func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

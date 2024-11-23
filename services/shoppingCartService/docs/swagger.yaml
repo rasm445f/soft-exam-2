@@ -68,6 +68,14 @@ paths:
           description: cart cleared
           schema:
             type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Clears the cart
       tags:
       - shoppingCart
@@ -130,6 +138,14 @@ paths:
       responses:
         "200":
           description: Cart cleared
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
           schema:
             type: string
       summary: View items for a customer
