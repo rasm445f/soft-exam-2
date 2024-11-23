@@ -28,7 +28,6 @@ func Redis_conn() (*redis.Client, error) {
 	})
 	if client == nil {
 		return nil, errors.New("could not connect to client")
-
 	}
 
 	return client, nil

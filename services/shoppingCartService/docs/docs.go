@@ -61,6 +61,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/shopping/{customerId}": {
+            "delete": {
+                "description": "Clears the cart for the specified customer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shoppingCart"
+                ],
+                "summary": "Clears the cart",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer ID",
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "cart cleared",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/shopping/{customerId}/{itemId}": {
             "patch": {
                 "description": "Update the quantity of an existing item in the shopping cart. If the quantity is set to 0, the item will be removed.",
@@ -148,12 +180,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Cart cleared",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.ShoppingCartItem"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -177,23 +206,6 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "restaurant_id": {
-                    "type": "integer"
-                }
-            }
-        },
-        "db.ShoppingCartItem": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                },
-                "quantity": {
                     "type": "integer"
                 }
             }

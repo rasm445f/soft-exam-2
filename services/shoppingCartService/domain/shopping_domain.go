@@ -41,3 +41,10 @@ func (d *ShoppingCartDomain) ViewCart(ctx context.Context, costumerId int) (*db.
 
 	return d.repo.ViewCart(ctx, costumerId)
 }
+func (d *ShoppingCartDomain) ClearCart(ctx context.Context, costumerId int) error {
+	// if costumerId == nil {
+	// 	return nil, errors.New("customerId cannot be empty")
+	// }
+
+	return d.repo.ClearCart(ctx, costumerId)
+}

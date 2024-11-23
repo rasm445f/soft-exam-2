@@ -169,6 +169,9 @@ func (s *ShoppingCartRepository) UpdateCart(ctx context.Context, customerId int,
 }
 
 func (s *ShoppingCartRepository) ClearCart(ctx context.Context, customerId int) error {
-	key := fmt.Sprintf("cart:%d", customerId)
-	return s.redisClient.Del(ctx, key).Err()
+	cartKey := fmt.Sprintf("cart:%d", customerId)
+	nextIdKey := fmt.Sprintf("cart:%d:nextId", customerId)
+
+	// Delete both keys atomically
+	return s.redisClient.Del(ctx, cartKey, nextIdKey).Err()
 }

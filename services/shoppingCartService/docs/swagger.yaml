@@ -12,17 +12,6 @@ definitions:
       restaurant_id:
         type: integer
     type: object
-  db.ShoppingCartItem:
-    properties:
-      id:
-        type: integer
-      name:
-        type: string
-      price:
-        type: number
-      quantity:
-        type: integer
-    type: object
   handlers.UpdateQuantityRequest:
     properties:
       quantity:
@@ -59,6 +48,27 @@ paths:
           schema:
             type: string
       summary: Add an item
+      tags:
+      - shoppingCart
+  /api/shopping/{customerId}:
+    delete:
+      consumes:
+      - application/json
+      description: Clears the cart for the specified customer
+      parameters:
+      - description: customer ID
+        in: path
+        name: customerId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cart cleared
+          schema:
+            type: string
+      summary: Clears the cart
       tags:
       - shoppingCart
   /api/shopping/{customerId}/{itemId}:
@@ -119,11 +129,9 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Cart cleared
           schema:
-            items:
-              $ref: '#/definitions/db.ShoppingCartItem'
-            type: array
+            type: string
       summary: View items for a customer
       tags:
       - shoppingCart

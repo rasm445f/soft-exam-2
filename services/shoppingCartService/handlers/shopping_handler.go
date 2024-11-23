@@ -95,14 +95,14 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 	}
 }
 
-// GetTodo godoc
+// ViewCart godoc
 //
 //	@Summary		View items for a customer
 //	@Description	Fetches a list of items based on the customerId
 //	@Tags			shoppingCart
 //	@Produce		application/json
 //	@Param			id	path	string	true	"customer ID"
-//	@Success		200	{array}	db.ShoppingCartItem
+//	@Success		200		{string}	string					"Cart cleared"
 //	@Router			/api/shopping/{id} [get]
 func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -127,5 +127,29 @@ func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 	}
 }
 
-// func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
-// }
+// ClearCart godoc
+//
+//	@Summary		Clears the cart
+//	@Description	Clears the cart for the specified customer
+//	@Tags			shoppingCart
+//	@Accept			application/json
+//	@Produce		application/json
+//	@Param			customerId	path		int						true	"customer ID"
+//	@Success		200		{string}	string					"cart cleared"
+//	@Router			/api/shopping/{customerId} [delete]
+func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		customerIdStr := r.PathValue("customerId")
+		customerId, err := strconv.Atoi(customerIdStr)
+		if err != nil {
+			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
+		}
+
+		if err := h.domain.ClearCart(ctx, customerId); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		w.WriteHeader(http.StatusOK)
+	}
+}
