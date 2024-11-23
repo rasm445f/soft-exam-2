@@ -207,9 +207,6 @@
         "generated.Restaurant": {
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
-                },
                 "category": {
                     "type": "string"
                 },
@@ -221,6 +218,12 @@
                 },
                 "rating": {
                     "$ref": "#/definitions/pgtype.Numeric"
+                },
+                "street": {
+                    "type": "string"
+                },
+                "zip_code": {
+                    "type": "integer"
                 }
             }
         },

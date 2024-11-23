@@ -16,8 +16,6 @@ definitions:
     type: object
   generated.Restaurant:
     properties:
-      address:
-        type: string
       category:
         type: string
       id:
@@ -26,6 +24,10 @@ definitions:
         type: string
       rating:
         $ref: '#/definitions/pgtype.Numeric'
+      street:
+        type: string
+      zip_code:
+        type: integer
     type: object
   pgtype.InfinityModifier:
     enum:

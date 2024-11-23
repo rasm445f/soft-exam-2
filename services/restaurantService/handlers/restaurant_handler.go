@@ -26,7 +26,7 @@ func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
 // @Success 200 {array} generated.Restaurant
 // @Router /api/restaurants [get]
 func (h *RestaurantHandler) GetAllRestaurants() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) { 
 		ctx := r.Context()
 
 		restaurants, err := h.domain.FetchAllRestaurants(ctx)

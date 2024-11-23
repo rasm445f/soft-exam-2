@@ -27,9 +27,10 @@ func (d *RestaurantDomain) FetchAllRestaurants(ctx context.Context) ([]generated
 		restaurants = append(restaurants, generated.Restaurant{
 			ID: row.ID,
 			Name: row.Name,
-			Address: row.Address,
 			Rating: row.Rating,
 			Category: row.Category,
+			Street: row.Street,
+			ZipCode: row.ZipCode,
 		})
 	}
 	return restaurants, nil
@@ -48,15 +49,16 @@ func (d *RestaurantDomain) GetRestaurantById(ctx context.Context, restaurantId i
 	restaurant := &generated.Restaurant{
 		ID: row.ID,
 		Name: row.Name,
-		Address: row.Address,
 		Rating: row.Rating,
 		Category: row.Category,
+		Street: row.Street,
+		ZipCode: row.ZipCode,
 	}
 
 	return restaurant, nil
 }
 
-func (d *RestaurantDomain) FetchMenuItemsByRestaurantId(ctx context.Context, restaurantId int32) ([]generated.FetchMenuItemsByRestaurantIdRow, error) {
+func (d *RestaurantDomain) FetchMenuItemsByRestaurantId(ctx context.Context, restaurantId int32) ([]generated.Menuitem, error) {
 	if restaurantId <= 0 {
 		return nil, errors.New("invalid restaurant id")
 	}
@@ -76,10 +78,10 @@ func (d *RestaurantDomain) GetMenuItemByRestaurantAndId(ctx context.Context, par
 
 	menuitem := &generated.Menuitem{
 		ID: row.ID,
-		Name: row.Name,
-		Description: row.Description,
-		Price: row.Price,
 		Restaurantid: row.Restaurantid,
+		Name: row.Name,
+		Price: row.Price,
+		Description: row.Description,
 	}
 
 	return menuitem, nil
@@ -106,9 +108,22 @@ func (d* RestaurantDomain) FilterRestaurantsByCategory(ctx context.Context, cate
 		return nil, errors.New("category cannot be empty")
 	}
 
-	restaurants, err := d.repo.FilterRestaurantsByCategory(ctx, &category)
+	rows, err := d.repo.FilterRestaurantsByCategory(ctx, &category)
 	if err != nil {
 		return nil, errors.New("failed to filter restaurants by category")
+	}
+
+	// Map rows to Restaurant objects
+	var restaurants []generated.Restaurant
+	for _, row := range rows {
+		restaurants = append(restaurants, generated.Restaurant{
+			ID: row.ID,
+			Name: row.Name,
+			Rating: row.Rating,
+			Category: row.Category,
+			Street: row.Street,
+			ZipCode: row.ZipCode,
+		})
 	}
 	return restaurants, nil
 }
