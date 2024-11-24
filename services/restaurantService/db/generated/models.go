@@ -8,6 +8,11 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Address struct {
+	ZipCode int32  `json:"zip_code"`
+	City    string `json:"city"`
+}
+
 type Menuitem struct {
 	ID           int32          `json:"id"`
 	Restaurantid int32          `json:"restaurantid"`
@@ -19,7 +24,8 @@ type Menuitem struct {
 type Restaurant struct {
 	ID       int32          `json:"id"`
 	Name     string         `json:"name"`
-	Address  string         `json:"address"`
 	Rating   pgtype.Numeric `json:"rating"`
 	Category *string        `json:"category"`
+	Street   *string        `json:"street"`
+	ZipCode  *int32         `json:"zip_code"`
 }

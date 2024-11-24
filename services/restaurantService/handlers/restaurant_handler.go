@@ -1,29 +1,20 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
 	"strconv"
 
 	"github.com/rasm445f/soft-exam-2/db/generated"
+	"github.com/rasm445f/soft-exam-2/domain"
 )
 
-type RestaurantDomainInterface interface {
-	FetchAllRestaurants(ctx context.Context) ([]generated.Restaurant, error)
-	GetRestaurantById(ctx context.Context, restaurantId int32) (*generated.Restaurant, error) 
-	FetchMenuItemsByRestaurantId(ctx context.Context, restaurantId int32) ([]generated.FetchMenuItemsByRestaurantIdRow, error)
-	GetMenuItemByRestaurantAndId(ctx context.Context, params generated.GetMenuItemByRestaurantAndIdParams) (*generated.Menuitem, error)
-	FetchAllCategories(ctx context.Context) ([]string, error)
-	FilterRestaurantsByCategory(ctx context.Context, category string) ([]generated.Restaurant, error)
-}
-
 type RestaurantHandler struct {
-	domain RestaurantDomainInterface
+	domain *domain.RestaurantDomain
 }
 
-func NewRestaurantHandler(domain RestaurantDomainInterface) *RestaurantHandler {
+func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
 	return &RestaurantHandler{domain: domain}
 }
 
@@ -35,7 +26,7 @@ func NewRestaurantHandler(domain RestaurantDomainInterface) *RestaurantHandler {
 // @Success 200 {array} generated.Restaurant
 // @Router /api/restaurants [get]
 func (h *RestaurantHandler) GetAllRestaurants() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) { 
 		ctx := r.Context()
 
 		restaurants, err := h.domain.FetchAllRestaurants(ctx)

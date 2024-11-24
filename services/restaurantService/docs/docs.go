@@ -218,9 +218,6 @@ const docTemplate = `{
         "generated.Restaurant": {
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
-                },
                 "category": {
                     "type": "string"
                 },
@@ -232,6 +229,12 @@ const docTemplate = `{
                 },
                 "rating": {
                     "$ref": "#/definitions/pgtype.Numeric"
+                },
+                "street": {
+                    "type": "string"
+                },
+                "zip_code": {
+                    "type": "integer"
                 }
             }
         },
