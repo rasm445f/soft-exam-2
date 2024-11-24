@@ -5,12 +5,12 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/oTuff/go-startkode/db"
-	"github.com/oTuff/go-startkode/db/generated"
-	_ "github.com/oTuff/go-startkode/docs"
-	"github.com/oTuff/go-startkode/domain"
-	"github.com/oTuff/go-startkode/handlers"
 	"github.com/rasm445f/soft-exam-2/broker"
+	"github.com/rasm445f/soft-exam-2/db"
+	"github.com/rasm445f/soft-exam-2/db/generated"
+	_ "github.com/rasm445f/soft-exam-2/docs"
+	"github.com/rasm445f/soft-exam-2/domain"
+	"github.com/rasm445f/soft-exam-2/handlers"
 	"github.com/rs/cors"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -36,6 +36,7 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("DELETE /api/customer/{id}", customerHandler.DeleteCustomer())
 	mux.HandleFunc("POST /api/customer", customerHandler.CreateCustomer())
 	mux.HandleFunc("PATCH /api/customer/{id}", customerHandler.UpdateCustomer())
+	mux.HandleFunc("POST /api/customer/menu/select", customerHandler.SelectMenuitem())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)

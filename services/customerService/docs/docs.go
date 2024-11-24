@@ -326,6 +326,9 @@ const docTemplate = `{
                 },
                 "quantity": {
                     "type": "integer"
+                },
+                "restaurantId": {
+                    "type": "integer"
                 }
             }
         }

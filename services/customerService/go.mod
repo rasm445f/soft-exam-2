@@ -1,4 +1,4 @@
-module github.com/oTuff/go-startkode
+module github.com/rasm445f/soft-exam-2
 
 go 1.23.1
 

@@ -315,6 +315,9 @@
                 },
                 "quantity": {
                     "type": "integer"
+                },
+                "restaurantId": {
+                    "type": "integer"
                 }
             }
         }
