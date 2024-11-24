@@ -210,15 +210,13 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 	}
 }
 
-
 /* BROKER */
 type MenuItemSelection struct {
-	CustomerID int32 `json:"customerId"`
+	CustomerID   int32 `json:"customerId"`
 	RestaurantId int32 `json:"restaurantId"`
-	MenuItemId int32 `json:"menuItemId"`
-	Quantity int `json:"quantity"`
+	MenuItemId   int32 `json:"menuItemId"`
+	Quantity     int   `json:"quantity"`
 }
-
 
 // SelectMenuItem godoc
 // @Summary Select Menuitem
@@ -232,7 +230,7 @@ type MenuItemSelection struct {
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/customer/menu/select [post]
 func (h *CustomerHandler) SelectMenuitem() http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		var selection MenuItemSelection
 		err := json.NewDecoder(r.Body).Decode(&selection)
 		if err != nil {
@@ -242,7 +240,7 @@ func (h *CustomerHandler) SelectMenuitem() http.HandlerFunc {
 
 		// Publish event to RabbitMQ
 		event := broker.Event{
-			Type: broker.MenuItemSelected,
+			Type:    broker.MenuItemSelected,
 			Payload: selection,
 		}
 		err = broker.Publish("menu_item_selected_queue", event)

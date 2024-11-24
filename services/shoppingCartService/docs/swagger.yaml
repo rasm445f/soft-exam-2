@@ -151,4 +151,25 @@ paths:
       summary: View items for a customer
       tags:
       - shoppingCart
+  /api/shopping/consume:
+    get:
+      description: Fetches a list of items based on the customerId
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Cart cleared
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: View items for a customer
+      tags:
+      - shoppingCart
 swagger: "2.0"

@@ -61,6 +61,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/shopping/consume": {
+            "get": {
+                "description": "Fetches a list of items based on the customerId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shoppingCart"
+                ],
+                "summary": "View items for a customer",
+                "responses": {
+                    "200": {
+                        "description": "Cart cleared",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/shopping/{customerId}": {
             "delete": {
                 "description": "Clears the cart for the specified customer",

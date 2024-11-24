@@ -11,6 +11,21 @@ import (
 
 func Publish(queue string, event Event) error {
 	channel := GetChannel()
+
+	// Declare the queue
+	_, err := channel.QueueDeclare(
+		queue, // Name
+		false, // Durable
+		false, // Delete when unused
+		false, // Exclusive
+		false, // No-wait
+		nil,   // Arguments
+	)
+	if err != nil {
+		log.Printf("Failed to declare queue: %v", err)
+		return err
+	}
+
 	body, err := json.Marshal(event)
 	if err != nil {
 		return err

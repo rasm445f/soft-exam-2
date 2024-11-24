@@ -48,7 +48,7 @@ func main() {
 	// Initialize RabbitMQ
 	broker.InitRabbitMQ()
 	defer broker.CloseRabbitMQ()
-	
+
 	mux, err := run()
 	if err != nil {
 		log.Fatal(err)
