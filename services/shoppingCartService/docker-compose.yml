@@ -5,9 +5,9 @@ services:
     container_name: ${CONTAINER_NAME}
     image: redis:alpine
     environment:
-      - REDIS_PASSWORD=${DB_PASSWORD}
+      - REDIS_PASSWORD=${DB_PASSWORD} # rest of variables in .env
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
     networks:
       - db
     restart: unless-stopped

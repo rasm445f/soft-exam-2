@@ -1,113 +1,63 @@
 definitions:
-  generated.CreateTodoParams:
-    properties:
-      category:
-        type: string
-      deadline:
-        type: string
-      iscompleted:
-        type: boolean
-      text:
-        type: string
-      title:
-        type: string
+  big.Int:
     type: object
-  generated.Todo:
+  generated.Menuitem:
     properties:
-      category:
-        type: string
-      deadline:
+      description:
         type: string
       id:
         type: integer
-      iscompleted:
+      name:
+        type: string
+      price:
+        $ref: '#/definitions/pgtype.Numeric'
+      restaurantid:
+        type: integer
+    type: object
+  generated.Restaurant:
+    properties:
+      category:
+        type: string
+      id:
+        type: integer
+      name:
+        type: string
+      rating:
+        $ref: '#/definitions/pgtype.Numeric'
+      street:
+        type: string
+      zip_code:
+        type: integer
+    type: object
+  pgtype.InfinityModifier:
+    enum:
+    - 1
+    - 0
+    - -1
+    type: integer
+    x-enum-varnames:
+    - Infinity
+    - Finite
+    - NegativeInfinity
+  pgtype.Numeric:
+    properties:
+      exp:
+        type: integer
+      infinityModifier:
+        $ref: '#/definitions/pgtype.InfinityModifier'
+      int:
+        $ref: '#/definitions/big.Int'
+      naN:
         type: boolean
-      text:
-        type: string
-      title:
-        type: string
+      valid:
+        type: boolean
     type: object
 info:
   contact: {}
 paths:
-  /api/todo:
-    post:
-      consumes:
-      - application/json
-      description: Create a new todo entry in the database
-      parameters:
-      - description: Todo object
-        in: body
-        name: todo
-        required: true
-        schema:
-          $ref: '#/definitions/generated.CreateTodoParams'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Created
-          schema:
-            $ref: '#/definitions/generated.CreateTodoParams'
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      summary: Create a new todo
-      tags:
-      - todos
-  /api/todo/{id}:
-    delete:
-      description: Delete a todo based on the id from the database
-      parameters:
-      - description: Todo ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/generated.Todo'
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "404":
-          description: Not found
-          schema:
-            type: string
-      summary: Delete todo
-      tags:
-      - todos
+  /api/categories:
     get:
-      description: Fetches a todo based on the id from the database
-      parameters:
-      - description: Todo ID
-        in: path
-        name: id
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/generated.Todo'
-      summary: Get todo
-      tags:
-      - todos
-  /api/todos:
-    get:
-      description: Fetches a list of all todos from the database
+      description: Fetches a list of all unique categories from the restaurant
       produces:
       - application/json
       responses:
@@ -115,9 +65,109 @@ paths:
           description: OK
           schema:
             items:
-              $ref: '#/definitions/generated.Todo'
+              type: string
             type: array
-      summary: Get all todos
+      summary: Get all categories
       tags:
-      - todos
+      - categories
+  /api/filter/{category}:
+    get:
+      description: Fetches all restaurants for a given category
+      parameters:
+      - description: Restaurant Category
+        in: path
+        name: category
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/generated.Restaurant'
+            type: array
+      summary: Filter restaurants by category
+      tags:
+      - categories
+  /api/restaurants:
+    get:
+      description: Fetches a list of all restaurants from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/generated.Restaurant'
+            type: array
+      summary: Get all restaurants
+      tags:
+      - restaurants
+  /api/restaurants/{id}:
+    get:
+      description: Fetches a restaurant based on the id from the database
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/generated.Restaurant'
+      summary: Get restaurant by id
+      tags:
+      - restaurants
+  /api/restaurants/{restaurantId}/menu-items:
+    get:
+      description: Fetches all menu items associated with a specific restaurant ID
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: restaurantId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/generated.Menuitem'
+            type: array
+      summary: Get menu items by restaurant ID
+      tags:
+      - menu_items
+  /api/restaurants/{restaurantId}/menu-items/{menuitemId}:
+    get:
+      description: Fetches a menu item based on the restaurant and id from the database
+      parameters:
+      - description: Restaurant ID
+        in: path
+        name: restaurantId
+        required: true
+        type: string
+      - description: Menu Item ID
+        in: path
+        name: menuitemId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/generated.Menuitem'
+      summary: Get menu item by restaurant and id
+      tags:
+      - menu_items
 swagger: "2.0"

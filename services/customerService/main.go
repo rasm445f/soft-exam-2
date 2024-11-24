@@ -8,6 +8,7 @@ import (
 	"github.com/oTuff/go-startkode/db"
 	"github.com/oTuff/go-startkode/db/generated"
 	_ "github.com/oTuff/go-startkode/docs"
+	"github.com/oTuff/go-startkode/domain"
 	"github.com/oTuff/go-startkode/handlers"
 	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rs/cors"
@@ -23,16 +24,18 @@ func run() (http.Handler, error) {
 
 	// Initialize Queries with DB
 	queries := generated.New(db)
+	customerDomain := domain.NewCustomerDomain(queries)
+	customerHandler := handlers.NewCustomerHandler(customerDomain)
 
 	mux := http.NewServeMux()
 
 	// Routes
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
-	mux.HandleFunc("GET /api/customer", handlers.GetAllCustomers(queries))
-	mux.HandleFunc("GET /api/customer/{id}", handlers.GetCustomerById(queries))
-	mux.HandleFunc("DELETE /api/customer/{id}", handlers.DeleteCustomer(queries))
-	mux.HandleFunc("POST /api/customer", handlers.CreateCustomer(queries))
-	mux.HandleFunc("POST /api/customer/menu/select", handlers.SelectMenuItemHandler())
+	mux.HandleFunc("GET /api/customer", customerHandler.GetAllCustomers())
+	mux.HandleFunc("GET /api/customer/{id}", customerHandler.GetCustomerById())
+	mux.HandleFunc("DELETE /api/customer/{id}", customerHandler.DeleteCustomer())
+	mux.HandleFunc("POST /api/customer", customerHandler.CreateCustomer())
+	mux.HandleFunc("PATCH /api/customer/{id}", customerHandler.UpdateCustomer())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)

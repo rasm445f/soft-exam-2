@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/oTuff/go-startkode/db"
-	"github.com/oTuff/go-startkode/db/generated"
-	_ "github.com/oTuff/go-startkode/docs"
-	"github.com/oTuff/go-startkode/handlers"
+	"github.com/rasm445f/soft-exam-2/db"
+	"github.com/rasm445f/soft-exam-2/db/generated"
+	_ "github.com/rasm445f/soft-exam-2/docs"
+	"github.com/rasm445f/soft-exam-2/domain"
+	"github.com/rasm445f/soft-exam-2/handlers"
 	"github.com/rs/cors"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -20,17 +21,21 @@ func run() (http.Handler, error) {
 		return nil, err
 	}
 
-	// Initialize Queries with DB
+	// Initialize queries and domain layer
 	queries := generated.New(db)
+	restaurantDomain := domain.NewRestaurantDomain(queries)
+	restaurantHandler := handlers.NewRestaurantHandler(restaurantDomain)
 
 	mux := http.NewServeMux()
 
 	// Routes
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
-	mux.HandleFunc("GET /api/todos", handlers.GetAllTodos(queries))
-	mux.HandleFunc("GET /api/todo/{id}", handlers.GetTodo(queries))
-	mux.HandleFunc("DELETE /api/todo/{id}", handlers.DeleteTodo(queries))
-	mux.HandleFunc("POST /api/todo", handlers.CreateTodo(queries))
+	mux.HandleFunc("GET /api/restaurants", restaurantHandler.GetAllRestaurants())
+	mux.HandleFunc("GET /api/restaurants/{restaurantId}", restaurantHandler.GetRestaurantById())
+	mux.HandleFunc("GET /api/restaurants/{restaurantId}/menu-items", restaurantHandler.GetMenuItemsByRestaurant())
+	mux.HandleFunc("GET /api/restaurants/{restaurantId}/menu-items/{menuitemId}", restaurantHandler.GetMenuItemByRestaurantAndId())
+	mux.HandleFunc("GET /api/categories", restaurantHandler.GetAllCategories())
+	mux.HandleFunc("GET /api/filter/{category}", restaurantHandler.FilterRestaurantByCategory())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)

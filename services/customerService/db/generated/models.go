@@ -6,9 +6,9 @@ package generated
 
 type Customer struct {
 	ID          int32   `json:"id"`
-	Name        string  `json:"name"`
-	Email       string  `json:"email"`
-	Password    string  `json:"password"`
+	Name        *string `json:"name"`
+	Email       *string `json:"email"`
+	Password    *string `json:"password"`
 	Phonenumber *string `json:"phonenumber"`
 	Address     *string `json:"address"`
 }

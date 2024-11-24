@@ -1,18 +1,18 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 	"os"
 
 	"github.com/go-redis/redis/v8"
 )
 
-func Redis_conn() *redis.Client {
+func Redis_conn() (*redis.Client, error) {
 	redisPassword := os.Getenv("REDIS_PASSWORD")
 	redisHost := os.Getenv("REDIS_HOST")
 	redisPort := os.Getenv("REDIS_PORT")
 
-	// TODO: simplify this
 	if redisHost == "" {
 		redisHost = "localhost"
 	}
@@ -26,14 +26,9 @@ func Redis_conn() *redis.Client {
 		Password: redisPassword,
 		DB:       0,
 	})
+	if client == nil {
+		return nil, errors.New("could not connect to client")
+	}
 
-	// maybe using url can simplify connection stuff
-	//  url := "redis://user:password@localhost:6379/0?protocol=3"
-	// opts, err := redis.ParseURL(url)
-	// if err != nil {
-	//     panic(err)
-	// }
-	//
-	// return redis.NewClient(opts)
-	return client
+	return client, nil
 }

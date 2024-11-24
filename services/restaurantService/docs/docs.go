@@ -15,138 +15,176 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/todo": {
-            "post": {
-                "description": "Create a new todo entry in the database",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Create a new todo",
-                "parameters": [
-                    {
-                        "description": "Todo object",
-                        "name": "todo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/todo/{id}": {
+        "/api/categories": {
             "get": {
-                "description": "Fetches a todo based on the id from the database",
+                "description": "Fetches a list of all unique categories from the restaurant",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "categories"
                 ],
-                "summary": "Get todo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a todo based on the id from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Delete todo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/todos": {
-            "get": {
-                "description": "Fetches a list of all todos from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Get all todos",
+                "summary": "Get all categories",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/generated.Todo"
+                                "type": "string"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/filter/{category}": {
+            "get": {
+                "description": "Fetches all restaurants for a given category",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "categories"
+                ],
+                "summary": "Filter restaurants by category",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Restaurant Category",
+                        "name": "category",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Restaurant"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/restaurants": {
+            "get": {
+                "description": "Fetches a list of all restaurants from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "restaurants"
+                ],
+                "summary": "Get all restaurants",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Restaurant"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/restaurants/{id}": {
+            "get": {
+                "description": "Fetches a restaurant based on the id from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "restaurants"
+                ],
+                "summary": "Get restaurant by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Restaurant ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Restaurant"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/restaurants/{restaurantId}/menu-items": {
+            "get": {
+                "description": "Fetches all menu items associated with a specific restaurant ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu_items"
+                ],
+                "summary": "Get menu items by restaurant ID",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Restaurant ID",
+                        "name": "restaurantId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Menuitem"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/restaurants/{restaurantId}/menu-items/{menuitemId}": {
+            "get": {
+                "description": "Fetches a menu item based on the restaurant and id from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu_items"
+                ],
+                "summary": "Get menu item by restaurant and id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Restaurant ID",
+                        "name": "restaurantId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Menu Item ID",
+                        "name": "menuitemId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Menuitem"
                         }
                     }
                 }
@@ -154,46 +192,82 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "generated.CreateTodoParams": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
+        "big.Int": {
+            "type": "object"
         },
-        "generated.Todo": {
+        "generated.Menuitem": {
             "type": "object",
             "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "deadline": {
+                "description": {
                     "type": "string"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "iscompleted": {
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                },
+                "restaurantid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "generated.Restaurant": {
+            "type": "object",
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "rating": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                },
+                "street": {
+                    "type": "string"
+                },
+                "zip_code": {
+                    "type": "integer"
+                }
+            }
+        },
+        "pgtype.InfinityModifier": {
+            "type": "integer",
+            "enum": [
+                1,
+                0,
+                -1
+            ],
+            "x-enum-varnames": [
+                "Infinity",
+                "Finite",
+                "NegativeInfinity"
+            ]
+        },
+        "pgtype.Numeric": {
+            "type": "object",
+            "properties": {
+                "exp": {
+                    "type": "integer"
+                },
+                "infinityModifier": {
+                    "$ref": "#/definitions/pgtype.InfinityModifier"
+                },
+                "int": {
+                    "$ref": "#/definitions/big.Int"
+                },
+                "naN": {
                     "type": "boolean"
                 },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
+                "valid": {
+                    "type": "boolean"
                 }
             }
         }

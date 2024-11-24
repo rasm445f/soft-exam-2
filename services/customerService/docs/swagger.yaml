@@ -27,14 +27,20 @@ definitions:
       phonenumber:
         type: string
     type: object
-  handlers.MenuItemSelection:
+  generated.UpdateCustomerParams:
     properties:
-      customerId:
+      address:
+        type: string
+      email:
+        type: string
+      id:
         type: integer
-      menuItemId:
-        type: integer
-      quantity:
-        type: integer
+      name:
+        type: string
+      password:
+        type: string
+      phonenumber:
+        type: string
     type: object
 info:
   contact: {}
@@ -128,34 +134,38 @@ paths:
       summary: Get customer
       tags:
       - customers
-  /api/customer/menu/select:
-    post:
+    patch:
       consumes:
       - application/json
-      description: Select Menu Item
+      description: Updates a customer's details based on the ID from the database
       parameters:
-      - description: Customer object
+      - description: Customer ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated customer details
         in: body
         name: customer
         required: true
         schema:
-          $ref: '#/definitions/handlers.MenuItemSelection'
+          $ref: '#/definitions/generated.UpdateCustomerParams'
       produces:
       - application/json
       responses:
-        "201":
-          description: Created
+        "200":
+          description: Customer updated successfully
           schema:
-            $ref: '#/definitions/generated.Customer'
+            type: string
         "400":
-          description: Bad request
+          description: Invalid input
           schema:
             type: string
-        "500":
-          description: Internal server error
+        "404":
+          description: Customer not found
           schema:
             type: string
-      summary: Select Menuitem
+      summary: Update customer
       tags:
       - customers
 swagger: "2.0"
