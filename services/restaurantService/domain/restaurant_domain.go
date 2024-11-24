@@ -29,7 +29,7 @@ func (d *RestaurantDomain) FetchAllRestaurants(ctx context.Context) ([]generated
 			Name: row.Name,
 			Rating: row.Rating,
 			Category: row.Category,
-			Street: row.Street,
+			Address: row.Address,
 			ZipCode: row.ZipCode,
 		})
 	}
@@ -51,7 +51,7 @@ func (d *RestaurantDomain) GetRestaurantById(ctx context.Context, restaurantId i
 		Name: row.Name,
 		Rating: row.Rating,
 		Category: row.Category,
-		Street: row.Street,
+		Address: row.Address,
 		ZipCode: row.ZipCode,
 	}
 
@@ -121,7 +121,7 @@ func (d* RestaurantDomain) FilterRestaurantsByCategory(ctx context.Context, cate
 			Name: row.Name,
 			Rating: row.Rating,
 			Category: row.Category,
-			Street: row.Street,
+			Address: row.Address,
 			ZipCode: row.ZipCode,
 		})
 	}

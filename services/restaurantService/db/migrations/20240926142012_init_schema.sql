@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 
-CREATE TABLE Address (
+CREATE TABLE ZipCode (
     zip_code INT PRIMARY KEY,
     city VARCHAR(255) NOT NULL
 );
@@ -9,7 +9,6 @@ CREATE TABLE Address (
 CREATE TABLE Restaurant (
     ID serial PRIMARY KEY,
     Name VARCHAR(255) NOT NULL,
-    Address TEXT NOT NULL,
     Rating DECIMAL(2, 1),
     category VARCHAR(50)
 );
@@ -25,7 +24,7 @@ CREATE TABLE MenuItem (
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE Address;
+DROP TABLE ZipCode;
 DROP TABLE MenuItem;
 DROP TABLE Restaurant;
 
