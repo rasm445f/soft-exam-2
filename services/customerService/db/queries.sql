@@ -9,11 +9,15 @@ SELECT * FROM customer WHERE id = $1;
 -- name: GetAllCustomers :many
 SELECT * FROM customer ORDER BY name;
 
--- name: UpdateCustomer :one
+-- name: UpdateCustomer :exec
 UPDATE customer
-SET name = $2, email = $3, phonenumber = $4, address = $5, password = $6
-WHERE id = $1
-RETURNING *;
+SET 
+    name = COALESCE($2, name),
+    email = COALESCE($3, email),
+    phonenumber = COALESCE($4, phonenumber),
+    address = COALESCE($5, address),
+    password = COALESCE($6, password)
+WHERE id = $1;
 
 -- name: DeleteCustomer :exec
 DELETE FROM customer WHERE id = $1;

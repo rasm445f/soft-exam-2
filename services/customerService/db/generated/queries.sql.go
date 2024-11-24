@@ -16,20 +16,20 @@ RETURNING id, name, email, phonenumber, address, password
 `
 
 type CreateCustomerParams struct {
-	Name        string  `json:"name"`
-	Email       string  `json:"email"`
+	Name        *string `json:"name"`
+	Email       *string `json:"email"`
 	Phonenumber *string `json:"phonenumber"`
 	Address     *string `json:"address"`
-	Password    string  `json:"password"`
+	Password    *string `json:"password"`
 }
 
 type CreateCustomerRow struct {
 	ID          int32   `json:"id"`
-	Name        string  `json:"name"`
-	Email       string  `json:"email"`
+	Name        *string `json:"name"`
+	Email       *string `json:"email"`
 	Phonenumber *string `json:"phonenumber"`
 	Address     *string `json:"address"`
-	Password    string  `json:"password"`
+	Password    *string `json:"password"`
 }
 
 func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (CreateCustomerRow, error) {
@@ -110,24 +110,28 @@ func (q *Queries) GetCustomerByID(ctx context.Context, id int32) (Customer, erro
 	return i, err
 }
 
-const updateCustomer = `-- name: UpdateCustomer :one
+const updateCustomer = `-- name: UpdateCustomer :exec
 UPDATE customer
-SET name = $2, email = $3, phonenumber = $4, address = $5, password = $6
+SET 
+    name = COALESCE($2, name),
+    email = COALESCE($3, email),
+    phonenumber = COALESCE($4, phonenumber),
+    address = COALESCE($5, address),
+    password = COALESCE($6, password)
 WHERE id = $1
-RETURNING id, name, email, password, phonenumber, address
 `
 
 type UpdateCustomerParams struct {
 	ID          int32   `json:"id"`
-	Name        string  `json:"name"`
-	Email       string  `json:"email"`
+	Name        *string `json:"name"`
+	Email       *string `json:"email"`
 	Phonenumber *string `json:"phonenumber"`
 	Address     *string `json:"address"`
-	Password    string  `json:"password"`
+	Password    *string `json:"password"`
 }
 
-func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) (Customer, error) {
-	row := q.db.QueryRow(ctx, updateCustomer,
+func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) error {
+	_, err := q.db.Exec(ctx, updateCustomer,
 		arg.ID,
 		arg.Name,
 		arg.Email,
@@ -135,14 +139,5 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		arg.Address,
 		arg.Password,
 	)
-	var i Customer
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Email,
-		&i.Password,
-		&i.Phonenumber,
-		&i.Address,
-	)
-	return i, err
+	return err
 }
