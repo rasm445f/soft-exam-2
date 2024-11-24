@@ -50,20 +50,130 @@
                 }
             }
         },
-        "/api/shopping/{id}": {
-            "get": {
-                "description": "Fetches a list of items based on the userId",
+        "/api/shopping/{customerId}": {
+            "delete": {
+                "description": "Clears the cart for the specified customer",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "shoppingCart"
                 ],
-                "summary": "View items for a user",
+                "summary": "Clears the cart",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer ID",
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "cart cleared",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shopping/{customerId}/{itemId}": {
+            "patch": {
+                "description": "Update the quantity of an existing item in the shopping cart. If the quantity is set to 0, the item will be removed.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shoppingCart"
+                ],
+                "summary": "Update an item in the cart",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer ID",
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Item ID",
+                        "name": "itemId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New quantity for the item",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateQuantityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Item updated successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Item not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shopping/{id}": {
+            "get": {
+                "description": "Fetches a list of items based on the customerId",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shoppingCart"
+                ],
+                "summary": "View items for a customer",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "User ID",
+                        "description": "customer ID",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -71,12 +181,21 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Cart cleared",
                         "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.ShoppingCartItem"
-                            }
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -87,6 +206,9 @@
         "db.AddItemParams": {
             "type": "object",
             "properties": {
+                "customer_id": {
+                    "type": "integer"
+                },
                 "name": {
                     "type": "string"
                 },
@@ -96,23 +218,14 @@
                 "quantity": {
                     "type": "integer"
                 },
-                "user_id": {
-                    "type": "string"
+                "restaurant_id": {
+                    "type": "integer"
                 }
             }
         },
-        "db.ShoppingCartItem": {
+        "handlers.UpdateQuantityRequest": {
             "type": "object",
             "properties": {
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "price": {
-                    "type": "number"
-                },
                 "quantity": {
                     "type": "integer"
                 }
