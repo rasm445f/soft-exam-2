@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
@@ -211,10 +212,18 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 }
 
 /* BROKER */
+// type MenuItemSelection struct {
+// 	CustomerID   int32 `json:"customerId"`
+// 	RestaurantId int32 `json:"restaurantId"`
+// 	MenuItemId   int32 `json:"menuItemId"`
+// 	Quantity     int   `json:"quantity"`
+// }
+
 type MenuItemSelection struct {
 	CustomerID   int32 `json:"customerId"`
 	RestaurantId int32 `json:"restaurantId"`
-	MenuItemId   int32 `json:"menuItemId"`
+	Name   string `json:"name"`
+	Price  pgtype.Numeric `json:"price"`
 	Quantity     int   `json:"quantity"`
 }
 
