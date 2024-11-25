@@ -15,50 +15,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/publish/{customerId}": {
-            "delete": {
-                "description": "Clears the cart for the specified customer",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "shoppingCart"
-                ],
-                "summary": "Publish the shopping cart to rabbimq to be consumed by the Order service",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "customer ID",
-                        "name": "customerId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "cart cleared",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/api/shopping": {
             "post": {
                 "description": "Add an item to the shopping cart",
@@ -118,6 +74,50 @@ const docTemplate = `{
                 "responses": {
                     "200": {
                         "description": "Cart cleared",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/shopping/publish/{customerId}": {
+            "get": {
+                "description": "Clears the cart for the specified customer",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "shoppingCart"
+                ],
+                "summary": "Publish the shopping cart to rabbimq to be consumed by the Order service",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "customer ID",
+                        "name": "customerId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "cart cleared",
                         "schema": {
                             "type": "string"
                         }

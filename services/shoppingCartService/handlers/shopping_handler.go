@@ -239,7 +239,7 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 //	@Success		200			{string}	string	"cart cleared"
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
-//	@Router			/api/publish/{customerId} [delete]
+//	@Router			/api/shopping/publish/{customerId} [get]
 func (h *ShoppingCartHandler) SelectMenuitem() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
