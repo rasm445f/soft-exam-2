@@ -21,13 +21,28 @@ default:
 	@echo "  test-cover-html	# Show test coverage in the browser"
 	@echo "  test-mutation		# Run mutation testing with gremlins"
 
-
-# run:
-# 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
-run:
+# Unix-like systems (Linux/Mac)
+run-unix:
+	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
+	
+# Windows
+run-windows:
 	DBSTRING="postgres://postgres:test@127.0.0.1:5434/restaurant?sslmode=disable" \
 		air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
 
+# Main run target
+run:
+ifeq ($(OS),Windows_NT)
+	$(MAKE) run-windows
+else
+	$(MAKE) run-unix
+endif
+
+# run:
+# 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
+# run:
+# 	DBSTRING="postgres://postgres:test@127.0.0.1:5434/customer?sslmode=disable" \
+# 		air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
 
 build:
 	go build -o bin/api

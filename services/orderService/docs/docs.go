@@ -15,35 +15,21 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/todo": {
-            "post": {
-                "description": "Create a new todo entry in the database",
-                "consumes": [
-                    "application/json"
-                ],
+        "/api/order/consume": {
+            "get": {
+                "description": "Consume the created order for customer",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "order"
                 ],
-                "summary": "Create a new todo",
-                "parameters": [
-                    {
-                        "description": "Todo object",
-                        "name": "todo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
-                        }
-                    }
-                ],
+                "summary": "View order for a customer",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "Order Consume Success",
                         "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -58,142 +44,6 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
-                }
-            }
-        },
-        "/api/todo/{id}": {
-            "get": {
-                "description": "Fetches a todo based on the id from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Get todo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a todo based on the id from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Delete todo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Not found",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
-        "/api/todos": {
-            "get": {
-                "description": "Fetches a list of all todos from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Get all todos",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/generated.Todo"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "generated.CreateTodoParams": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
-        },
-        "generated.Todo": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
                 }
             }
         }

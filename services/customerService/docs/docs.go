@@ -82,6 +82,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/customer/menu/select": {
+            "post": {
+                "description": "Select Menu Item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Select Menuitem",
+                "parameters": [
+                    {
+                        "description": "Customer object",
+                        "name": "customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MenuItemSelection"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Customer"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/customer/{id}": {
             "get": {
                 "description": "Fetches a customer based on the id from the database",
@@ -266,6 +312,23 @@ const docTemplate = `{
                 },
                 "phonenumber": {
                     "type": "string"
+                }
+            }
+        },
+        "handlers.MenuItemSelection": {
+            "type": "object",
+            "properties": {
+                "customerId": {
+                    "type": "integer"
+                },
+                "menuItemId": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer"
+                },
+                "restaurantId": {
+                    "type": "integer"
                 }
             }
         }

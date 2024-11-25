@@ -1,10 +1,10 @@
 -- name: FetchAllRestaurants :many
-SELECT r.id, r.name, r.rating, r.category, r.street, r.zip_code
+SELECT r.id, r.name, r.rating, r.category, r.address, r.zip_code
 FROM restaurant r
-JOIN address a ON r.zip_code = a.zip_code;
+JOIN zipcode a ON r.zip_code = a.zip_code;
 
 -- name: GetRestaurantById :one
-SELECT id, name, rating, category, street, zip_code
+SELECT id, name, rating, category, address, zip_code
 FROM restaurant
 WHERE id = $1;
 
@@ -18,13 +18,13 @@ SELECT id, restaurantid, name, price, description
 from menuitem
 WHERE restaurantid = $1;
 
--- name: CreateAddress :exec
-INSERT INTO address (zip_code, city)
+-- name: CreateZipCode :exec
+INSERT INTO zipcode (zip_code, city)
 VALUES ($1, $2)
 ON CONFLICT (zip_code) DO NOTHING;
 
 -- name: CreateRestaurant :one
-INSERT INTO restaurant (name, rating, category, street, zip_code)
+INSERT INTO restaurant (name, rating, category, address, zip_code)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING id;
 
@@ -40,7 +40,7 @@ WHERE category IS NOT NULL
 ORDER BY category;
 
 -- name: FilterRestaurantsByCategory :many
-SELECT id, name, rating, category, street, zip_code
+SELECT id, name, rating, category, address, zip_code
 FROM restaurant
 WHERE category ILIKE $1;
 
