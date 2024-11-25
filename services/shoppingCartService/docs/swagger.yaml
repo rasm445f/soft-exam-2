@@ -20,35 +20,6 @@ definitions:
 info:
   contact: {}
 paths:
-  /api/publish/{customerId}:
-    delete:
-      consumes:
-      - application/json
-      description: Clears the cart for the specified customer
-      parameters:
-      - description: customer ID
-        in: path
-        name: customerId
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: cart cleared
-          schema:
-            type: string
-        "400":
-          description: Bad request
-          schema:
-            type: string
-        "500":
-          description: Internal server error
-          schema:
-            type: string
-      summary: Publish the shopping cart to rabbimq to be consumed by the Order service
-      tags:
-      - shoppingCart
   /api/shopping:
     post:
       consumes:
@@ -199,6 +170,35 @@ paths:
           schema:
             type: string
       summary: View items for a customer
+      tags:
+      - shoppingCart
+  /api/shopping/publish/{customerId}:
+    get:
+      consumes:
+      - application/json
+      description: Clears the cart for the specified customer
+      parameters:
+      - description: customer ID
+        in: path
+        name: customerId
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: cart cleared
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Publish the shopping cart to rabbimq to be consumed by the Order service
       tags:
       - shoppingCart
 swagger: "2.0"
