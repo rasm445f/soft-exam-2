@@ -240,7 +240,7 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/api/shopping/publish/{customerId} [get]
-func (h *ShoppingCartHandler) SelectMenuitem() http.HandlerFunc {
+func (h *ShoppingCartHandler) SelectOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		customerIdStr := r.PathValue("customerId")
@@ -257,7 +257,7 @@ func (h *ShoppingCartHandler) SelectMenuitem() http.HandlerFunc {
 
 		// Publish event to RabbitMQ
 		event := broker.Event{
-			Type:    broker.MenuItemSelected,
+			Type:    broker.OrderCreated,
 			Payload: shoppingCart,
 		}
 		err = broker.Publish("order_created_queue", event)

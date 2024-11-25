@@ -5,11 +5,12 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	_ "github.com/rasm445f/soft-exam-2/docs"
-	"github.com/rasm445f/soft-exam-2/handlers"
 	"github.com/rasm445f/soft-exam-2/domain"
+	"github.com/rasm445f/soft-exam-2/handlers"
 	"github.com/rs/cors"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -42,6 +43,9 @@ func run() (http.Handler, error) {
 }
 
 func main() {
+	broker.InitRabbitMQ()
+	defer broker.CloseRabbitMQ()
+
 	mux, err := run()
 	if err != nil {
 		log.Fatal(err)

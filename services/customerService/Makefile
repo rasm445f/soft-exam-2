@@ -21,24 +21,28 @@ default:
 	@echo "  test-cover-html	# Show test coverage in the browser"
 	@echo "  test-mutation		# Run mutation testing with gremlins"
 
+# Unix-like systems (Linux/Mac)
+run-unix:
+	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
 
-# run:
-# 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
-run:
+# Windows
+run-windows:
 	DBSTRING="postgres://postgres:test@127.0.0.1:5432/customer?sslmode=disable" \
 		air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
 
-# different command if on mac/linux or windows. does not work!
+# Main run target
+run:
+ifeq ($(OS),Windows_NT)
+	$(MAKE) run-windows
+else
+	$(MAKE) run-unix
+endif
+
 # run:
-# 	# Set the DBSTRING environment variable
-# 	DBSTRING=$(DBSTRING) \
-# 		# Check the operating system and use the appropriate build command
-# 		ifeq ($(shell uname),Darwin) || eq ($(shell uname),Linux); then \
-# 			air --build.cmd "go build -o bin/api" --build.bin "./bin/api"; \
-# 		elifeq ($(shell uname -s),MINGW32_NT) || eq ($(shell uname -s),MINGW64_NT); then \
-# 			DBSTRING="postgres://postgres:test@127.0.0.1:5432/customer?sslmode=disable" \
-# 			air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"; \
-# 		fi
+# 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
+# run:
+# 	DBSTRING="postgres://postgres:test@127.0.0.1:5432/customer?sslmode=disable" \
+# 		air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
 
 build:
 	go build -o bin/api
