@@ -227,3 +227,49 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 		})
 	}
 }
+
+// ClearCart godoc
+//
+//	@Summary		Publish the shopping cart to rabbimq to be consumed by the Order service
+//	@Description	Clears the cart for the specified customer
+//	@Tags			shoppingCart
+//	@Accept			application/json
+//	@Produce		application/json
+//	@Param			customerId	path		int		true	"customer ID"
+//	@Success		200			{string}	string	"cart cleared"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/api/publish/{customerId} [delete]
+func (h *ShoppingCartHandler) SelectMenuitem() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		customerIdStr := r.PathValue("customerId")
+		customerId, err := strconv.Atoi(customerIdStr)
+		if err != nil {
+			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
+		}
+		shoppingCart, err := h.domain.ViewCart(ctx, customerId)
+		if err != nil {
+			log.Printf("Failed to publish event: %v", err)
+			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
+			return
+		}
+
+		// Publish event to RabbitMQ
+		event := broker.Event{
+			Type:    broker.MenuItemSelected,
+			Payload: shoppingCart,
+		}
+		err = broker.Publish("order_created_queue", event)
+		if err != nil {
+			log.Printf("Failed to publish event: %v", err)
+			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
+			return
+		}
+		// TODO: should the shoppingcart be cleared afterwards? or maybe when the order is confirmed?
+		// h.domain.ClearCart(ctx, customerId)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Menu item selected successfully}`))
+	}
+}
