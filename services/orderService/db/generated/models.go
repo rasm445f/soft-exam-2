@@ -6,13 +6,48 @@ package generated
 
 import (
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Todo struct {
-	ID          int64      `json:"id"`
-	Title       string     `json:"title"`
-	Text        string     `json:"text"`
-	Iscompleted bool       `json:"iscompleted"`
-	Category    *string    `json:"category"`
-	Deadline    *time.Time `json:"deadline"`
+type Bonu struct {
+	ID              int32          `json:"id"`
+	Description     *string        `json:"description"`
+	Earlylateamount pgtype.Numeric `json:"earlylateamount"`
+	Percentage      pgtype.Numeric `json:"percentage"`
+}
+
+type Fee struct {
+	ID          int32          `json:"id"`
+	Amount      pgtype.Numeric `json:"amount"`
+	Description *string        `json:"description"`
+}
+
+type Order struct {
+	ID              int32          `json:"id"`
+	Totalamount     pgtype.Numeric `json:"totalamount"`
+	Vatamount       pgtype.Numeric `json:"vatamount"`
+	Status          string         `json:"status"`
+	Timestamp       *time.Time     `json:"timestamp"`
+	Comment         *string        `json:"comment"`
+	Customerid      *int32         `json:"customerid"`
+	Restaurantid    *int32         `json:"restaurantid"`
+	Deliveryagentid *int32         `json:"deliveryagentid"`
+	Paymentid       *int32         `json:"paymentid"`
+	Bonusid         *int32         `json:"bonusid"`
+	Feeid           *int32         `json:"feeid"`
+}
+
+type Orderitem struct {
+	ID       int32          `json:"id"`
+	Orderid  int32          `json:"orderid"`
+	Name     string         `json:"name"`
+	Price    pgtype.Numeric `json:"price"`
+	Quantity pgtype.Numeric `json:"quantity"`
+}
+
+type Payment struct {
+	ID            int32  `json:"id"`
+	Paymentstatus string `json:"paymentstatus"`
+	Paymentmethod string `json:"paymentmethod"`
 }

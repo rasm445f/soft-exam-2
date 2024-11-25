@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/oTuff/go-startkode/db"
-	"github.com/oTuff/go-startkode/db/generated"
-	_ "github.com/oTuff/go-startkode/docs"
-	"github.com/oTuff/go-startkode/handlers"
+	"github.com/rasm445f/soft-exam-2/db"
+	"github.com/rasm445f/soft-exam-2/db/generated"
+	_ "github.com/rasm445f/soft-exam-2/docs"
+	"github.com/rasm445f/soft-exam-2/handlers"
+	"github.com/rasm445f/soft-exam-2/domain"
 	"github.com/rs/cors"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -21,16 +22,18 @@ func run() (http.Handler, error) {
 	}
 
 	// Initialize Queries with DB
-	queries := generated.New(db)
+		queries := generated.New(db)
+		orderDomain := domain.NewOrderDomain(queries)
+		orderHandler := handlers.NewOrderHandler(orderDomain)
 
 	mux := http.NewServeMux()
 
 	// Routes
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
-	mux.HandleFunc("GET /api/todos", handlers.GetAllTodos(queries))
-	mux.HandleFunc("GET /api/todo/{id}", handlers.GetTodo(queries))
-	mux.HandleFunc("DELETE /api/todo/{id}", handlers.DeleteTodo(queries))
-	mux.HandleFunc("POST /api/todo", handlers.CreateTodo(queries))
+	mux.HandleFunc("GET /api/order/consume", orderHandler.ConsumeOrder())
+	//mux.HandleFunc("GET /api/todo/{id}", handlers.GetTodo(queries))
+	//mux.HandleFunc("DELETE /api/todo/{id}", handlers.DeleteTodo(queries))
+	//mux.HandleFunc("POST /api/todo", handlers.CreateTodo(queries))
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)

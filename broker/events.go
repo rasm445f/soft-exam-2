@@ -10,4 +10,5 @@ type Event struct {
 const (
 	MenuItemSelected = "menu_item_selected"
 	CartUpdated = "cart_updated"
+	OrderCreated = "order_created"
 )
