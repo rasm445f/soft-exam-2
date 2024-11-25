@@ -3,11 +3,10 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
@@ -29,10 +28,16 @@ type IntermediatePayload struct {
 	RestaurantId int `json:"restaurantId"`
 }
 
+// Helper function
+func int32Ptr(i int) *int32 {
+	value := int32(i)
+	return &value
+}
+
 // Consume godoc
 //
 //	@Summary		View order for a customer
-//	@Description	Fetches a list of items based on the order
+//	@Description	Consume the created order for customer
 //	@Tags			order
 //	@Produce		application/json
 //	@Success		200	{string}	string	"Order Consume Success"
@@ -59,8 +64,8 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 			var payload struct {
 				Customerid int `json:"customer_id"`
 				Restaurantid int `json:"restaurant_id"`
-				Totalamount float64 `json:"total_amount"`
-				Vatamount float64 `json:"vat_amount"`
+				Totalamount pgtype.Numeric `json:"total_amount"`
+				Vatamount pgtype.Numeric `json:"vat_amount"`
 				Comment string `json:"comment"`
 				Items []generated.CreateOrderItemParams `json:"items"`
 			}
@@ -77,19 +82,52 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 				Vatamount: payload.Vatamount,
 				Status: "Pending",
 				Comment: &payload.Comment,
-				
+				Customerid: int32Ptr(payload.Customerid),
+				Restaurantid: int32Ptr(payload.Restaurantid),
+				Deliveryagentid: nil,	// Not assigned yet
+				Paymentid: nil,			// Not processed yet
+				Bonusid: nil,			// No bonus assigned
+				Feeid: nil,				// No fees applied
 			}
 
-			// Create a context for the AddItem function
+			// Create context
 			ctx := context.Background()
 
-			// Call the AddItem logic
-			if err := h.domain.CreateOrder(ctx, ); err != nil {
-				log.Printf("Failed to add item to shopping cart: %v", err)
+			// Call the CreateOrder domain function
+			orderid, err := h.domain.CreateOrder(ctx, orderParams)
+			if err != nil {
+				log.Printf("Failed to create order: %v", err)
 				return
 			}
 
-			log.Printf("Successfully added item to shopping cart: %+v", item)
+			// Log success for the order creation
+			log.Printf("Successfully created order with ID: %d for customer: %d", orderid, payload.Customerid)
+
+			// Create order items for the created order
+			for _, item := range payload.Items {
+				itemParams := generated.CreateOrderItemParams{
+					Orderid: orderid,
+					Name: item.Name,
+					Price: item.Price,
+					Quantity: item.Quantity,
+				}
+				
+				// Call the CreateOrderItem domain function
+				_, err := h.domain.CreateOrderItem(ctx, itemParams)
+				if err != nil {
+					log.Printf("Failed to create order item: %+v, err: %v", item, err)
+					continue
+				}
+
+				log.Printf("Successfully added item to order ID %d: %+v", orderid, item)
+			}
+		})
+
+		// Respond to the client
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]string{
+			"message": "Order consumption started",
 		})
 	}
 }

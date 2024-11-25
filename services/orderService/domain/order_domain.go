@@ -26,15 +26,27 @@ func (o *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.Cre
 	// }
 	
 	// Call the repository layer to create the order
-	orderID, err := o.repo.CreateOrder(ctx, orderParams)
+	orderid, err := o.repo.CreateOrder(ctx, orderParams)
 	if err != nil {
 		return 0, errors.New("failed to create order: " + err.Error())
 	}
 
-	return orderID, nil
+	return orderid, nil
 }
+
+func (o *OrderDomain) CreateOrderItem(ctx context.Context, itemParams generated.CreateOrderItemParams) (int32, error) {
+		// Call the repository layer to create the order
+		itemid, err := o.repo.CreateOrderItem(ctx, itemParams)
+		if err != nil {
+			return 0, errors.New("failed to create order item: " + err.Error())
+		}
+	
+		return itemid, nil
+}
+
+
+
 // TODO: implement
-// create order item
 // create fee
 // create bonus
 // create payment
