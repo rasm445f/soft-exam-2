@@ -227,11 +227,11 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 	}
 }
 
-type SelectOrderRequest struct {
+type PublishOrderRequest struct {
 	Comment string `json:"comment" example:"No vegetables on the pizza."`
 }
 
-// SelectOrder godoc
+// PublishOrder godoc
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
 //	@Description	Selecting the cart for the specified customer with an optional comment
@@ -239,12 +239,12 @@ type SelectOrderRequest struct {
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int		true	"Customer ID"
-//	@Param			comment		body		SelectOrderRequest		true	"Customer Comment (optional)"
+//	@Param			comment		body		PublishOrderRequest		true	"Customer Comment (optional)"
 //	@Success		200			{string}	string	"Order Selected Successfully"
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/api/shopping/publish/{customerId} [post]
-func (h *ShoppingCartHandler) SelectOrder() http.HandlerFunc {
+func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -255,7 +255,7 @@ func (h *ShoppingCartHandler) SelectOrder() http.HandlerFunc {
 		}
 
 		// Decode the Comment from the request body
-		var requestPayload SelectOrderRequest
+		var requestPayload PublishOrderRequest
 		if err := json.NewDecoder(r.Body).Decode(&requestPayload); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return

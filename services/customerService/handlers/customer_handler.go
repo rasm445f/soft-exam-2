@@ -211,13 +211,6 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 }
 
 /* BROKER */
-// type MenuItemSelection struct {
-// 	CustomerID   int32 `json:"customerId"`
-// 	RestaurantId int32 `json:"restaurantId"`
-// 	MenuItemId   int32 `json:"menuItemId"`
-// 	Quantity     int   `json:"quantity"`
-// }
-
 type MenuItemSelection struct {
 	CustomerID   int32 `json:"customerId" example:"1"`
 	RestaurantId int32 `json:"restaurantId" example:"10"`
@@ -225,8 +218,6 @@ type MenuItemSelection struct {
 	Price  float64 `json:"price" example:"9.99"`
 	Quantity     int   `json:"quantity" example:"2"`
 }
-
-
 // SelectMenuItem godoc
 // @Summary Select Menuitem
 // @Description Select Menu Item

@@ -24,10 +24,10 @@ const docTemplate = `{
                 "tags": [
                     "order"
                 ],
-                "summary": "View order for a customer",
+                "summary": "Consume Order for a Customer",
                 "responses": {
                     "200": {
-                        "description": "Order Consume Success",
+                        "description": "Order Consumed Successfully",
                         "schema": {
                             "type": "string"
                         }
@@ -40,6 +40,53 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/status/{orderId}": {
+            "patch": {
+                "description": "Updates the status of an order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Update Order Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Order Status",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order status updated successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
                         "schema": {
                             "type": "string"
                         }
@@ -172,6 +219,15 @@ const docTemplate = `{
                 },
                 "vatamount": {
                     "$ref": "#/definitions/pgtype.Numeric"
+                }
+            }
+        },
+        "handlers.UpdateOrderStatusRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "Pending/On its way/Delivered"
                 }
             }
         },

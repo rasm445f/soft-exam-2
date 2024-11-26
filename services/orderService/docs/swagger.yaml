@@ -28,6 +28,12 @@ definitions:
       vatamount:
         $ref: '#/definitions/pgtype.Numeric'
     type: object
+  handlers.UpdateOrderStatusRequest:
+    properties:
+      status:
+        example: Pending/On its way/Delivered
+        type: string
+    type: object
   pgtype.InfinityModifier:
     enum:
     - 1
@@ -61,7 +67,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Order Consume Success
+          description: Order Consumed Successfully
           schema:
             type: string
         "400":
@@ -72,9 +78,40 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: View order for a customer
+      summary: Consume Order for a Customer
       tags:
       - order
+  /api/order/status/{orderId}:
+    patch:
+      consumes:
+      - application/json
+      description: Updates the status of an order
+      parameters:
+      - description: Order ID
+        in: path
+        name: orderId
+        required: true
+        type: integer
+      - description: New Order Status
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateOrderStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Order status updated successfully
+          schema:
+            type: string
+        "404":
+          description: Order not found
+          schema:
+            type: string
+      summary: Update Order Status
+      tags:
+      - orders
   /api/orders:
     get:
       description: Fetches a list of all orders from the database

@@ -71,9 +71,9 @@ func (d *OrderDomain) GetOrderById(ctx context.Context, orderId int32) (*generat
 	return order, nil
 }
 
-func (o *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {
+func (d *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {
 	// Call the repository layer to create the order
-	orderid, err := o.repo.CreateOrder(ctx, orderParams)
+	orderid, err := d.repo.CreateOrder(ctx, orderParams)
 	if err != nil {
 		return 0, errors.New("failed to create order: " + err.Error())
 	}
@@ -81,23 +81,29 @@ func (o *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.Cre
 	return orderid, nil
 }
 
-func (o *OrderDomain) CreateOrderItem(ctx context.Context, itemParams generated.CreateOrderItemParams) (int32, error) {
-		// Call the repository layer to create the order
-		itemid, err := o.repo.CreateOrderItem(ctx, itemParams)
-		if err != nil {
-			return 0, errors.New("failed to create order item: " + err.Error())
+func (d *OrderDomain) UpdateOrderStatus(ctx context.Context, orderId int32, status string) error {
+	// Call the repository layer to update the order
+	err := d.repo.UpdateOrderStatus(ctx, generated.UpdateOrderStatusParams{
+		Status: status,
+		ID: orderId,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("order not found")
 		}
-	
-		return itemid, nil
+		return err
+	}
+
+	return nil
 }
 
-func (o *OrderDomain) DeleteOrder(ctx context.Context, orderId int32) (error) {
-	err := o.repo.DeleteOrderItemsByOrderId(ctx, orderId)
+func (d *OrderDomain) DeleteOrder(ctx context.Context, orderId int32) (error) {
+	err := d.repo.DeleteOrderItemsByOrderId(ctx, orderId)
 	if err != nil {
 		return errors.New("failed to delete order items: " + err.Error())
 	}
 
-	err = o.repo.DeleteOrder(ctx, orderId)
+	err = d.repo.DeleteOrder(ctx, orderId)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("order not found")
@@ -105,6 +111,16 @@ func (o *OrderDomain) DeleteOrder(ctx context.Context, orderId int32) (error) {
 		return errors.New("failed to delete order: " + err.Error())
 	}
 	return nil
+}
+
+func (d *OrderDomain) CreateOrderItem(ctx context.Context, itemParams generated.CreateOrderItemParams) (int32, error) {
+	// Call the repository layer to create the order
+	itemid, err := d.repo.CreateOrderItem(ctx, itemParams)
+	if err != nil {
+		return 0, errors.New("failed to create order item: " + err.Error())
+	}
+
+	return itemid, nil
 }
 
 

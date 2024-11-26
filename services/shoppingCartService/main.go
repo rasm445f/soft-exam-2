@@ -34,7 +34,7 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("GET /api/shopping/{customerId}", shoppingHandler.ViewCart())
 	mux.HandleFunc("DELETE /api/shopping/{customerId}", shoppingHandler.ClearCart())
 	mux.HandleFunc("GET /api/shopping/consume", shoppingHandler.ConsumeMenuItem())
-	mux.HandleFunc("POST /api/shopping/publish/{customerId}", shoppingHandler.SelectOrder())
+	mux.HandleFunc("POST /api/shopping/publish/{customerId}", shoppingHandler.PublishOrder())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)

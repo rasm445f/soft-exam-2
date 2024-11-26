@@ -32,10 +32,11 @@ func run() (http.Handler, error) {
 	// Routes
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
 	mux.HandleFunc("GET /api/orders", orderHandler.GetAllOrders())
-	mux.HandleFunc("GET /api/order/consume", orderHandler.ConsumeOrder())
 	mux.HandleFunc("GET /api/orders/{orderId}", orderHandler.GetOrderById())
+	mux.HandleFunc("PATCH /api/order/status/{orderId}", orderHandler.UpdateOrderStatus())
 	mux.HandleFunc("DELETE /api/orders/{orderId}", orderHandler.DeleteOrder())
-	//mux.HandleFunc("POST /api/todo", handlers.CreateTodo(queries))
+	// Broker
+	mux.HandleFunc("GET /api/order/consume", orderHandler.ConsumeOrder())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)

@@ -12,7 +12,7 @@ definitions:
       restaurant_id:
         type: integer
     type: object
-  handlers.SelectOrderRequest:
+  handlers.PublishOrderRequest:
     properties:
       comment:
         example: No vegetables on the pizza.
@@ -195,7 +195,7 @@ paths:
         name: comment
         required: true
         schema:
-          $ref: '#/definitions/handlers.SelectOrderRequest'
+          $ref: '#/definitions/handlers.PublishOrderRequest'
       produces:
       - application/json
       responses:

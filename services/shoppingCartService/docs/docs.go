@@ -120,7 +120,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.SelectOrderRequest"
+                            "$ref": "#/definitions/handlers.PublishOrderRequest"
                         }
                     }
                 ],
@@ -319,7 +319,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.SelectOrderRequest": {
+        "handlers.PublishOrderRequest": {
             "type": "object",
             "properties": {
                 "comment": {
