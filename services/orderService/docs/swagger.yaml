@@ -1,3 +1,56 @@
+definitions:
+  big.Int:
+    type: object
+  generated.Order:
+    properties:
+      bonusid:
+        type: integer
+      comment:
+        type: string
+      customerid:
+        type: integer
+      deliveryagentid:
+        type: integer
+      feeid:
+        type: integer
+      id:
+        type: integer
+      paymentid:
+        type: integer
+      restaurantid:
+        type: integer
+      status:
+        type: string
+      timestamp:
+        type: string
+      totalamount:
+        $ref: '#/definitions/pgtype.Numeric'
+      vatamount:
+        $ref: '#/definitions/pgtype.Numeric'
+    type: object
+  pgtype.InfinityModifier:
+    enum:
+    - 1
+    - 0
+    - -1
+    type: integer
+    x-enum-varnames:
+    - Infinity
+    - Finite
+    - NegativeInfinity
+  pgtype.Numeric:
+    properties:
+      exp:
+        type: integer
+      infinityModifier:
+        $ref: '#/definitions/pgtype.InfinityModifier'
+      int:
+        $ref: '#/definitions/big.Int'
+      naN:
+        type: boolean
+      valid:
+        type: boolean
+    type: object
 info:
   contact: {}
 paths:
@@ -22,4 +75,58 @@ paths:
       summary: View order for a customer
       tags:
       - order
+  /api/orders:
+    get:
+      description: Fetches a list of all orders from the database
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/generated.Order'
+            type: array
+      summary: Get all orders
+      tags:
+      - orders
+  /api/orders/{id}:
+    delete:
+      description: Deletes an order by its id from the database
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Order deleted successfully
+          schema:
+            type: string
+        "404":
+          description: Order not found
+          schema:
+            type: string
+      summary: Delete an order
+      tags:
+      - orders
+    get:
+      description: Fetches an order based on the id from the database
+      parameters:
+      - description: Order ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/generated.Order'
+      summary: Get order by id
+      tags:
+      - orders
 swagger: "2.0"

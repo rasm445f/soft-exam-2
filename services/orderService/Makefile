@@ -48,8 +48,10 @@ endif
 build:
 	go build -o bin/api
 
+# Used for pgtype.Numeric fields
 docs:
-	swag init
+	swag init --parseDependency --parseInternal
+
 sqlc:
 	sqlc generate
 

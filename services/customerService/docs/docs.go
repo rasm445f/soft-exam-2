@@ -97,7 +97,7 @@ const docTemplate = `{
                 "summary": "Select Menuitem",
                 "parameters": [
                     {
-                        "description": "Customer object",
+                        "description": "Menu item selection details",
                         "name": "customer",
                         "in": "body",
                         "required": true,
@@ -108,9 +108,9 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "201": {
-                        "description": "Created",
+                        "description": "Menu item successfully selected",
                         "schema": {
-                            "$ref": "#/definitions/generated.Customer"
+                            "$ref": "#/definitions/handlers.MenuItemSelection"
                         }
                     },
                     "400": {
@@ -319,16 +319,24 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "customerId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
                 },
-                "menuItemId": {
-                    "type": "integer"
+                "name": {
+                    "type": "string",
+                    "example": "Cheese Burger"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 9.99
                 },
                 "quantity": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 2
                 },
                 "restaurantId": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 10
                 }
             }
         }

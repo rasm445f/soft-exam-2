@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rasm445f/soft-exam-2/broker"
@@ -20,6 +21,120 @@ func NewOrderHandler(domain *domain.OrderDomain) *OrderHandler {
 	return &OrderHandler{domain: domain}
 }
 
+// GetAllOrders godoc
+// @Summary Get all orders
+// @Description Fetches a list of all orders from the database
+// @Tags orders
+// @Produce application/json
+// @Success 200 {array} generated.Order
+// @Router /api/orders [get]
+func (h *OrderHandler) GetAllOrders() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) { 
+		ctx := r.Context()
+
+		orders, err := h.domain.FetchAllOrders(ctx)
+		if err != nil {
+			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		res, _ := json.Marshal(orders)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+	}
+}
+
+// GetOrderById godoc
+// @Summary Get order by id
+// @Description Fetches an order based on the id from the database
+// @Tags orders
+// @Produce application/json
+// @Param id path string true "Order ID"
+// @Success 200 {object} generated.Order
+// @Router /api/orders/{id} [get]
+func (h *OrderHandler) GetOrderById() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		orderIdStr := r.PathValue("orderId")
+		if orderIdStr == "" {
+			http.Error(w, "Missing orderId query parameter", http.StatusBadRequest)
+			return
+		}
+
+		orderId, err := strconv.Atoi(orderIdStr)
+		if err != nil {
+			http.Error(w, "Invalid Order ID", http.StatusBadRequest)
+			return
+		}
+
+		order, err := h.domain.GetOrderById(ctx, int32(orderId))
+		if err != nil {
+			http.Error(w, "Order not found", http.StatusNotFound)
+			log.Println(err)
+			return
+		}
+
+		res, _ := json.Marshal(order)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
+	}
+}
+
+// DeleteOrder godoc
+// @Summary Delete an order
+// @Description Deletes an order by its id from the database
+// @Tags orders
+// @Param id path int true "Order ID"
+// @Success 200 {string} string "Order deleted successfully"
+// @Failure 404 {string} string "Order not found"
+// @Router /api/orders/{id} [delete]
+func (h *OrderHandler) DeleteOrder() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		orderIdStr := r.PathValue("orderId")
+		if orderIdStr == "" {
+			http.Error(w, "Missing orderId query parameter", http.StatusBadRequest)
+			return
+		}
+
+		orderId, err := strconv.Atoi(orderIdStr)
+		if err != nil {
+			http.Error(w, "Invalid Order ID", http.StatusBadRequest)
+			return
+		}
+
+		err = h.domain.DeleteOrder(ctx, int32(orderId))
+		if err != nil {
+			if err.Error() == "Order not found" {
+				http.Error(w, "Order not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Failed to delete order", http.StatusInternalServerError)
+			}
+			log.Println(err)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Order deleted successfully"}`))
+	}
+}
+
+
+
+
+
+
+
+
+
+
+/* BROKER */
 
 type IntermediatePayload struct {
 	CustomerId   int `json:"customerId"`
@@ -81,6 +196,7 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 				Totalamount: payload.Totalamount,
 				Vatamount: payload.Vatamount,
 				Status: "Pending",
+				// Timestamp: time.Now(),
 				Comment: &payload.Comment,
 				Customerid: int32Ptr(payload.Customerid),
 				Restaurantid: int32Ptr(payload.Restaurantid),

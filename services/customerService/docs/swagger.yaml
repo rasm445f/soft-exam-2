@@ -45,12 +45,19 @@ definitions:
   handlers.MenuItemSelection:
     properties:
       customerId:
+        example: 1
         type: integer
-      menuItemId:
-        type: integer
+      name:
+        example: Cheese Burger
+        type: string
+      price:
+        example: 9.99
+        type: number
       quantity:
+        example: 2
         type: integer
       restaurantId:
+        example: 10
         type: integer
     type: object
 info:
@@ -185,7 +192,7 @@ paths:
       - application/json
       description: Select Menu Item
       parameters:
-      - description: Customer object
+      - description: Menu item selection details
         in: body
         name: customer
         required: true
@@ -195,9 +202,9 @@ paths:
       - application/json
       responses:
         "201":
-          description: Created
+          description: Menu item successfully selected
           schema:
-            $ref: '#/definitions/generated.Customer'
+            $ref: '#/definitions/handlers.MenuItemSelection'
         "400":
           description: Bad request
           schema:

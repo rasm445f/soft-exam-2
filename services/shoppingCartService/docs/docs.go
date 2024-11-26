@@ -94,8 +94,8 @@ const docTemplate = `{
             }
         },
         "/api/shopping/publish/{customerId}": {
-            "get": {
-                "description": "Clears the cart for the specified customer",
+            "post": {
+                "description": "Selecting the cart for the specified customer with an optional comment",
                 "consumes": [
                     "application/json"
                 ],
@@ -105,19 +105,28 @@ const docTemplate = `{
                 "tags": [
                     "shoppingCart"
                 ],
-                "summary": "Publish the shopping cart to rabbimq to be consumed by the Order service",
+                "summary": "Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "customer ID",
+                        "description": "Customer ID",
                         "name": "customerId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "description": "Customer Comment (optional)",
+                        "name": "comment",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SelectOrderRequest"
+                        }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "cart cleared",
+                        "description": "Order Selected Successfully",
                         "schema": {
                             "type": "string"
                         }
@@ -307,6 +316,15 @@ const docTemplate = `{
                 },
                 "restaurant_id": {
                     "type": "integer"
+                }
+            }
+        },
+        "handlers.SelectOrderRequest": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string",
+                    "example": "No vegetables on the pizza."
                 }
             }
         },
