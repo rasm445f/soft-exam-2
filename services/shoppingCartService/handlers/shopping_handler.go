@@ -163,13 +163,13 @@ func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 	}
 }
 
-// Consume godoc
+// Consume Shopping Cart's MenuItems godoc
 //
-//	@Summary		View items for a customer
-//	@Description	Fetches a list of items based on the customerId
-//	@Tags			shoppingCart
+//	@Summary		Consume the chosen Menu Items for a Customer
+//	@Description	Consumes the Shopping Cart's Menu Items for a Customer
+//	@Tags			Broker
 //	@Produce		application/json
-//	@Success		200	{string}	string	"Cart cleared"
+//	@Success		200	{string}	string	"Shopping Cart's Menu Items Consumed"
 //	@Failure		400	{string}	string	"Bad request"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/api/shopping/consume [get]
@@ -190,41 +190,42 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 			}
 			fmt.Println(payloadBytes)
 
-			// Unmarshal JSON bytes into IntermediatePayload
+			// Unmarshal JSON bytes
 			var item db.AddItemParams
 			if err := json.Unmarshal(payloadBytes, &item); err != nil {
-				log.Printf("Failed to unmarshal payload into IntermediatePayload: %v", err)
+				log.Printf("Failed to unmarshal payload: %v", err)
 				return
 			}
-			fmt.Printf("Unmarshaled intermediate: %v", item)
+			fmt.Printf("Unmarshaled JSON bytes: %v", item)
 
 			// Create a context for the AddItem function
 			ctx := context.Background()
 
 			// Call the AddItem logic
 			if err := h.domain.AddItem(ctx, item); err != nil {
-				log.Printf("Failed to add item to shopping cart: %v", err)
+				log.Printf("Failed to add menuitem to shopping cart: %v", err)
 				return
 			}
 
-			log.Printf("Successfully added item to shopping cart: %+v", item)
+			log.Printf("Successfully added menuitem to shopping cart: %+v", item)
 		})
 	}
 }
 
-// ClearCart godoc
+// PublishOrder godoc
 //
-//	@Summary		Publish the shopping cart to rabbimq to be consumed by the Order service
-//	@Description	Clears the cart for the specified customer
+//	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
+//	@Description	Selecting the cart for the specified customer with an optional comment
 //	@Tags			shoppingCart
 //	@Accept			application/json
 //	@Produce		application/json
-//	@Param			customerId	path		int		true	"customer ID"
-//	@Success		200			{string}	string	"cart cleared"
+//	@Param			customerId	path		int		true	"Customer ID"
+//	@Param			comment		body		PublishOrderRequest		true	"Customer Comment (optional)"
+//	@Success		200			{string}	string	"Order Selected Successfully"
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
-//	@Router			/api/shopping/publish/{customerId} [get]
-func (h *ShoppingCartHandler) SelectOrder() http.HandlerFunc {
+//	@Router			/api/shopping/publish/{customerId} [post]
+func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 		customerIdStr := r.PathValue("customerId")
@@ -232,6 +233,7 @@ func (h *ShoppingCartHandler) SelectOrder() http.HandlerFunc {
 		if err != nil {
 			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
 		}
+
 		shoppingCart, err := h.domain.ViewCart(ctx, customerId)
 		if err != nil {
 			log.Printf("Failed to publish event: %v", err)
