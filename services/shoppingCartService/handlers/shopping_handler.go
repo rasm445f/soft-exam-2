@@ -162,13 +162,6 @@ func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 	}
 }
 
-type IntermediatePayload struct {
-	CustomerId   int `json:"customerId"`
-	MenuItemId   int `json:"menuItemId"`
-	Quantity     int `json:"quantity"`
-	RestaurantId int `json:"restaurantId"`
-}
-
 // Consume godoc
 //
 //	@Summary		View items for a customer
@@ -197,20 +190,10 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 			// fmt.Println(payloadBytes)
 
 			// Unmarshal JSON bytes into IntermediatePayload
-			var intermediate IntermediatePayload
-			if err := json.Unmarshal(payloadBytes, &intermediate); err != nil {
-				log.Printf("Failed to unmarshal payload into IntermediatePayload: %v", err)
+			var item db.AddItemParams
+			if err := json.Unmarshal(payloadBytes, &item); err != nil {
+				log.Printf("Failed to unmarshal payload into Item: %v", err)
 				return
-			}
-			// fmt.Printf("Unmarshaled intermediate: %v", intermediate)
-
-			// Map IntermediatePayload to AddItemParams
-			item := db.AddItemParams{
-				CustomerId:   intermediate.CustomerId,
-				RestaurantId: intermediate.RestaurantId,
-				Name:         "Placeholder Name", // Placeholder data
-				Price:        0,                  // Placeholder data
-				Quantity:     intermediate.Quantity,
 			}
 
 			// Create a context for the AddItem function
@@ -218,33 +201,33 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 
 			// Call the AddItem logic
 			if err := h.domain.AddItem(ctx, item); err != nil {
-				log.Printf("Failed to add item to shopping cart: %v", err)
+				log.Printf("Failed to add menuitem to shopping cart: %v", err)
 				return
 			}
 
-			log.Printf("Successfully added item to shopping cart: %+v", item)
+			log.Printf("Successfully added menuitem to shopping cart: %+v", item)
 		})
 	}
 }
 
-type PublishOrderRequest struct {
+type PublishShoppingCartRequest struct {
 	Comment string `json:"comment" example:"No vegetables on the pizza."`
 }
 
-// PublishOrder godoc
+// PublishShoppingCart godoc
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
 //	@Description	Selecting the cart for the specified customer with an optional comment
-//	@Tags			shoppingCart
+//	@Tags			Broker
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int		true	"Customer ID"
-//	@Param			comment		body		PublishOrderRequest		true	"Customer Comment (optional)"
+//	@Param			comment		body		PublishShoppingCartRequest		true	"Customer Comment (optional)"
 //	@Success		200			{string}	string	"Order Selected Successfully"
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/api/shopping/publish/{customerId} [post]
-func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
+func (h *ShoppingCartHandler) PublishShoppingCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
@@ -255,7 +238,7 @@ func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
 		}
 
 		// Decode the Comment from the request body
-		var requestPayload PublishOrderRequest
+		var requestPayload PublishShoppingCartRequest
 		if err := json.NewDecoder(r.Body).Decode(&requestPayload); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
@@ -279,15 +262,13 @@ func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
 		err = broker.Publish("order_created_queue", event)
 		if err != nil {
 			log.Printf("Failed to publish event: %v", err)
-			http.Error(w, "Failed to select order", http.StatusInternalServerError)
+			http.Error(w, "Failed to select shopping cart", http.StatusInternalServerError)
 			return
 		}
 		// TODO: should the shoppingcart be cleared afterwards? or maybe when the order is confirmed?
 		// h.domain.ClearCart(ctx, customerId)
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Order published and selected successfully}`))
+		w.Write([]byte(`{"message": "Shopping Cart published and selected to Order successfully}`))
 	}
 }
-
-

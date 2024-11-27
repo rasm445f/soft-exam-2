@@ -9,8 +9,8 @@ import (
 )
 
 type AddItemParams struct {
-	CustomerId   int     `json:"customer_id"`
-	RestaurantId int     `json:"restaurant_id"`
+	CustomerId   int     `json:"customerId"`
+	RestaurantId int     `json:"restaurantId"`
 	Name         string  `json:"name"`
 	Price        float64 `json:"price"`
 	Quantity     int     `json:"quantity"`

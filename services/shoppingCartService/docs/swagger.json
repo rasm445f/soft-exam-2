@@ -92,7 +92,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "Broker"
                 ],
                 "summary": "Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment",
                 "parameters": [
@@ -109,7 +109,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.PublishOrderRequest"
+                            "$ref": "#/definitions/handlers.PublishShoppingCartRequest"
                         }
                     }
                 ],
@@ -291,7 +291,7 @@
         "db.AddItemParams": {
             "type": "object",
             "properties": {
-                "customer_id": {
+                "customerId": {
                     "type": "integer"
                 },
                 "name": {
@@ -303,12 +303,12 @@
                 "quantity": {
                     "type": "integer"
                 },
-                "restaurant_id": {
+                "restaurantId": {
                     "type": "integer"
                 }
             }
         },
-        "handlers.PublishOrderRequest": {
+        "handlers.PublishShoppingCartRequest": {
             "type": "object",
             "properties": {
                 "comment": {

@@ -103,7 +103,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "Broker"
                 ],
                 "summary": "Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment",
                 "parameters": [
@@ -120,7 +120,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.PublishOrderRequest"
+                            "$ref": "#/definitions/handlers.PublishShoppingCartRequest"
                         }
                     }
                 ],
@@ -302,7 +302,7 @@ const docTemplate = `{
         "db.AddItemParams": {
             "type": "object",
             "properties": {
-                "customer_id": {
+                "customerId": {
                     "type": "integer"
                 },
                 "name": {
@@ -314,12 +314,12 @@ const docTemplate = `{
                 "quantity": {
                     "type": "integer"
                 },
-                "restaurant_id": {
+                "restaurantId": {
                     "type": "integer"
                 }
             }
         },
-        "handlers.PublishOrderRequest": {
+        "handlers.PublishShoppingCartRequest": {
             "type": "object",
             "properties": {
                 "comment": {
