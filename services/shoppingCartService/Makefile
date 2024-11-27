@@ -22,9 +22,30 @@ default:
 	@echo "  test-mutation		# Run mutation testing with gremlins"
 
 
-run:
-	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
+# Unix-like systems (Linux/Mac)
+run-unix:
+	REDIS_HOST=$(REDIS_HOST) REDIS_PORT=$(REDIS_PORT) REDIS_PASSWORD=$(REDIS_PASSWORD) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
 
+# Windows
+run-windows:
+	REDIS_HOST=$(REDIS_HOST) REDIS_PORT=$(REDIS_PORT) REDIS_PASSWORD=$(REDIS_PASSWORD) air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
+
+# Main run target
+run:
+ifeq ($(OS),Windows_NT)
+	$(MAKE) run-windows
+else
+	$(MAKE) run-unix
+endif
+
+# run:
+# 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
+
+# run:
+# 	REDIS_PASSWORD=$(REDIS_PASSWORD) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
+
+# run:
+# 	REDIS_HOST=$(REDIS_HOST) REDIS_PORT=$(REDIS_PORT) REDIS_PASSWORD=$(REDIS_PASSWORD) air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
 build:
 	go build -o bin/api
 

@@ -7,8 +7,8 @@ import (
 	"log"
 	"regexp"
 
-	"github.com/oTuff/go-startkode/db/generated"
-	"github.com/oTuff/go-startkode/mailer"
+	"github.com/rasm445f/soft-exam-2/db/generated"
+	"github.com/rasm445f/soft-exam-2/mailer"
 )
 
 type CustomerDomain struct {

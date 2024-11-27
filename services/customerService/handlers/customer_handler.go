@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/oTuff/go-startkode/db/generated"
-	"github.com/oTuff/go-startkode/domain"
+	"github.com/rasm445f/soft-exam-2/broker"
+	"github.com/rasm445f/soft-exam-2/db/generated"
+	"github.com/rasm445f/soft-exam-2/domain"
 )
 
 type CustomerHandler struct {
@@ -254,5 +255,50 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"message": "Customer updated successfully"}`))
+	}
+}
+
+/* BROKER */
+type MenuItemSelection struct {
+	CustomerID   int32 `json:"customerId" example:"1"`
+	RestaurantId int32 `json:"restaurantId" example:"10"`
+	Name   string `json:"name" example:"Cheese Burger"`
+	Price  float64 `json:"price" example:"9.99"`
+	Quantity     int   `json:"quantity" example:"2"`
+}
+// SelectMenuItem godoc
+// @Summary Select Menuitem
+// @Description Select Menu Item
+// @Tags customers
+// @Accept  application/json
+// @Produce application/json
+// @Param customer body MenuItemSelection true "Menu item selection details"
+// @Success 201 {object} MenuItemSelection "Menu item successfully selected"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /api/customer/menu/select [post]
+func (h *CustomerHandler) SelectMenuitem() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var selection MenuItemSelection
+		err := json.NewDecoder(r.Body).Decode(&selection)
+		if err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+
+		// Publish event to RabbitMQ
+		event := broker.Event{
+			Type:    broker.MenuItemSelected,
+			Payload: selection,
+		}
+		err = broker.Publish("menu_item_selected_queue", event)
+		if err != nil {
+			log.Printf("Failed to publish event: %v", err)
+			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Menu item selected successfully}`))
 	}
 }

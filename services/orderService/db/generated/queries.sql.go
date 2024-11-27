@@ -8,74 +8,185 @@ package generated
 import (
 	"context"
 	"time"
+
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createTodo = `-- name: CreateTodo :one
-INSERT INTO todo (title, text, iscompleted, category, deadline)
-    VALUES ($1, $2, $3, $4, $5)
-RETURNING
-    id
+const createBonus = `-- name: CreateBonus :one
+INSERT INTO Bonus (Description, EarlyLateAmount, Percentage)
+VALUES ($1, $2, $3)
+RETURNING ID
 `
 
-type CreateTodoParams struct {
-	Title       string     `json:"title"`
-	Text        string     `json:"text"`
-	Iscompleted bool       `json:"iscompleted"`
-	Category    *string    `json:"category"`
-	Deadline    *time.Time `json:"deadline"`
+type CreateBonusParams struct {
+	Description     *string        `json:"description"`
+	Earlylateamount pgtype.Numeric `json:"earlylateamount"`
+	Percentage      pgtype.Numeric `json:"percentage"`
 }
 
-func (q *Queries) CreateTodo(ctx context.Context, arg CreateTodoParams) (int64, error) {
-	row := q.db.QueryRow(ctx, createTodo,
-		arg.Title,
-		arg.Text,
-		arg.Iscompleted,
-		arg.Category,
-		arg.Deadline,
-	)
-	var id int64
+// Create a Bonus
+func (q *Queries) CreateBonus(ctx context.Context, arg CreateBonusParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createBonus, arg.Description, arg.Earlylateamount, arg.Percentage)
+	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
 
-const deleteTodoById = `-- name: DeleteTodoById :exec
-DELETE FROM todo
-WHERE id = $1
+const createFee = `-- name: CreateFee :one
+INSERT INTO Fee (Amount, Description)
+VALUES ($1, $2)
+RETURNING ID
 `
 
-func (q *Queries) DeleteTodoById(ctx context.Context, id int64) error {
-	_, err := q.db.Exec(ctx, deleteTodoById, id)
+type CreateFeeParams struct {
+	Amount      pgtype.Numeric `json:"amount"`
+	Description *string        `json:"description"`
+}
+
+// Create a Fee
+func (q *Queries) CreateFee(ctx context.Context, arg CreateFeeParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createFee, arg.Amount, arg.Description)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const createOrder = `-- name: CreateOrder :one
+INSERT INTO "Order" (TotalAmount, VATAmount, Status, Timestamp, Comment, CustomerID, RestaurantID, DeliveryAgentID, PaymentID, BonusID, FeeID)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+RETURNING ID
+`
+
+type CreateOrderParams struct {
+	Totalamount     pgtype.Numeric `json:"totalamount"`
+	Vatamount       pgtype.Numeric `json:"vatamount"`
+	Status          string         `json:"status"`
+	Timestamp       *time.Time     `json:"timestamp"`
+	Comment         *string        `json:"comment"`
+	Customerid      *int32         `json:"customerid"`
+	Restaurantid    *int32         `json:"restaurantid"`
+	Deliveryagentid *int32         `json:"deliveryagentid"`
+	Paymentid       *int32         `json:"paymentid"`
+	Bonusid         *int32         `json:"bonusid"`
+	Feeid           *int32         `json:"feeid"`
+}
+
+// Create a new Order
+func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createOrder,
+		arg.Totalamount,
+		arg.Vatamount,
+		arg.Status,
+		arg.Timestamp,
+		arg.Comment,
+		arg.Customerid,
+		arg.Restaurantid,
+		arg.Deliveryagentid,
+		arg.Paymentid,
+		arg.Bonusid,
+		arg.Feeid,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const createOrderItem = `-- name: CreateOrderItem :one
+INSERT INTO OrderItem (OrderID, Name, Price, Quantity)
+VALUES ($1, $2, $3, $4)
+RETURNING ID
+`
+
+type CreateOrderItemParams struct {
+	Orderid  int32          `json:"orderid"`
+	Name     string         `json:"name"`
+	Price    pgtype.Numeric `json:"price"`
+	Quantity pgtype.Numeric `json:"quantity"`
+}
+
+// Create a new Order Item
+func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createOrderItem,
+		arg.Orderid,
+		arg.Name,
+		arg.Price,
+		arg.Quantity,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const createPayment = `-- name: CreatePayment :one
+INSERT INTO Payment (PaymentStatus, PaymentMethod)
+VALUES ($1, $2)
+RETURNING ID
+`
+
+type CreatePaymentParams struct {
+	Paymentstatus string `json:"paymentstatus"`
+	Paymentmethod string `json:"paymentmethod"`
+}
+
+// Create a Payment
+func (q *Queries) CreatePayment(ctx context.Context, arg CreatePaymentParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createPayment, arg.Paymentstatus, arg.Paymentmethod)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const deleteOrder = `-- name: DeleteOrder :exec
+DELETE FROM "Order"
+WHERE ID = $1
+`
+
+// Delete an Order
+func (q *Queries) DeleteOrder(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteOrder, id)
 	return err
 }
 
-const fetchAllTodos = `-- name: FetchAllTodos :many
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo
+const deleteOrderItemsByOrderId = `-- name: DeleteOrderItemsByOrderId :exec
+DELETE FROM OrderItem
+WHERE OrderID = $1
 `
 
-func (q *Queries) FetchAllTodos(ctx context.Context) ([]Todo, error) {
-	rows, err := q.db.Query(ctx, fetchAllTodos)
+// Delete all Order Items by Order ID
+func (q *Queries) DeleteOrderItemsByOrderId(ctx context.Context, orderid int32) error {
+	_, err := q.db.Exec(ctx, deleteOrderItemsByOrderId, orderid)
+	return err
+}
+
+const getAllOrders = `-- name: GetAllOrders :many
+SELECT ID, TotalAmount, VATAmount, Status, Timestamp, Comment, CustomerID, RestaurantID, DeliveryAgentID, PaymentID, BonusID, FeeID
+FROM "Order"
+ORDER BY Timestamp DESC
+`
+
+// Fetch all Orders
+func (q *Queries) GetAllOrders(ctx context.Context) ([]Order, error) {
+	rows, err := q.db.Query(ctx, getAllOrders)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Todo
+	var items []Order
 	for rows.Next() {
-		var i Todo
+		var i Order
 		if err := rows.Scan(
 			&i.ID,
-			&i.Title,
-			&i.Text,
-			&i.Iscompleted,
-			&i.Category,
-			&i.Deadline,
+			&i.Totalamount,
+			&i.Vatamount,
+			&i.Status,
+			&i.Timestamp,
+			&i.Comment,
+			&i.Customerid,
+			&i.Restaurantid,
+			&i.Deliveryagentid,
+			&i.Paymentid,
+			&i.Bonusid,
+			&i.Feeid,
 		); err != nil {
 			return nil, err
 		}
@@ -87,30 +198,126 @@ func (q *Queries) FetchAllTodos(ctx context.Context) ([]Todo, error) {
 	return items, nil
 }
 
-const getTodoById = `-- name: GetTodoById :one
-SELECT
-    id,
-    title,
-    text,
-    iscompleted,
-    category,
-    deadline
-FROM
-    todo
-WHERE
-    id = $1
+const getBonusById = `-- name: GetBonusById :one
+SELECT ID, Description, EarlyLateAmount, Percentage
+FROM Bonus
+WHERE ID = $1
 `
 
-func (q *Queries) GetTodoById(ctx context.Context, id int64) (Todo, error) {
-	row := q.db.QueryRow(ctx, getTodoById, id)
-	var i Todo
+// Fetch a Bonus by ID
+func (q *Queries) GetBonusById(ctx context.Context, id int32) (Bonu, error) {
+	row := q.db.QueryRow(ctx, getBonusById, id)
+	var i Bonu
 	err := row.Scan(
 		&i.ID,
-		&i.Title,
-		&i.Text,
-		&i.Iscompleted,
-		&i.Category,
-		&i.Deadline,
+		&i.Description,
+		&i.Earlylateamount,
+		&i.Percentage,
 	)
 	return i, err
+}
+
+const getFeeById = `-- name: GetFeeById :one
+SELECT ID, Amount, Description
+FROM Fee
+WHERE ID = $1
+`
+
+// Fetch a Fee by ID
+func (q *Queries) GetFeeById(ctx context.Context, id int32) (Fee, error) {
+	row := q.db.QueryRow(ctx, getFeeById, id)
+	var i Fee
+	err := row.Scan(&i.ID, &i.Amount, &i.Description)
+	return i, err
+}
+
+const getOrderById = `-- name: GetOrderById :one
+SELECT ID, TotalAmount, VATAmount, Status, Timestamp, Comment, CustomerID, RestaurantID, DeliveryAgentID, PaymentID, BonusID, FeeID
+FROM "Order"
+WHERE ID = $1
+`
+
+// Fetch an Order by ID
+func (q *Queries) GetOrderById(ctx context.Context, id int32) (Order, error) {
+	row := q.db.QueryRow(ctx, getOrderById, id)
+	var i Order
+	err := row.Scan(
+		&i.ID,
+		&i.Totalamount,
+		&i.Vatamount,
+		&i.Status,
+		&i.Timestamp,
+		&i.Comment,
+		&i.Customerid,
+		&i.Restaurantid,
+		&i.Deliveryagentid,
+		&i.Paymentid,
+		&i.Bonusid,
+		&i.Feeid,
+	)
+	return i, err
+}
+
+const getOrderItemsByOrderId = `-- name: GetOrderItemsByOrderId :many
+SELECT ID, OrderID, Name, Price, Quantity
+FROM OrderItem
+WHERE OrderID = $1
+`
+
+// Fetch all Order Items by Order ID
+func (q *Queries) GetOrderItemsByOrderId(ctx context.Context, orderid int32) ([]Orderitem, error) {
+	rows, err := q.db.Query(ctx, getOrderItemsByOrderId, orderid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Orderitem
+	for rows.Next() {
+		var i Orderitem
+		if err := rows.Scan(
+			&i.ID,
+			&i.Orderid,
+			&i.Name,
+			&i.Price,
+			&i.Quantity,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getPaymentById = `-- name: GetPaymentById :one
+SELECT ID, PaymentStatus, PaymentMethod
+FROM Payment
+WHERE ID = $1
+`
+
+// Fetch a Payment by ID
+func (q *Queries) GetPaymentById(ctx context.Context, id int32) (Payment, error) {
+	row := q.db.QueryRow(ctx, getPaymentById, id)
+	var i Payment
+	err := row.Scan(&i.ID, &i.Paymentstatus, &i.Paymentmethod)
+	return i, err
+}
+
+const updateOrderStatus = `-- name: UpdateOrderStatus :exec
+UPDATE "Order"
+SET Status = $1
+WHERE ID = $2
+`
+
+type UpdateOrderStatusParams struct {
+	Status string `json:"status"`
+	ID     int32  `json:"id"`
+}
+
+// Update an Order's status
+func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) error {
+	_, err := q.db.Exec(ctx, updateOrderStatus, arg.Status, arg.ID)
+	return err
 }

@@ -8,10 +8,11 @@ import (
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
-	"github.com/oTuff/go-startkode/db"
-	_ "github.com/oTuff/go-startkode/docs"
-	"github.com/oTuff/go-startkode/domain"
-	"github.com/oTuff/go-startkode/handlers"
+	"github.com/rasm445f/soft-exam-2/broker"
+	"github.com/rasm445f/soft-exam-2/db"
+	_ "github.com/rasm445f/soft-exam-2/docs"
+	"github.com/rasm445f/soft-exam-2/domain"
+	"github.com/rasm445f/soft-exam-2/handlers"
 )
 
 func run() (http.Handler, error) {
@@ -32,6 +33,8 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("PATCH /api/shopping/{customerId}/{itemId}", shoppingHandler.UpdateCart())
 	mux.HandleFunc("GET /api/shopping/{customerId}", shoppingHandler.ViewCart())
 	mux.HandleFunc("DELETE /api/shopping/{customerId}", shoppingHandler.ClearCart())
+	mux.HandleFunc("GET /api/shopping/consume", shoppingHandler.ConsumeMenuItem())
+	mux.HandleFunc("POST /api/shopping/publish/{customerId}", shoppingHandler.PublishOrder())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)
@@ -40,11 +43,14 @@ func run() (http.Handler, error) {
 }
 
 func main() {
+	broker.InitRabbitMQ()
+	defer broker.CloseRabbitMQ()
+
 	mux, err := run()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Running server on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	fmt.Println("Running server on port 8081")
+	log.Fatal(http.ListenAndServe(":8081", mux))
 }

@@ -11,22 +11,6 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createAddress = `-- name: CreateAddress :exec
-INSERT INTO address (zip_code, city)
-VALUES ($1, $2)
-ON CONFLICT (zip_code) DO NOTHING
-`
-
-type CreateAddressParams struct {
-	ZipCode int32  `json:"zip_code"`
-	City    string `json:"city"`
-}
-
-func (q *Queries) CreateAddress(ctx context.Context, arg CreateAddressParams) error {
-	_, err := q.db.Exec(ctx, createAddress, arg.ZipCode, arg.City)
-	return err
-}
-
 const createMenuItem = `-- name: CreateMenuItem :one
 INSERT INTO menuitem (restaurantid, name, price, description)
 VALUES ($1, $2, $3, $4)
@@ -53,7 +37,7 @@ func (q *Queries) CreateMenuItem(ctx context.Context, arg CreateMenuItemParams) 
 }
 
 const createRestaurant = `-- name: CreateRestaurant :one
-INSERT INTO restaurant (name, rating, category, street, zip_code)
+INSERT INTO restaurant (name, rating, category, address, zip_code)
 VALUES ($1, $2, $3, $4, $5)
 RETURNING id
 `
@@ -62,7 +46,7 @@ type CreateRestaurantParams struct {
 	Name     string         `json:"name"`
 	Rating   pgtype.Numeric `json:"rating"`
 	Category *string        `json:"category"`
-	Street   *string        `json:"street"`
+	Address  *string        `json:"address"`
 	ZipCode  *int32         `json:"zip_code"`
 }
 
@@ -71,12 +55,28 @@ func (q *Queries) CreateRestaurant(ctx context.Context, arg CreateRestaurantPara
 		arg.Name,
 		arg.Rating,
 		arg.Category,
-		arg.Street,
+		arg.Address,
 		arg.ZipCode,
 	)
 	var id int32
 	err := row.Scan(&id)
 	return id, err
+}
+
+const createZipCode = `-- name: CreateZipCode :exec
+INSERT INTO zipcode (zip_code, city)
+VALUES ($1, $2)
+ON CONFLICT (zip_code) DO NOTHING
+`
+
+type CreateZipCodeParams struct {
+	ZipCode int32  `json:"zip_code"`
+	City    string `json:"city"`
+}
+
+func (q *Queries) CreateZipCode(ctx context.Context, arg CreateZipCodeParams) error {
+	_, err := q.db.Exec(ctx, createZipCode, arg.ZipCode, arg.City)
+	return err
 }
 
 const fetchAllCategories = `-- name: FetchAllCategories :many
@@ -107,9 +107,9 @@ func (q *Queries) FetchAllCategories(ctx context.Context) ([]*string, error) {
 }
 
 const fetchAllRestaurants = `-- name: FetchAllRestaurants :many
-SELECT r.id, r.name, r.rating, r.category, r.street, r.zip_code
+SELECT r.id, r.name, r.rating, r.category, r.address, r.zip_code
 FROM restaurant r
-JOIN address a ON r.zip_code = a.zip_code
+JOIN zipcode a ON r.zip_code = a.zip_code
 `
 
 func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]Restaurant, error) {
@@ -126,7 +126,7 @@ func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]Restaurant, error)
 			&i.Name,
 			&i.Rating,
 			&i.Category,
-			&i.Street,
+			&i.Address,
 			&i.ZipCode,
 		); err != nil {
 			return nil, err
@@ -172,7 +172,7 @@ func (q *Queries) FetchMenuItemsByRestaurantId(ctx context.Context, restaurantid
 }
 
 const filterRestaurantsByCategory = `-- name: FilterRestaurantsByCategory :many
-SELECT id, name, rating, category, street, zip_code
+SELECT id, name, rating, category, address, zip_code
 FROM restaurant
 WHERE category ILIKE $1
 `
@@ -191,7 +191,7 @@ func (q *Queries) FilterRestaurantsByCategory(ctx context.Context, category *str
 			&i.Name,
 			&i.Rating,
 			&i.Category,
-			&i.Street,
+			&i.Address,
 			&i.ZipCode,
 		); err != nil {
 			return nil, err
@@ -229,7 +229,7 @@ func (q *Queries) GetMenuItemByRestaurantAndId(ctx context.Context, arg GetMenuI
 }
 
 const getRestaurantById = `-- name: GetRestaurantById :one
-SELECT id, name, rating, category, street, zip_code
+SELECT id, name, rating, category, address, zip_code
 FROM restaurant
 WHERE id = $1
 `
@@ -242,7 +242,7 @@ func (q *Queries) GetRestaurantById(ctx context.Context, id int32) (Restaurant, 
 		&i.Name,
 		&i.Rating,
 		&i.Category,
-		&i.Street,
+		&i.Address,
 		&i.ZipCode,
 	)
 	return i, err

@@ -29,9 +29,9 @@ CREATE TABLE "Order" (
     CustomerID int,
     RestaurantID int,
     DeliveryAgentID int,
-    PaymentID int REFERENCES Payment (ID),
-    BonusID int REFERENCES Bonus (ID),
-    FeeID int REFERENCES Fee (ID)
+    PaymentID int REFERENCES Payment (ID) ON DELETE SET NULL,
+    BonusID int REFERENCES Bonus (ID) ON DELETE SET NULL,
+    FeeID int REFERENCES Fee (ID) ON DELETE SET NULL
 );
 
 CREATE TABLE OrderItem (
@@ -45,14 +45,14 @@ CREATE TABLE OrderItem (
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE Fee;
+DROP TABLE Fee CASCADE;
 
-DROP TABLE Payment;
+DROP TABLE Payment CASCADE;
 
-DROP TABLE Bonus;
+DROP TABLE Bonus CASCADE;
 
-DROP TABLE "Order";
+DROP TABLE "Order" CASCADE;
 
-DROP TABLE OrderItem;
+DROP TABLE OrderItem CASCADE;
 
 -- +goose StatementEnd

@@ -1,12 +1,15 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"log"
 	"net/http"
 	"strconv"
 
-	"github.com/oTuff/go-startkode/db"
-	"github.com/oTuff/go-startkode/domain"
+	"github.com/rasm445f/soft-exam-2/broker"
+	"github.com/rasm445f/soft-exam-2/db"
+	"github.com/rasm445f/soft-exam-2/domain"
 )
 
 type ShoppingCartHandler struct {
@@ -158,3 +161,133 @@ func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 	}
 }
+
+type IntermediatePayload struct {
+	CustomerId   int `json:"customerId"`
+	MenuItemId   int `json:"menuItemId"`
+	Quantity     int `json:"quantity"`
+	RestaurantId int `json:"restaurantId"`
+}
+
+// Consume godoc
+//
+//	@Summary		View items for a customer
+//	@Description	Fetches a list of items based on the customerId
+//	@Tags			shoppingCart
+//	@Produce		application/json
+//	@Success		200	{string}	string	"Cart cleared"
+//	@Failure		400	{string}	string	"Bad request"
+//	@Failure		500	{string}	string	"Internal server error"
+//	@Router			/api/shopping/consume [get]
+func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		broker.Consume("menu_item_selected_queue", func(event broker.Event) {
+			// Ensure the event type is as expected
+			if event.Type != broker.MenuItemSelected {
+				log.Printf("Ignored event of unexpected type: %v", event.Type)
+				return
+			}
+
+			// Convert event.Payload (interface{}) to JSON bytes
+			payloadBytes, err := json.Marshal(event.Payload)
+			if err != nil {
+				log.Printf("Failed to marshal event payload: %v", err)
+				return
+			}
+			// fmt.Println(payloadBytes)
+
+			// Unmarshal JSON bytes into IntermediatePayload
+			var intermediate IntermediatePayload
+			if err := json.Unmarshal(payloadBytes, &intermediate); err != nil {
+				log.Printf("Failed to unmarshal payload into IntermediatePayload: %v", err)
+				return
+			}
+			// fmt.Printf("Unmarshaled intermediate: %v", intermediate)
+
+			// Map IntermediatePayload to AddItemParams
+			item := db.AddItemParams{
+				CustomerId:   intermediate.CustomerId,
+				RestaurantId: intermediate.RestaurantId,
+				Name:         "Placeholder Name", // Placeholder data
+				Price:        0,                  // Placeholder data
+				Quantity:     intermediate.Quantity,
+			}
+
+			// Create a context for the AddItem function
+			ctx := context.Background()
+
+			// Call the AddItem logic
+			if err := h.domain.AddItem(ctx, item); err != nil {
+				log.Printf("Failed to add item to shopping cart: %v", err)
+				return
+			}
+
+			log.Printf("Successfully added item to shopping cart: %+v", item)
+		})
+	}
+}
+
+type PublishOrderRequest struct {
+	Comment string `json:"comment" example:"No vegetables on the pizza."`
+}
+
+// PublishOrder godoc
+//
+//	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
+//	@Description	Selecting the cart for the specified customer with an optional comment
+//	@Tags			shoppingCart
+//	@Accept			application/json
+//	@Produce		application/json
+//	@Param			customerId	path		int		true	"Customer ID"
+//	@Param			comment		body		PublishOrderRequest		true	"Customer Comment (optional)"
+//	@Success		200			{string}	string	"Order Selected Successfully"
+//	@Failure		400			{string}	string	"Bad request"
+//	@Failure		500			{string}	string	"Internal server error"
+//	@Router			/api/shopping/publish/{customerId} [post]
+func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		customerIdStr := r.PathValue("customerId")
+		customerId, err := strconv.Atoi(customerIdStr)
+		if err != nil {
+			http.Error(w, "Invalid customer_id", http.StatusBadRequest)
+		}
+
+		// Decode the Comment from the request body
+		var requestPayload PublishOrderRequest
+		if err := json.NewDecoder(r.Body).Decode(&requestPayload); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Fetch the shopping cart
+		shoppingCart, err := h.domain.ViewCart(ctx, customerId)
+		if err != nil {
+			http.Error(w, "Failed to fetch shopping cart", http.StatusInternalServerError)
+			return
+		}
+
+		// Add the Comment to the shopping cart payload
+		shoppingCart.Comment = requestPayload.Comment
+
+		// Publish event to RabbitMQ
+		event := broker.Event{
+			Type:    broker.OrderCreated,
+			Payload: shoppingCart,
+		}
+		err = broker.Publish("order_created_queue", event)
+		if err != nil {
+			log.Printf("Failed to publish event: %v", err)
+			http.Error(w, "Failed to select order", http.StatusInternalServerError)
+			return
+		}
+		// TODO: should the shoppingcart be cleared afterwards? or maybe when the order is confirmed?
+		// h.domain.ClearCart(ctx, customerId)
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Order published and selected successfully}`))
+	}
+}
+
+

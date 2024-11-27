@@ -15,35 +15,21 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/api/todo": {
-            "post": {
-                "description": "Create a new todo entry in the database",
-                "consumes": [
-                    "application/json"
-                ],
+        "/api/order/consume": {
+            "get": {
+                "description": "Consume the created order for customer",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "order"
                 ],
-                "summary": "Create a new todo",
-                "parameters": [
-                    {
-                        "description": "Todo object",
-                        "name": "todo",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
-                        }
-                    }
-                ],
+                "summary": "Consume Order for a Customer",
                 "responses": {
-                    "201": {
-                        "description": "Created",
+                    "200": {
+                        "description": "Order Consumed Successfully",
                         "schema": {
-                            "$ref": "#/definitions/generated.CreateTodoParams"
+                            "type": "string"
                         }
                     },
                     "400": {
@@ -61,67 +47,46 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/todo/{id}": {
-            "get": {
-                "description": "Fetches a todo based on the id from the database",
+        "/api/order/status/{orderId}": {
+            "patch": {
+                "description": "Updates the status of an order",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "orders"
                 ],
-                "summary": "Get todo",
+                "summary": "Update Order Status",
                 "parameters": [
                     {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderId",
                         "in": "path",
                         "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "description": "Delete a todo based on the id from the database",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "todos"
-                ],
-                "summary": "Delete todo",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Todo ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/generated.Todo"
-                        }
                     },
-                    "400": {
-                        "description": "Bad request",
+                    {
+                        "description": "New Order Status",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order status updated successfully",
                         "schema": {
                             "type": "string"
                         }
                     },
                     "404": {
-                        "description": "Not found",
+                        "description": "Order not found",
                         "schema": {
                             "type": "string"
                         }
@@ -129,24 +94,83 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/todos": {
+        "/api/orders": {
             "get": {
-                "description": "Fetches a list of all todos from the database",
+                "description": "Fetches a list of all orders from the database",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "todos"
+                    "orders"
                 ],
-                "summary": "Get all todos",
+                "summary": "Get all orders",
                 "responses": {
                     "200": {
                         "description": "OK",
                         "schema": {
                             "type": "array",
                             "items": {
-                                "$ref": "#/definitions/generated.Todo"
+                                "$ref": "#/definitions/generated.Order"
                             }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders/{id}": {
+            "get": {
+                "description": "Fetches an order based on the id from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get order by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Order"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an order by its id from the database",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Delete an order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order deleted successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -154,46 +178,89 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "generated.CreateTodoParams": {
-            "type": "object",
-            "properties": {
-                "category": {
-                    "type": "string"
-                },
-                "deadline": {
-                    "type": "string"
-                },
-                "iscompleted": {
-                    "type": "boolean"
-                },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
-            }
+        "big.Int": {
+            "type": "object"
         },
-        "generated.Todo": {
+        "generated.Order": {
             "type": "object",
             "properties": {
-                "category": {
+                "bonusid": {
+                    "type": "integer"
+                },
+                "comment": {
                     "type": "string"
                 },
-                "deadline": {
-                    "type": "string"
+                "customerid": {
+                    "type": "integer"
+                },
+                "deliveryagentid": {
+                    "type": "integer"
+                },
+                "feeid": {
+                    "type": "integer"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "iscompleted": {
+                "paymentid": {
+                    "type": "integer"
+                },
+                "restaurantid": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "totalamount": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                },
+                "vatamount": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                }
+            }
+        },
+        "handlers.UpdateOrderStatusRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "Pending/On its way/Delivered"
+                }
+            }
+        },
+        "pgtype.InfinityModifier": {
+            "type": "integer",
+            "enum": [
+                1,
+                0,
+                -1
+            ],
+            "x-enum-varnames": [
+                "Infinity",
+                "Finite",
+                "NegativeInfinity"
+            ]
+        },
+        "pgtype.Numeric": {
+            "type": "object",
+            "properties": {
+                "exp": {
+                    "type": "integer"
+                },
+                "infinityModifier": {
+                    "$ref": "#/definitions/pgtype.InfinityModifier"
+                },
+                "int": {
+                    "$ref": "#/definitions/big.Int"
+                },
+                "naN": {
                     "type": "boolean"
                 },
-                "text": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
+                "valid": {
+                    "type": "boolean"
                 }
             }
         }

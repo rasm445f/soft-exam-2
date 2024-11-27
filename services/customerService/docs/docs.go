@@ -82,6 +82,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/customer/menu/select": {
+            "post": {
+                "description": "Select Menu Item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Select Menuitem",
+                "parameters": [
+                    {
+                        "description": "Menu item selection details",
+                        "name": "customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MenuItemSelection"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Menu item successfully selected",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MenuItemSelection"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/customer/{id}": {
             "get": {
                 "description": "Fetches a customer based on the id from the database",
@@ -298,6 +344,31 @@ const docTemplate = `{
                 "zip_code": {
                     "type": "integer",
                     "example": 12345
+                }
+            }
+        },
+        "handlers.MenuItemSelection": {
+            "type": "object",
+            "properties": {
+                "customerId": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Cheese Burger"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 9.99
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "restaurantId": {
+                    "type": "integer",
+                    "example": 10
                 }
             }
         }

@@ -2,16 +2,15 @@
 -- +goose StatementBegin
 
 ALTER TABLE Restaurant
-DROP COLUMN Address,
-ADD COLUMN street VARCHAR(255),
-ADD COLUMN zip_code INT REFERENCES Address(zip_code);
+ADD COLUMN address VARCHAR(255),
+ADD COLUMN zip_code INT REFERENCES ZipCode(zip_code);
 
-INSERT INTO Address (zip_code, city) VALUES
+INSERT INTO ZipCode (zip_code, city) VALUES
     (2800, 'Kgs. Lyngby'),
     (2970, 'Hørsholm'),
     (2980, 'Kokkedal');
 
-INSERT INTO Restaurant (name, street, zip_code, rating, category) VALUES
+INSERT INTO Restaurant (name, address, zip_code, rating, category) VALUES
     ('Pizza Paradise', 'Lyngby Hovedgade 25', 2800, 4.5, 'pizza'),
     ('Taco Town', 'Lyngbyvej 18', 2800, 3.7, 'mexican'),
     ('Café Aroma', 'Kongensgade 15', 2800, 4.5, 'coffee'),
@@ -140,11 +139,10 @@ INSERT INTO Menuitem (restaurantid, name, price, description) VALUES
 -- +goose StatementBegin
 
 ALTER TABLE Restaurant
-DROP COLUMN street,
+DROP COLUMN address,
 DROP COLUMN zip_code,
-ADD COLUMN Address TEXT;
 
-DROP TABLE Address;
+DROP TABLE ZipCode;
 
 DELETE FROM Menuitem WHERE restaurantid IN(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
