@@ -178,9 +178,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "big.Int": {
-            "type": "object"
-        },
         "generated.Order": {
             "type": "object",
             "properties": {
@@ -215,10 +212,10 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "totalamount": {
-                    "$ref": "#/definitions/pgtype.Numeric"
+                    "type": "number"
                 },
                 "vatamount": {
-                    "$ref": "#/definitions/pgtype.Numeric"
+                    "type": "number"
                 }
             }
         },
@@ -228,39 +225,6 @@ const docTemplate = `{
                 "status": {
                     "type": "string",
                     "example": "Pending/On its way/Delivered"
-                }
-            }
-        },
-        "pgtype.InfinityModifier": {
-            "type": "integer",
-            "enum": [
-                1,
-                0,
-                -1
-            ],
-            "x-enum-varnames": [
-                "Infinity",
-                "Finite",
-                "NegativeInfinity"
-            ]
-        },
-        "pgtype.Numeric": {
-            "type": "object",
-            "properties": {
-                "exp": {
-                    "type": "integer"
-                },
-                "infinityModifier": {
-                    "$ref": "#/definitions/pgtype.InfinityModifier"
-                },
-                "int": {
-                    "$ref": "#/definitions/big.Int"
-                },
-                "naN": {
-                    "type": "boolean"
-                },
-                "valid": {
-                    "type": "boolean"
                 }
             }
         }

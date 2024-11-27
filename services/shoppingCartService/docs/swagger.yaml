@@ -15,7 +15,7 @@ definitions:
   handlers.PublishShoppingCartRequest:
     properties:
       comment:
-        example: No vegetables on the pizza.
+        example: No vegetables
         type: string
     type: object
   handlers.UpdateQuantityRequest:
@@ -159,12 +159,12 @@ paths:
       - shoppingCart
   /api/shopping/consume:
     get:
-      description: Fetches a list of items based on the customerId
+      description: Consumes the Shopping Cart's Menu Items for a Customer
       produces:
       - application/json
       responses:
         "200":
-          description: Cart cleared
+          description: Shopping Cart's Menu Items Consumed
           schema:
             type: string
         "400":
@@ -175,9 +175,9 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: View items for a customer
+      summary: Consume the chosen Menu Items for a Customer
       tags:
-      - shoppingCart
+      - Broker
   /api/shopping/publish/{customerId}:
     post:
       consumes:
