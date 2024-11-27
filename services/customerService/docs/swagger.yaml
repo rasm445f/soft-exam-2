@@ -1,8 +1,6 @@
 definitions:
   generated.CreateCustomerParams:
     properties:
-      address:
-        type: string
       email:
         type: string
       name:
@@ -11,11 +9,15 @@ definitions:
         type: string
       phonenumber:
         type: string
+      street_address:
+        type: string
+      zip_code:
+        type: integer
     type: object
   generated.Customer:
     properties:
-      address:
-        type: string
+      addressid:
+        type: integer
       email:
         type: string
       id:
@@ -29,8 +31,6 @@ definitions:
     type: object
   generated.UpdateCustomerParams:
     properties:
-      address:
-        type: string
       email:
         type: string
       id:
@@ -137,13 +137,14 @@ paths:
     patch:
       consumes:
       - application/json
-      description: Updates a customer's details based on the ID from the database
+      description: Updates a customer's details based on the ID provided in the URL
+        path. This may include personal information as well as optional address updates.
       parameters:
       - description: Customer ID
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       - description: Updated customer details
         in: body
         name: customer
@@ -156,16 +157,28 @@ paths:
         "200":
           description: Customer updated successfully
           schema:
-            type: string
+            additionalProperties:
+              type: string
+            type: object
         "400":
           description: Invalid input
           schema:
-            type: string
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Customer not found
           schema:
-            type: string
-      summary: Update customer
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a customer
       tags:
       - customers
 swagger: "2.0"

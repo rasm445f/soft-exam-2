@@ -64,11 +64,11 @@ func NewCustomerDomain(queries *generated.Queries) *CustomerDomain {
 	return &CustomerDomain{Queries: queries}
 }
 
-func (cd *CustomerDomain) GetAllCustomers(ctx context.Context) ([]generated.Customer, error) {
+func (cd *CustomerDomain) GetAllCustomers(ctx context.Context) ([]generated.GetAllCustomersRow, error) {
 	return cd.Queries.GetAllCustomers(ctx)
 }
 
-func (cd *CustomerDomain) GetCustomerByID(ctx context.Context, id int32) (generated.Customer, error) {
+func (cd *CustomerDomain) GetCustomerByID(ctx context.Context, id int32) (generated.GetCustomerByIDRow, error) {
 	return cd.Queries.GetCustomerByID(ctx, id)
 }
 
@@ -76,18 +76,18 @@ func (cd *CustomerDomain) DeleteCustomer(ctx context.Context, id int32) error {
 	return cd.Queries.DeleteCustomer(ctx, id)
 }
 
-func (cs *CustomerDomain) CreateCustomer(ctx context.Context, customerParams generated.CreateCustomerParams) (*generated.Customer, error) {
+func (cs *CustomerDomain) CreateCustomer(ctx context.Context, customerParams generated.CreateCustomerParams) error {
 	if *customerParams.Name == "" || *customerParams.Email == "" || *customerParams.Password == "" {
-		return nil, errors.New("all required fields must be filled")
+		return errors.New("all required fields must be filled")
 	}
 
 	if err := ValidatePassword(*customerParams.Password); err != nil {
-		return nil, err
+		return err
 	}
 
-	createdCustomer, err := cs.Queries.CreateCustomer(ctx, customerParams)
+	err := cs.Queries.CreateCustomer(ctx, customerParams)
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	subject := "Welcome to MTOGO, " + *customerParams.Name + "!"
@@ -123,37 +123,42 @@ func (cs *CustomerDomain) CreateCustomer(ctx context.Context, customerParams gen
 		log.Println("Failed to send email:", err)
 	}
 
-	customer := &generated.Customer{
-		ID:          createdCustomer.ID,
-		Name:        createdCustomer.Name,
-		Email:       createdCustomer.Email,
-		Password:    createdCustomer.Password,
-		Phonenumber: createdCustomer.Phonenumber,
-		Address:     createdCustomer.Address,
-	}
-
-	return customer, nil
+	return nil
 }
 
 func (cd *CustomerDomain) UpdateCustomer(ctx context.Context, customerParams generated.UpdateCustomerParams) error {
-	// Validate optional fields if provided
+	// Validate password if being updated
 	if customerParams.Password != nil {
 		if err := ValidatePassword(*customerParams.Password); err != nil {
 			return err
 		}
 	}
 
+	// Validate email if being updated
 	if customerParams.Email != nil {
 		if err := ValidateEmail(*customerParams.Email); err != nil {
 			return err
 		}
 	}
 
-	// Perform the update in the database
+	// Update the customer information
 	err := cd.Queries.UpdateCustomer(ctx, customerParams)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return errors.New("customer not found")
+		}
+		return err
+	}
+
+	return nil
+}
+
+func (cd *CustomerDomain) UpdateAddress(ctx context.Context, addressParams generated.UpdateAddressParams) error {
+	// Update the address in the database
+	err := cd.Queries.UpdateAddress(ctx, addressParams)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return errors.New("address not found")
 		}
 		return err
 	}

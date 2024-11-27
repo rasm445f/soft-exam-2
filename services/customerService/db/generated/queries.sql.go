@@ -9,47 +9,51 @@ import (
 	"context"
 )
 
-const createCustomer = `-- name: CreateCustomer :one
-INSERT INTO customer (name, email, phonenumber, address, password)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING id, name, email, phonenumber, address, password
+const createCustomer = `-- name: CreateCustomer :exec
+WITH new_address AS (
+    INSERT INTO address (street_address, zip_code)
+    VALUES ($1, $2)
+    RETURNING id AS address_id
+)
+INSERT INTO customer (name, email, phonenumber, addressid, password)
+VALUES ($3, $4, $5, (SELECT address_id FROM new_address), $6)
 `
 
 type CreateCustomerParams struct {
-	Name        *string `json:"name"`
-	Email       *string `json:"email"`
-	Phonenumber *string `json:"phonenumber"`
-	Address     *string `json:"address"`
-	Password    *string `json:"password"`
+	StreetAddress *string `json:"street_address"`
+	ZipCode       *int32  `json:"zip_code"`
+	Name          *string `json:"name"`
+	Email         *string `json:"email"`
+	Phonenumber   *string `json:"phonenumber"`
+	Password      *string `json:"password"`
 }
 
-type CreateCustomerRow struct {
-	ID          int32   `json:"id"`
-	Name        *string `json:"name"`
-	Email       *string `json:"email"`
-	Phonenumber *string `json:"phonenumber"`
-	Address     *string `json:"address"`
-	Password    *string `json:"password"`
-}
-
-func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) (CreateCustomerRow, error) {
-	row := q.db.QueryRow(ctx, createCustomer,
+func (q *Queries) CreateCustomer(ctx context.Context, arg CreateCustomerParams) error {
+	_, err := q.db.Exec(ctx, createCustomer,
+		arg.StreetAddress,
+		arg.ZipCode,
 		arg.Name,
 		arg.Email,
 		arg.Phonenumber,
-		arg.Address,
 		arg.Password,
 	)
-	var i CreateCustomerRow
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.Email,
-		&i.Phonenumber,
-		&i.Address,
-		&i.Password,
-	)
-	return i, err
+	return err
+}
+
+const createZipCode = `-- name: CreateZipCode :exec
+INSERT INTO zipcode (zip_code, city)
+VALUES ($1, $2)
+ON CONFLICT DO NOTHING
+`
+
+type CreateZipCodeParams struct {
+	ZipCode int32   `json:"zip_code"`
+	City    *string `json:"city"`
+}
+
+func (q *Queries) CreateZipCode(ctx context.Context, arg CreateZipCodeParams) error {
+	_, err := q.db.Exec(ctx, createZipCode, arg.ZipCode, arg.City)
+	return err
 }
 
 const deleteCustomer = `-- name: DeleteCustomer :exec
@@ -62,25 +66,50 @@ func (q *Queries) DeleteCustomer(ctx context.Context, id int32) error {
 }
 
 const getAllCustomers = `-- name: GetAllCustomers :many
-SELECT id, name, email, password, phonenumber, address FROM customer ORDER BY name
+SELECT 
+    c.id,
+    c.name,
+    c.email,
+    c.phonenumber,
+    c.password,
+    a.street_address AS street_address,
+    z.zip_code,
+    z.city
+FROM customer c
+LEFT JOIN address a ON c.addressid = a.id
+LEFT JOIN zipcode z ON a.zip_code = z.zip_code
+ORDER BY c.name
 `
 
-func (q *Queries) GetAllCustomers(ctx context.Context) ([]Customer, error) {
+type GetAllCustomersRow struct {
+	ID            int32   `json:"id"`
+	Name          *string `json:"name"`
+	Email         *string `json:"email"`
+	Phonenumber   *string `json:"phonenumber"`
+	Password      *string `json:"password"`
+	StreetAddress *string `json:"street_address"`
+	ZipCode       *int32  `json:"zip_code"`
+	City          *string `json:"city"`
+}
+
+func (q *Queries) GetAllCustomers(ctx context.Context) ([]GetAllCustomersRow, error) {
 	rows, err := q.db.Query(ctx, getAllCustomers)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []Customer
+	var items []GetAllCustomersRow
 	for rows.Next() {
-		var i Customer
+		var i GetAllCustomersRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Name,
 			&i.Email,
-			&i.Password,
 			&i.Phonenumber,
-			&i.Address,
+			&i.Password,
+			&i.StreetAddress,
+			&i.ZipCode,
+			&i.City,
 		); err != nil {
 			return nil, err
 		}
@@ -93,21 +122,65 @@ func (q *Queries) GetAllCustomers(ctx context.Context) ([]Customer, error) {
 }
 
 const getCustomerByID = `-- name: GetCustomerByID :one
-SELECT id, name, email, password, phonenumber, address FROM customer WHERE id = $1
+SELECT 
+    c.id,
+    c.name,
+    c.email,
+    c.phonenumber,
+    c.password,
+    a.street_address,
+    z.zip_code,
+    z.city
+FROM customer c
+LEFT JOIN address a ON c.addressid = a.id
+LEFT JOIN zipcode z ON a.zip_code = z.zip_code
+WHERE c.id = $1
 `
 
-func (q *Queries) GetCustomerByID(ctx context.Context, id int32) (Customer, error) {
+type GetCustomerByIDRow struct {
+	ID            int32   `json:"id"`
+	Name          *string `json:"name"`
+	Email         *string `json:"email"`
+	Phonenumber   *string `json:"phonenumber"`
+	Password      *string `json:"password"`
+	StreetAddress *string `json:"street_address"`
+	ZipCode       *int32  `json:"zip_code"`
+	City          *string `json:"city"`
+}
+
+func (q *Queries) GetCustomerByID(ctx context.Context, id int32) (GetCustomerByIDRow, error) {
 	row := q.db.QueryRow(ctx, getCustomerByID, id)
-	var i Customer
+	var i GetCustomerByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Name,
 		&i.Email,
-		&i.Password,
 		&i.Phonenumber,
-		&i.Address,
+		&i.Password,
+		&i.StreetAddress,
+		&i.ZipCode,
+		&i.City,
 	)
 	return i, err
+}
+
+const updateAddress = `-- name: UpdateAddress :exec
+UPDATE address
+SET 
+    street_address = COALESCE($2, street_address),
+    zip_code = COALESCE($3, zip_code)
+WHERE id = $1
+`
+
+type UpdateAddressParams struct {
+	ID            int32   `json:"id"`
+	StreetAddress *string `json:"street_address"`
+	ZipCode       *int32  `json:"zip_code"`
+}
+
+func (q *Queries) UpdateAddress(ctx context.Context, arg UpdateAddressParams) error {
+	_, err := q.db.Exec(ctx, updateAddress, arg.ID, arg.StreetAddress, arg.ZipCode)
+	return err
 }
 
 const updateCustomer = `-- name: UpdateCustomer :exec
@@ -116,8 +189,7 @@ SET
     name = COALESCE($2, name),
     email = COALESCE($3, email),
     phonenumber = COALESCE($4, phonenumber),
-    address = COALESCE($5, address),
-    password = COALESCE($6, password)
+    password = COALESCE($5, password)
 WHERE id = $1
 `
 
@@ -126,7 +198,6 @@ type UpdateCustomerParams struct {
 	Name        *string `json:"name"`
 	Email       *string `json:"email"`
 	Phonenumber *string `json:"phonenumber"`
-	Address     *string `json:"address"`
 	Password    *string `json:"password"`
 }
 
@@ -136,7 +207,6 @@ func (q *Queries) UpdateCustomer(ctx context.Context, arg UpdateCustomerParams) 
 		arg.Name,
 		arg.Email,
 		arg.Phonenumber,
-		arg.Address,
 		arg.Password,
 	)
 	return err

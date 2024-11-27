@@ -4,11 +4,22 @@
 
 package generated
 
+type Address struct {
+	ID            int32   `json:"id"`
+	StreetAddress *string `json:"street_address"`
+	ZipCode       *int32  `json:"zip_code"`
+}
+
 type Customer struct {
 	ID          int32   `json:"id"`
 	Name        *string `json:"name"`
 	Email       *string `json:"email"`
 	Password    *string `json:"password"`
 	Phonenumber *string `json:"phonenumber"`
-	Address     *string `json:"address"`
+	Addressid   *int32  `json:"addressid"`
+}
+
+type Zipcode struct {
+	ZipCode int32   `json:"zip_code"`
+	City    *string `json:"city"`
 }
