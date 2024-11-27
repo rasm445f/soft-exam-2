@@ -1,6 +1,4 @@
 definitions:
-  big.Int:
-    type: object
   generated.Order:
     properties:
       bonusid:
@@ -24,38 +22,15 @@ definitions:
       timestamp:
         type: string
       totalamount:
-        $ref: '#/definitions/pgtype.Numeric'
+        type: number
       vatamount:
-        $ref: '#/definitions/pgtype.Numeric'
+        type: number
     type: object
   handlers.UpdateOrderStatusRequest:
     properties:
       status:
         example: Pending/On its way/Delivered
         type: string
-    type: object
-  pgtype.InfinityModifier:
-    enum:
-    - 1
-    - 0
-    - -1
-    type: integer
-    x-enum-varnames:
-    - Infinity
-    - Finite
-    - NegativeInfinity
-  pgtype.Numeric:
-    properties:
-      exp:
-        type: integer
-      infinityModifier:
-        $ref: '#/definitions/pgtype.InfinityModifier'
-      int:
-        $ref: '#/definitions/big.Int'
-      naN:
-        type: boolean
-      valid:
-        type: boolean
     type: object
 info:
   contact: {}

@@ -212,6 +212,10 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 	}
 }
 
+type PublishOrderRequest struct {
+	Comment string `json:"comment" example:"No vegetables"`
+}
+
 // PublishOrder godoc
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
@@ -231,15 +235,26 @@ func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
 		customerIdStr := r.PathValue("customerId")
 		customerId, err := strconv.Atoi(customerIdStr)
 		if err != nil {
-			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
+			http.Error(w, "Invalid customer_id", http.StatusBadRequest)
 		}
 
+		// Decode the Comment from the request body
+		var requestPayload PublishOrderRequest
+		if err := json.NewDecoder(r.Body).Decode(&requestPayload); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Fetch the shopping cart
 		shoppingCart, err := h.domain.ViewCart(ctx, customerId)
 		if err != nil {
 			log.Printf("Failed to publish event: %v", err)
 			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
 			return
 		}
+
+		// Add the Comment to the shopping cart payload
+		shoppingCart.Comment = requestPayload.Comment
 
 		// Publish event to RabbitMQ
 		event := broker.Event{
@@ -249,13 +264,13 @@ func (h *ShoppingCartHandler) PublishOrder() http.HandlerFunc {
 		err = broker.Publish("order_created_queue", event)
 		if err != nil {
 			log.Printf("Failed to publish event: %v", err)
-			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
+			http.Error(w, "Failed to select menu item Event to RabbitMQ", http.StatusInternalServerError)
 			return
 		}
 		// TODO: should the shoppingcart be cleared afterwards? or maybe when the order is confirmed?
 		// h.domain.ClearCart(ctx, customerId)
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Menu item selected successfully}`))
+		w.Write([]byte(`{"message": "Order published and selected successfully}`))
 	}
 }

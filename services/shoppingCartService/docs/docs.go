@@ -63,17 +63,17 @@ const docTemplate = `{
         },
         "/api/shopping/consume": {
             "get": {
-                "description": "Fetches a list of items based on the customerId",
+                "description": "Consumes the Shopping Cart's Menu Items for a Customer",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "Broker"
                 ],
-                "summary": "View items for a customer",
+                "summary": "Consume the chosen Menu Items for a Customer",
                 "responses": {
                     "200": {
-                        "description": "Cart cleared",
+                        "description": "Shopping Cart's Menu Items Consumed",
                         "schema": {
                             "type": "string"
                         }
@@ -324,7 +324,7 @@ const docTemplate = `{
             "properties": {
                 "comment": {
                     "type": "string",
-                    "example": "No vegetables on the pizza."
+                    "example": "No vegetables"
                 }
             }
         },
