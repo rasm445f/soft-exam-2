@@ -12,6 +12,12 @@ definitions:
       restaurant_id:
         type: integer
     type: object
+  handlers.PublishOrderRequest:
+    properties:
+      comment:
+        example: No vegetables on the pizza.
+        type: string
+    type: object
   handlers.UpdateQuantityRequest:
     properties:
       quantity:
@@ -173,21 +179,28 @@ paths:
       tags:
       - shoppingCart
   /api/shopping/publish/{customerId}:
-    get:
+    post:
       consumes:
       - application/json
-      description: Clears the cart for the specified customer
+      description: Selecting the cart for the specified customer with an optional
+        comment
       parameters:
-      - description: customer ID
+      - description: Customer ID
         in: path
         name: customerId
         required: true
         type: integer
+      - description: Customer Comment (optional)
+        in: body
+        name: comment
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.PublishOrderRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: cart cleared
+          description: Order Selected Successfully
           schema:
             type: string
         "400":
@@ -198,7 +211,8 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Publish the shopping cart to rabbimq to be consumed by the Order service
+      summary: Publish a Customer's shopping cart to RabbitMQ to be consumed by the
+        Order service with an optional Comment
       tags:
       - shoppingCart
 swagger: "2.0"

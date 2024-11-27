@@ -24,10 +24,10 @@ const docTemplate = `{
                 "tags": [
                     "order"
                 ],
-                "summary": "View order for a customer",
+                "summary": "Consume Order for a Customer",
                 "responses": {
                     "200": {
-                        "description": "Order Consume Success",
+                        "description": "Order Consumed Successfully",
                         "schema": {
                             "type": "string"
                         }
@@ -44,6 +44,223 @@ const docTemplate = `{
                             "type": "string"
                         }
                     }
+                }
+            }
+        },
+        "/api/order/status/{orderId}": {
+            "patch": {
+                "description": "Updates the status of an order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Update Order Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Order Status",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateOrderStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order status updated successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders": {
+            "get": {
+                "description": "Fetches a list of all orders from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get all orders",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Order"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/orders/{id}": {
+            "get": {
+                "description": "Fetches an order based on the id from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Get order by id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Order"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Deletes an order by its id from the database",
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Delete an order",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order deleted successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "big.Int": {
+            "type": "object"
+        },
+        "generated.Order": {
+            "type": "object",
+            "properties": {
+                "bonusid": {
+                    "type": "integer"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "customerid": {
+                    "type": "integer"
+                },
+                "deliveryagentid": {
+                    "type": "integer"
+                },
+                "feeid": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "paymentid": {
+                    "type": "integer"
+                },
+                "restaurantid": {
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "timestamp": {
+                    "type": "string"
+                },
+                "totalamount": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                },
+                "vatamount": {
+                    "$ref": "#/definitions/pgtype.Numeric"
+                }
+            }
+        },
+        "handlers.UpdateOrderStatusRequest": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "Pending/On its way/Delivered"
+                }
+            }
+        },
+        "pgtype.InfinityModifier": {
+            "type": "integer",
+            "enum": [
+                1,
+                0,
+                -1
+            ],
+            "x-enum-varnames": [
+                "Infinity",
+                "Finite",
+                "NegativeInfinity"
+            ]
+        },
+        "pgtype.Numeric": {
+            "type": "object",
+            "properties": {
+                "exp": {
+                    "type": "integer"
+                },
+                "infinityModifier": {
+                    "$ref": "#/definitions/pgtype.InfinityModifier"
+                },
+                "int": {
+                    "$ref": "#/definitions/big.Int"
+                },
+                "naN": {
+                    "type": "boolean"
+                },
+                "valid": {
+                    "type": "boolean"
                 }
             }
         }
