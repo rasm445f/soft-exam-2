@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 
 	"github.com/rasm445f/soft-exam-2/db/generated"
 )
@@ -71,7 +72,16 @@ func (d *OrderDomain) GetOrderById(ctx context.Context, orderId int32) (*generat
 	return order, nil
 }
 
-func (d *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {
+func (d *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {	
+	amountExcludingVAT := orderParams.Totalamount - orderParams.Vatamount
+
+	feeid, err := d.CalculateFee(ctx, amountExcludingVAT)
+	if err != nil {
+		fmt.Printf("%v", err)
+		return 0, err
+	}
+	orderParams.Feeid = &feeid
+	
 	// Call the repository layer to create the order
 	orderid, err := d.repo.CreateOrder(ctx, orderParams)
 	if err != nil {
@@ -121,6 +131,40 @@ func (d *OrderDomain) CreateOrderItem(ctx context.Context, itemParams generated.
 	}
 
 	return itemid, nil
+}
+
+func (d *OrderDomain) CalculateFee(ctx context.Context, amount float64) (int32, error) {
+	var fee float64
+	var percent float64
+
+	if amount <= 100 {
+		percent = 0.06
+		fee = amount * percent
+	} else if amount > 100 && amount <= 500 {
+		percent = 0.05
+		fee = amount * percent
+	} else if amount > 500 && amount <= 1000 {
+
+		percent = 0.04
+		fee = amount * percent
+	} else {
+		percent = 0.03
+		fee = amount * percent
+	}
+
+	desc := "some description"
+	newFee := generated.CreateFeeParams{
+		Percentage: &percent,
+		Amount: &fee,
+		Description: &desc ,
+	}
+
+	feeid, err := d.repo.CreateFee(ctx, newFee)
+	if err != nil {
+		return 0, errors.New("failed to create fee: " + err.Error())
+	}
+
+	return feeid, nil
 }
 
 

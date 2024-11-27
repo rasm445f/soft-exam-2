@@ -58,13 +58,13 @@ WHERE ID = $1;
 
 -- Create a Fee
 -- name: CreateFee :one
-INSERT INTO Fee (Amount, Description)
-VALUES ($1, $2)
+INSERT INTO Fee (Percentage, Amount, Description)
+VALUES ($1, $2, $3)
 RETURNING ID;
 
 -- Fetch a Fee by ID
 -- name: GetFeeById :one
-SELECT ID, Amount, Description
+SELECT ID, Percentage, Amount, Description
 FROM Fee
 WHERE ID = $1;
 

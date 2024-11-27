@@ -8,7 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
@@ -31,7 +30,7 @@ func NewOrderHandler(domain *domain.OrderDomain) *OrderHandler {
 // @Success 200 {array} generated.Order
 // @Router /api/orders [get]
 func (h *OrderHandler) GetAllOrders() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) { 
+	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
 		orders, err := h.domain.FetchAllOrders(ctx)
@@ -88,8 +87,9 @@ func (h *OrderHandler) GetOrderById() http.HandlerFunc {
 }
 
 type UpdateOrderStatusRequest struct {
-		Status     string   `json:"status" example:"Pending/On its way/Delivered"`
+	Status string `json:"status" example:"Pending/On its way/Delivered"`
 }
+
 // UpdateOrderStatus godoc
 //
 // @Summary Update Order Status
@@ -103,7 +103,7 @@ type UpdateOrderStatusRequest struct {
 // @Failure 404 {string} string "Order not found"
 // @Router /api/order/status/{orderId} [patch]
 func (h *OrderHandler) UpdateOrderStatus() http.HandlerFunc {
-	return func (w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
 		orderIdStr := r.PathValue("orderId")
@@ -153,7 +153,6 @@ func (h *OrderHandler) UpdateOrderStatus() http.HandlerFunc {
 	}
 }
 
-
 // DeleteOrder godoc
 //
 // @Summary Delete an order
@@ -196,8 +195,6 @@ func (h *OrderHandler) DeleteOrder() http.HandlerFunc {
 	}
 }
 
-
-
 /* BROKER */
 
 // Helper functions
@@ -238,12 +235,12 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 
 			// Unmarshal JSON into a struct making the Redis payload from ShoppingCart
 			var payload struct {
-				Customerid int `json:"customer_id"`
-				Restaurantid int `json:"restaurant_id"`
-				Totalamount pgtype.Numeric `json:"total_amount"`
-				Vatamount pgtype.Numeric `json:"vat_amount"`
-				Comment string `json:"comment"`
-				Items []generated.CreateOrderItemParams `json:"items"`
+				Customerid   int                               `json:"customer_id"`
+				Restaurantid int                               `json:"restaurant_id"`
+				Totalamount  float64                           `json:"total_amount"`
+				Vatamount    float64                           `json:"vat_amount"`
+				Comment      string                            `json:"comment"`
+				Items        []generated.CreateOrderItemParams `json:"items"`
 			}
 
 			if err := json.Unmarshal(payloadBytes, &payload); err != nil {
@@ -254,17 +251,17 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 
 			// Create Order
 			orderParams := generated.CreateOrderParams{
-				Totalamount: payload.Totalamount,
-				Vatamount: payload.Vatamount,
-				Status: "Pending",
-				Timestamp: toTimeNowPtr(),
-				Comment: &payload.Comment,
-				Customerid: int32Ptr(payload.Customerid),
-				Restaurantid: int32Ptr(payload.Restaurantid),
-				Deliveryagentid: nil,	// Not assigned yet
-				Paymentid: nil,			// Not processed yet
-				Bonusid: nil,			// No bonus assigned
-				Feeid: nil,				// No fees applied
+				Totalamount:     payload.Totalamount,
+				Vatamount:       payload.Vatamount,
+				Status:          "Pending",
+				Timestamp:       toTimeNowPtr(),
+				Comment:         &payload.Comment,
+				Customerid:      int32Ptr(payload.Customerid),
+				Restaurantid:    int32Ptr(payload.Restaurantid),
+				Deliveryagentid: nil, // Not assigned yet
+				Paymentid:       nil, // Not processed yet
+				Bonusid:         nil, // No bonus assigned
+				Feeid:           nil, // No fees applied
 			}
 
 			// Create context
@@ -283,12 +280,12 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 			// Create order items for the created order
 			for _, item := range payload.Items {
 				itemParams := generated.CreateOrderItemParams{
-					Orderid: orderid,
-					Name: item.Name,
-					Price: item.Price,
+					Orderid:  orderid,
+					Name:     item.Name,
+					Price:    item.Price,
 					Quantity: item.Quantity,
 				}
-				
+
 				// Call the CreateOrderItem domain function
 				_, err := h.domain.CreateOrderItem(ctx, itemParams)
 				if err != nil {

@@ -15,14 +15,15 @@ CREATE TABLE Payment (
 
 CREATE TABLE Fee (
     ID serial PRIMARY KEY,
-    Amount DECIMAL(10, 2) NOT NULL,
+    Percentage DECIMAL(10, 2),
+    Amount DECIMAL(10, 2),
     Description text
 );
 
 CREATE TABLE "Order" (
     ID serial PRIMARY KEY,
     TotalAmount DECIMAL(10, 2) NOT NULL,
-    VATAmount DECIMAL(10, 2),
+    VATAmount DECIMAL(10, 2) NOT NULL,
     Status varchar(50) NOT NULL,
     Timestamp timestamp DEFAULT NOW(),
     Comment text,
