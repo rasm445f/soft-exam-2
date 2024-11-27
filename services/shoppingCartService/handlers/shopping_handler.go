@@ -163,11 +163,8 @@ func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 	}
 }
 
-<<<<<<< HEAD
-// Consume godoc
-=======
+
 // Consume Shopping Cart's MenuItems godoc
->>>>>>> 1a54299a71337ae73253e31d2207f6d51082b393
 //
 //	@Summary		Consume the chosen Menu Items for a Customer
 //	@Description	Consumes the Shopping Cart's Menu Items for a Customer
@@ -194,14 +191,6 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 			}
 			fmt.Println(payloadBytes)
 
-<<<<<<< HEAD
-			// Unmarshal JSON bytes into IntermediatePayload
-			var item db.AddItemParams
-			if err := json.Unmarshal(payloadBytes, &item); err != nil {
-				log.Printf("Failed to unmarshal payload into Item: %v", err)
-				return
-			}
-=======
 			// Unmarshal JSON bytes
 			var item db.AddItemParams
 			if err := json.Unmarshal(payloadBytes, &item); err != nil {
@@ -209,7 +198,6 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 				return
 			}
 			fmt.Printf("Unmarshaled JSON bytes: %v", item)
->>>>>>> 1a54299a71337ae73253e31d2207f6d51082b393
 
 			// Create a context for the AddItem function
 			ctx := context.Background()
@@ -225,15 +213,9 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 	}
 }
 
-<<<<<<< HEAD
 type PublishShoppingCartRequest struct {
 	Comment string `json:"comment" example:"No vegetables on the pizza."`
-=======
-type PublishOrderRequest struct {
-	Comment string `json:"comment" example:"No vegetables"`
->>>>>>> 1a54299a71337ae73253e31d2207f6d51082b393
 }
-
 // PublishShoppingCart godoc
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
@@ -282,11 +264,7 @@ func (h *ShoppingCartHandler) PublishShoppingCart() http.HandlerFunc {
 		err = broker.Publish("order_created_queue", event)
 		if err != nil {
 			log.Printf("Failed to publish event: %v", err)
-<<<<<<< HEAD
-			http.Error(w, "Failed to select shopping cart", http.StatusInternalServerError)
-=======
-			http.Error(w, "Failed to select menu item Event to RabbitMQ", http.StatusInternalServerError)
->>>>>>> 1a54299a71337ae73253e31d2207f6d51082b393
+			http.Error(w, "Failed to publish shopping cart", http.StatusInternalServerError)
 			return
 		}
 		// TODO: should the shoppingcart be cleared afterwards? or maybe when the order is confirmed?

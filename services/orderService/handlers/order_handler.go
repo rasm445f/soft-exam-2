@@ -251,7 +251,7 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 
 			// Create Order
 			orderParams := generated.CreateOrderParams{
-				Totalamount:     payload.Totalamount,
+				Totalamount:     payload.Totalamount + payload.Vatamount,
 				Vatamount:       payload.Vatamount,
 				Status:          "Pending",
 				Timestamp:       toTimeNowPtr(),
