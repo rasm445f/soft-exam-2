@@ -127,21 +127,18 @@ func (cs *CustomerDomain) CreateCustomer(ctx context.Context, customerParams gen
 }
 
 func (cd *CustomerDomain) UpdateCustomer(ctx context.Context, customerParams generated.UpdateCustomerParams) error {
-	// Validate password if being updated
 	if customerParams.Password != nil {
 		if err := ValidatePassword(*customerParams.Password); err != nil {
 			return err
 		}
 	}
 
-	// Validate email if being updated
 	if customerParams.Email != nil {
 		if err := ValidateEmail(*customerParams.Email); err != nil {
 			return err
 		}
 	}
 
-	// Update the customer information
 	err := cd.Queries.UpdateCustomer(ctx, customerParams)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -154,7 +151,6 @@ func (cd *CustomerDomain) UpdateCustomer(ctx context.Context, customerParams gen
 }
 
 func (cd *CustomerDomain) UpdateAddress(ctx context.Context, addressParams generated.UpdateAddressParams) error {
-	// Update the address in the database
 	err := cd.Queries.UpdateAddress(ctx, addressParams)
 	if err != nil {
 		if err == sql.ErrNoRows {

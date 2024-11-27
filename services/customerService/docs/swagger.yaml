@@ -29,18 +29,30 @@ definitions:
       phonenumber:
         type: string
     type: object
-  generated.UpdateCustomerParams:
+  handlers.UpdateCustomerWithAddress:
+    description: Update customer details including name, email, and address information.
     properties:
-      email:
+      city:
+        example: New York
         type: string
-      id:
-        type: integer
+      email:
+        example: john.doe@example.com
+        type: string
       name:
+        example: John Doe
         type: string
       password:
+        example: Password123!
         type: string
       phonenumber:
+        example: "1234567890"
         type: string
+      street_address:
+        example: 123 Main St
+        type: string
+      zip_code:
+        example: 12345
+        type: integer
     type: object
 info:
   contact: {}
@@ -150,7 +162,7 @@ paths:
         name: customer
         required: true
         schema:
-          $ref: '#/definitions/generated.UpdateCustomerParams'
+          $ref: '#/definitions/handlers.UpdateCustomerWithAddress'
       produces:
       - application/json
       responses:

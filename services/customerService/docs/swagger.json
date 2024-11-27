@@ -164,7 +164,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/generated.UpdateCustomerParams"
+                            "$ref": "#/definitions/handlers.UpdateCustomerWithAddress"
                         }
                     }
                 ],
@@ -256,23 +256,37 @@
                 }
             }
         },
-        "generated.UpdateCustomerParams": {
+        "handlers.UpdateCustomerWithAddress": {
+            "description": "Update customer details including name, email, and address information.",
             "type": "object",
             "properties": {
-                "email": {
-                    "type": "string"
+                "city": {
+                    "type": "string",
+                    "example": "New York"
                 },
-                "id": {
-                    "type": "integer"
+                "email": {
+                    "type": "string",
+                    "example": "john.doe@example.com"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John Doe"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Password123!"
                 },
                 "phonenumber": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1234567890"
+                },
+                "street_address": {
+                    "type": "string",
+                    "example": "123 Main St"
+                },
+                "zip_code": {
+                    "type": "integer",
+                    "example": 12345
                 }
             }
         }

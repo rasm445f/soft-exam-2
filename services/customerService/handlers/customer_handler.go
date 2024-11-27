@@ -153,6 +153,18 @@ func (h *CustomerHandler) CreateCustomer() http.HandlerFunc {
 	}
 }
 
+// UpdateCustomerWithAddress represents a customer update with optional address fields.
+// @Description Update customer details including name, email, and address information.
+type UpdateCustomerWithAddress struct {
+	Name          *string `json:"name" example:"John Doe"`
+	Email         *string `json:"email" example:"john.doe@example.com"`
+	Phonenumber   *string `json:"phonenumber" example:"1234567890"`
+	Password      *string `json:"password" example:"Password123!"`
+	StreetAddress *string `json:"street_address" example:"123 Main St" `
+	ZipCode       *int32  `json:"zip_code" example:"12345"`
+	City          *string `json:"city" example:"New York"`
+}
+
 // UpdateCustomer godoc
 // @Summary Update a customer
 // @Description Updates a customer's details based on the ID provided in the URL path. This may include personal information as well as optional address updates.
@@ -160,7 +172,7 @@ func (h *CustomerHandler) CreateCustomer() http.HandlerFunc {
 // @Accept application/json
 // @Produce application/json
 // @Param id path int true "Customer ID"
-// @Param customer body generated.UpdateCustomerParams true "Updated customer details"
+// @Param customer body UpdateCustomerWithAddress true "Updated customer details"
 // @Success 200 {object} map[string]string "Customer updated successfully"
 // @Failure 400 {object} map[string]string "Invalid input"
 // @Failure 404 {object} map[string]string "Customer not found"
@@ -224,8 +236,9 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 			if ok {
 				addressUpdates.StreetAddress = &streetAddress
 			}
-			if zipCode, ok := updatePayload["zip_code"].(int32); ok {
-				addressUpdates.ZipCode = &zipCode
+			if zipCode, ok := updatePayload["zip_code"].(float64); ok {
+				zipCodeInt32 := int32(zipCode)
+				addressUpdates.ZipCode = &zipCodeInt32
 			}
 
 			// Update the address in the database
