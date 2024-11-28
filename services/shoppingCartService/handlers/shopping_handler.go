@@ -163,7 +163,6 @@ func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 	}
 }
 
-
 // Consume Shopping Cart's MenuItems godoc
 //
 //	@Summary		Consume the chosen Menu Items for a Customer
@@ -216,6 +215,7 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 type PublishShoppingCartRequest struct {
 	Comment string `json:"comment" example:"No vegetables on the pizza."`
 }
+
 // PublishShoppingCart godoc
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
@@ -252,9 +252,6 @@ func (h *ShoppingCartHandler) PublishShoppingCart() http.HandlerFunc {
 			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
 			return
 		}
-
-		// Add the Comment to the shopping cart payload
-		shoppingCart.Comment = requestPayload.Comment
 
 		// Publish event to RabbitMQ
 		event := broker.Event{
