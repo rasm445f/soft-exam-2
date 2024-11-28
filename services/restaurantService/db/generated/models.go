@@ -4,25 +4,21 @@
 
 package generated
 
-import (
-	"github.com/jackc/pgx/v5/pgtype"
-)
-
 type Menuitem struct {
-	ID           int32          `json:"id"`
-	Restaurantid int32          `json:"restaurantid"`
-	Name         string         `json:"name"`
-	Price        pgtype.Numeric `json:"price"`
-	Description  *string        `json:"description"`
+	ID           int32   `json:"id"`
+	Restaurantid int32   `json:"restaurantid"`
+	Name         string  `json:"name"`
+	Price        float64 `json:"price"`
+	Description  *string `json:"description"`
 }
 
 type Restaurant struct {
-	ID       int32          `json:"id"`
-	Name     string         `json:"name"`
-	Rating   pgtype.Numeric `json:"rating"`
-	Category *string        `json:"category"`
-	Address  *string        `json:"address"`
-	ZipCode  *int32         `json:"zip_code"`
+	ID       int32    `json:"id"`
+	Name     string   `json:"name"`
+	Rating   *float64 `json:"rating"`
+	Category *string  `json:"category"`
+	Address  *string  `json:"address"`
+	ZipCode  *int32   `json:"zip_code"`
 }
 
 type Zipcode struct {

@@ -26,7 +26,7 @@ func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
 // @Success 200 {array} generated.Restaurant
 // @Router /api/restaurants [get]
 func (h *RestaurantHandler) GetAllRestaurants() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) { 
+	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
 		restaurants, err := h.domain.FetchAllRestaurants(ctx)
@@ -170,7 +170,6 @@ func (h *RestaurantHandler) GetMenuItemByRestaurantAndId() http.HandlerFunc {
 	}
 }
 
-
 // Categories
 
 // GetAllCategories godoc
@@ -228,4 +227,12 @@ func (h *RestaurantHandler) FilterRestaurantByCategory() http.HandlerFunc {
 		w.WriteHeader(http.StatusOK)
 		w.Write(res)
 	}
+}
+
+type MenuItemSelection struct {
+	CustomerID   int32   `json:"customerId" example:"1"`
+	RestaurantId int32   `json:"restaurantId" example:"10"`
+	Name         string  `json:"name" example:"Cheese Burger"`
+	Price        float64 `json:"price" example:"10.00"`
+	Quantity     int     `json:"quantity" example:"2"`
 }
