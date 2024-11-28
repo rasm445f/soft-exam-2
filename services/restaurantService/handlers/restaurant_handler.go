@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
 )
@@ -229,10 +230,78 @@ func (h *RestaurantHandler) FilterRestaurantByCategory() http.HandlerFunc {
 	}
 }
 
+type SelectItemParams struct {
+	CustomerId   int32 `json:"customerId" example:"1"`
+	RestaurantId int32 `json:"restaurantId" example:"10"`
+	ItemId       int32 `json:"id"`
+	Quantity     int   `json:"quantity" example:"2"`
+}
+
 type MenuItemSelection struct {
 	CustomerID   int32   `json:"customerId" example:"1"`
 	RestaurantId int32   `json:"restaurantId" example:"10"`
 	Name         string  `json:"name" example:"Cheese Burger"`
 	Price        float64 `json:"price" example:"10.00"`
 	Quantity     int     `json:"quantity" example:"2"`
+}
+
+// SelectMenuItem godoc
+// @Summary Select Menuitem
+// @Description Select Menu Item
+// @Tags customers
+// @Accept  application/json
+// @Produce application/json
+// @Param customer body SelectItemParams true "Menu item selection details"
+// @Success 201 {object} MenuItemSelection "Menu item successfully selected"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
+// @Router /api/restaurants/menu/select [post]
+func (h *RestaurantHandler) SelectMenuitem() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var selectionParams SelectItemParams
+		err := json.NewDecoder(r.Body).Decode(&selectionParams)
+		if err != nil {
+			http.Error(w, "Invalid request payload", http.StatusBadRequest)
+			return
+		}
+
+		ctx := r.Context()
+
+		// get menu item based on restaurantId and menuItemId
+		var menuSelectionParams = generated.GetMenuItemByRestaurantAndIdParams{
+			Restaurantid: selectionParams.RestaurantId,
+			ID:           selectionParams.ItemId,
+		}
+
+		intermediateMenuItem, err := h.domain.GetMenuItemByRestaurantAndId(ctx, menuSelectionParams)
+		if err != nil {
+			http.Error(w, "Menu Item not found", http.StatusNotFound)
+			log.Println(err)
+			return
+		}
+
+		// create final menuItem to send to rabbitMQ
+		menuItemSelection := MenuItemSelection{
+			CustomerID:   selectionParams.CustomerId,
+			RestaurantId: intermediateMenuItem.Restaurantid,
+			Name:         intermediateMenuItem.Name,
+			Price:        intermediateMenuItem.Price,
+			Quantity:     selectionParams.Quantity,
+		}
+
+		// Publish event to RabbitMQ
+		event := broker.Event{
+			Type:    broker.MenuItemSelected,
+			Payload: menuItemSelection,
+		}
+		err = broker.Publish("menu_item_selected_queue", event)
+		if err != nil {
+			log.Printf("Failed to publish event: %v", err)
+			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Menu item selected successfully}`))
+	}
 }
