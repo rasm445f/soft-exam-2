@@ -62,9 +62,9 @@ func (s *ShoppingCartRepository) AddItem(ctx context.Context, params AddItemPara
 	cart.Items = append(cart.Items, newItem)
 
 	// Recalculate totals
-	cart.TotalAmount = 0
+	// cart.TotalAmount = 0.0
 	for _, item := range cart.Items {
-		cart.TotalAmount += int(item.Price * float64(item.Quantity))
+		cart.TotalAmount += item.Price * float64(item.Quantity)
 	}
 	cart.VatAmount = int(float64(cart.TotalAmount) * 0.20) // Adjust VAT calculation as needed
 
@@ -141,7 +141,7 @@ func (s *ShoppingCartRepository) UpdateCart(ctx context.Context, customerId int,
 		// Recalculate totals
 		cart.TotalAmount = 0
 		for _, item := range cart.Items {
-			cart.TotalAmount += int(item.Price * float64(item.Quantity))
+			cart.TotalAmount += item.Price * float64(item.Quantity)
 		}
 		cart.VatAmount = int(float64(cart.TotalAmount) * 0.20) // Adjust VAT calculation
 

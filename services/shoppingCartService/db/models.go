@@ -3,9 +3,8 @@ package db
 type ShoppingCart struct {
 	CustomerId   int                `json:"customer_id"`
 	RestaurantId int                `json:"restaurant_id"`
-	TotalAmount  int                `json:"total_amount"`
+	TotalAmount  float64            `json:"total_amount"`
 	VatAmount    int                `json:"vat_amount"`
-	Comment      string             `json:"comment"`
 	Items        []ShoppingCartItem `json:"items"`
 }
 

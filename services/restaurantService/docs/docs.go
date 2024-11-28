@@ -93,6 +93,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/restaurants/menu/select": {
+            "post": {
+                "description": "Select Menu Item",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "customers"
+                ],
+                "summary": "Select Menuitem",
+                "parameters": [
+                    {
+                        "description": "Menu item selection details",
+                        "name": "customer",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.SelectItemParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Menu item successfully selected",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.MenuItemSelection"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
         "/api/restaurants/{id}": {
             "get": {
                 "description": "Fetches a restaurant based on the id from the database",
@@ -218,6 +264,9 @@ const docTemplate = `{
         "generated.Restaurant": {
             "type": "object",
             "properties": {
+                "address": {
+                    "type": "string"
+                },
                 "category": {
                     "type": "string"
                 },
@@ -230,11 +279,53 @@ const docTemplate = `{
                 "rating": {
                     "$ref": "#/definitions/pgtype.Numeric"
                 },
-                "street": {
-                    "type": "string"
-                },
                 "zip_code": {
                     "type": "integer"
+                }
+            }
+        },
+        "handlers.MenuItemSelection": {
+            "type": "object",
+            "properties": {
+                "customerId": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Cheese Burger"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 10
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "restaurantId": {
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
+        "handlers.SelectItemParams": {
+            "type": "object",
+            "properties": {
+                "customerId": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "restaurantId": {
+                    "type": "integer",
+                    "example": 10
                 }
             }
         },

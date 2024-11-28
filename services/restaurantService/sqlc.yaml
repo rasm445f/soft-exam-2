@@ -18,3 +18,13 @@ sql:
             go_type:
               type: "time.Time"
               pointer: true
+          - db_type: "pg_catalog.numeric"
+            nullable: true
+            engine: "postgresql"
+            go_type:
+              type: "float64"
+              pointer: true
+          - db_type: "pg_catalog.numeric"
+            engine: "postgresql"
+            go_type:
+              type: "float64"
