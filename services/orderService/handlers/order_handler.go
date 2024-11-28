@@ -249,6 +249,8 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 			}
 			log.Printf("Received payload: %+v", payload)
 
+			// 
+
 			// Create Order
 			orderParams := generated.CreateOrderParams{
 				Totalamount:     payload.Totalamount + payload.Vatamount,

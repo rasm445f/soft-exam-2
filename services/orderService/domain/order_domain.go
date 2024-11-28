@@ -81,7 +81,7 @@ func (d *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.Cre
 		return 0, err
 	}
 	orderParams.Feeid = &feeid
-	
+
 	// Call the repository layer to create the order
 	orderid, err := d.repo.CreateOrder(ctx, orderParams)
 	if err != nil {
@@ -144,7 +144,6 @@ func (d *OrderDomain) CalculateFee(ctx context.Context, amount float64) (int32, 
 		percent = 0.05
 		fee = amount * percent
 	} else if amount > 500 && amount <= 1000 {
-
 		percent = 0.04
 		fee = amount * percent
 	} else {
