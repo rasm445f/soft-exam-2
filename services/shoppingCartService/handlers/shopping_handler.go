@@ -43,7 +43,7 @@ func (h *ShoppingCartHandler) AddItem() http.HandlerFunc {
 			return
 		}
 
-		if err := h.domain.AddItem(ctx, item); err != nil {
+		if err := h.domain.AddItemDomain(ctx, item); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -56,7 +56,6 @@ func (h *ShoppingCartHandler) AddItem() http.HandlerFunc {
 type UpdateQuantityRequest struct {
 	Quantity int `json:"quantity"`
 }
-
 // UpdateCartHandler godoc
 //
 //	@Summary		Update an item in the cart
@@ -67,7 +66,7 @@ type UpdateQuantityRequest struct {
 //	@Param			customerId	path		int						true	"customer ID"
 //	@Param			itemId		path		int						true	"Item ID"
 //	@Param			body		body		UpdateQuantityRequest	true	"New quantity for the item"
-//	@Success		200			{string}	string					"Item updated successfully"
+//	@Success		200			{string}	string					"ShoppingCart updated successfully"
 //	@Failure		400			{string}	string					"Invalid input"
 //	@Failure		404			{string}	string					"Item not found"
 //	@Failure		500			{string}	string					"Internal server error"
@@ -92,7 +91,7 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 			http.Error(w, "Invalid input", http.StatusBadRequest)
 			return
 		}
-		if err := h.domain.UpdateCart(ctx, customerId, itemId, req.Quantity); err != nil {
+		if err := h.domain.UpdateCartDomain(ctx, customerId, itemId, req.Quantity); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -107,7 +106,7 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 //	@Tags			shoppingCart
 //	@Produce		application/json
 //	@Param			id	path		string	true	"customer ID"
-//	@Success		200	{string}	string	"Cart cleared"
+//	@Success		200	{string}	string	"Viewed Cart"
 //	@Failure		400	{string}	string	"Bad request"
 //	@Failure		500	{string}	string	"Internal server error"
 //	@Router			/api/shopping/{id} [get]
@@ -120,7 +119,7 @@ func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
 		}
 
-		shoppingCart, err := h.domain.ViewCart(ctx, customerId)
+		shoppingCart, err := h.domain.ViewCartDomain(ctx, customerId)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
@@ -142,7 +141,7 @@ func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int		true	"customer ID"
-//	@Success		200			{string}	string	"cart cleared"
+//	@Success		200			{string}	string	"Cart Cleared"
 //	@Failure		400			{string}	string	"Bad request"
 //	@Failure		500			{string}	string	"Internal server error"
 //	@Router			/api/shopping/{customerId} [delete]
@@ -155,7 +154,7 @@ func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
 		}
 
-		if err := h.domain.ClearCart(ctx, customerId); err != nil {
+		if err := h.domain.ClearCartDomain(ctx, customerId); err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -202,12 +201,12 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 			ctx := context.Background()
 
 			// Call the AddItem logic
-			if err := h.domain.AddItem(ctx, item); err != nil {
-				log.Printf("Failed to add menuitem to shopping cart: %v", err)
+			if err := h.domain.AddItemDomain(ctx, item); err != nil {
+				log.Printf("Failed to add MenuItem to shopping cart: %v", err)
 				return
 			}
 
-			log.Printf("Successfully added menuitem to shopping cart: %+v", item)
+			log.Printf("Successfully added MenuItem to shopping cart: %+v", item)
 		})
 	}
 }
@@ -246,7 +245,7 @@ func (h *ShoppingCartHandler) PublishShoppingCart() http.HandlerFunc {
 		}
 
 		// Fetch the shopping cart
-		shoppingCart, err := h.domain.ViewCart(ctx, customerId)
+		shoppingCart, err := h.domain.ViewCartDomain(ctx, customerId)
 		if err != nil {
 			log.Printf("Failed to publish event: %v", err)
 			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)

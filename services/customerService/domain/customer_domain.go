@@ -64,19 +64,19 @@ func NewCustomerDomain(queries *generated.Queries) *CustomerDomain {
 	return &CustomerDomain{Queries: queries}
 }
 
-func (cd *CustomerDomain) GetAllCustomers(ctx context.Context) ([]generated.Customer, error) {
+func (cd *CustomerDomain) GetAllCustomersDomain(ctx context.Context) ([]generated.Customer, error) {
 	return cd.Queries.GetAllCustomers(ctx)
 }
 
-func (cd *CustomerDomain) GetCustomerByID(ctx context.Context, id int32) (generated.Customer, error) {
+func (cd *CustomerDomain) GetCustomerByIdDomain(ctx context.Context, id int32) (generated.Customer, error) {
 	return cd.Queries.GetCustomerByID(ctx, id)
 }
 
-func (cd *CustomerDomain) DeleteCustomer(ctx context.Context, id int32) error {
+func (cd *CustomerDomain) DeleteCustomerDomain(ctx context.Context, id int32) error {
 	return cd.Queries.DeleteCustomer(ctx, id)
 }
 
-func (cs *CustomerDomain) CreateCustomer(ctx context.Context, customerParams generated.CreateCustomerParams) (*generated.Customer, error) {
+func (cs *CustomerDomain) CreateCustomerDomain(ctx context.Context, customerParams generated.CreateCustomerParams) (*generated.Customer, error) {
 	if *customerParams.Name == "" || *customerParams.Email == "" || *customerParams.Password == "" {
 		return nil, errors.New("all required fields must be filled")
 	}
@@ -135,7 +135,7 @@ func (cs *CustomerDomain) CreateCustomer(ctx context.Context, customerParams gen
 	return customer, nil
 }
 
-func (cd *CustomerDomain) UpdateCustomer(ctx context.Context, customerParams generated.UpdateCustomerParams) error {
+func (cd *CustomerDomain) UpdateCustomerDomain(ctx context.Context, customerParams generated.UpdateCustomerParams) error {
 	// Validate optional fields if provided
 	if customerParams.Password != nil {
 		if err := ValidatePassword(*customerParams.Password); err != nil {

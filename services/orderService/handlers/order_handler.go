@@ -33,7 +33,7 @@ func (h *OrderHandler) GetAllOrders() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		orders, err := h.domain.FetchAllOrders(ctx)
+		orders, err := h.domain.GetAllOrdersDomain(ctx)
 		if err != nil {
 			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
 			log.Println(err)
@@ -72,7 +72,7 @@ func (h *OrderHandler) GetOrderById() http.HandlerFunc {
 			return
 		}
 
-		order, err := h.domain.GetOrderById(ctx, int32(orderId))
+		order, err := h.domain.GetOrderByIdDomain(ctx, int32(orderId))
 		if err != nil {
 			http.Error(w, "Order not found", http.StatusNotFound)
 			log.Println(err)
@@ -137,7 +137,7 @@ func (h *OrderHandler) UpdateOrderStatus() http.HandlerFunc {
 		}
 
 		// Call the domain fucntion to update the order status
-		err = h.domain.UpdateOrderStatus(ctx, int32(orderId), requestPayload.Status)
+		err = h.domain.UpdateOrderStatusDomain(ctx, int32(orderId), requestPayload.Status)
 		if err != nil {
 			if err.Error() == "order not found" {
 				http.Error(w, "Order not found", http.StatusNotFound)
@@ -178,7 +178,7 @@ func (h *OrderHandler) DeleteOrder() http.HandlerFunc {
 			return
 		}
 
-		err = h.domain.DeleteOrder(ctx, int32(orderId))
+		err = h.domain.DeleteOrderDomain(ctx, int32(orderId))
 		if err != nil {
 			if err.Error() == "Order not found" {
 				http.Error(w, "Order not found", http.StatusNotFound)
@@ -270,7 +270,7 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 			ctx := context.Background()
 
 			// Call the CreateOrder domain function
-			orderid, err := h.domain.CreateOrder(ctx, orderParams)
+			orderid, err := h.domain.CreateOrderDomain(ctx, orderParams)
 			if err != nil {
 				log.Printf("Failed to create order: %v", err)
 				return
@@ -289,7 +289,7 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 				}
 
 				// Call the CreateOrderItem domain function
-				_, err := h.domain.CreateOrderItem(ctx, itemParams)
+				_, err := h.domain.CreateOrderItemDomain(ctx, itemParams)
 				if err != nil {
 					log.Printf("Failed to create order item: %+v, err: %v", item, err)
 					continue

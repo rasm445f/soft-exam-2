@@ -18,7 +18,7 @@ func NewOrderDomain(repo *generated.Queries) *OrderDomain {
 	return &OrderDomain{repo: repo}
 }
 
-func (d *OrderDomain) FetchAllOrders(ctx context.Context) ([]generated.Order, error) {
+func (d *OrderDomain) GetAllOrdersDomain(ctx context.Context) ([]generated.Order, error) {
 	rows, err := d.repo.GetAllOrders(ctx)
 	if err != nil {
 		return nil, errors.New("failed to fetch orders")
@@ -44,7 +44,7 @@ func (d *OrderDomain) FetchAllOrders(ctx context.Context) ([]generated.Order, er
 	return orders, nil
 }
 
-func (d *OrderDomain) GetOrderById(ctx context.Context, orderId int32) (*generated.Order, error) {
+func (d *OrderDomain) GetOrderByIdDomain(ctx context.Context, orderId int32) (*generated.Order, error) {
 	if orderId <= 0 {
 		return nil, errors.New("invalid order id")
 	}
@@ -72,7 +72,7 @@ func (d *OrderDomain) GetOrderById(ctx context.Context, orderId int32) (*generat
 	return order, nil
 }
 
-func (d *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {	
+func (d *OrderDomain) CreateOrderDomain(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {	
 	amountExcludingVAT := orderParams.Totalamount - orderParams.Vatamount
 
 	feeid, err := d.CalculateFee(ctx, amountExcludingVAT)
@@ -91,7 +91,7 @@ func (d *OrderDomain) CreateOrder(ctx context.Context, orderParams generated.Cre
 	return orderid, nil
 }
 
-func (d *OrderDomain) UpdateOrderStatus(ctx context.Context, orderId int32, status string) error {
+func (d *OrderDomain) UpdateOrderStatusDomain(ctx context.Context, orderId int32, status string) error {
 	// Call the repository layer to update the order
 	err := d.repo.UpdateOrderStatus(ctx, generated.UpdateOrderStatusParams{
 		Status: status,
@@ -107,7 +107,7 @@ func (d *OrderDomain) UpdateOrderStatus(ctx context.Context, orderId int32, stat
 	return nil
 }
 
-func (d *OrderDomain) DeleteOrder(ctx context.Context, orderId int32) (error) {
+func (d *OrderDomain) DeleteOrderDomain(ctx context.Context, orderId int32) (error) {
 	err := d.repo.DeleteOrderItemsByOrderId(ctx, orderId)
 	if err != nil {
 		return errors.New("failed to delete order items: " + err.Error())
@@ -123,7 +123,7 @@ func (d *OrderDomain) DeleteOrder(ctx context.Context, orderId int32) (error) {
 	return nil
 }
 
-func (d *OrderDomain) CreateOrderItem(ctx context.Context, itemParams generated.CreateOrderItemParams) (int32, error) {
+func (d *OrderDomain) CreateOrderItemDomain(ctx context.Context, itemParams generated.CreateOrderItemParams) (int32, error) {
 	// Call the repository layer to create the order
 	itemid, err := d.repo.CreateOrderItem(ctx, itemParams)
 	if err != nil {
