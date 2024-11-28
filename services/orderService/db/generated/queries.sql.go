@@ -8,8 +8,6 @@ package generated
 import (
 	"context"
 	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const createBonus = `-- name: CreateBonus :one
@@ -19,9 +17,9 @@ RETURNING ID
 `
 
 type CreateBonusParams struct {
-	Description     *string        `json:"description"`
-	Earlylateamount pgtype.Numeric `json:"earlylateamount"`
-	Percentage      pgtype.Numeric `json:"percentage"`
+	Description     *string  `json:"description"`
+	Earlylateamount *float64 `json:"earlylateamount"`
+	Percentage      *float64 `json:"percentage"`
 }
 
 // Create a Bonus
@@ -33,19 +31,20 @@ func (q *Queries) CreateBonus(ctx context.Context, arg CreateBonusParams) (int32
 }
 
 const createFee = `-- name: CreateFee :one
-INSERT INTO Fee (Amount, Description)
-VALUES ($1, $2)
+INSERT INTO Fee (Percentage, Amount, Description)
+VALUES ($1, $2, $3)
 RETURNING ID
 `
 
 type CreateFeeParams struct {
-	Amount      pgtype.Numeric `json:"amount"`
-	Description *string        `json:"description"`
+	Percentage  *float64 `json:"percentage"`
+	Amount      *float64 `json:"amount"`
+	Description *string  `json:"description"`
 }
 
 // Create a Fee
 func (q *Queries) CreateFee(ctx context.Context, arg CreateFeeParams) (int32, error) {
-	row := q.db.QueryRow(ctx, createFee, arg.Amount, arg.Description)
+	row := q.db.QueryRow(ctx, createFee, arg.Percentage, arg.Amount, arg.Description)
 	var id int32
 	err := row.Scan(&id)
 	return id, err
@@ -58,17 +57,17 @@ RETURNING ID
 `
 
 type CreateOrderParams struct {
-	Totalamount     pgtype.Numeric `json:"totalamount"`
-	Vatamount       pgtype.Numeric `json:"vatamount"`
-	Status          string         `json:"status"`
-	Timestamp       *time.Time     `json:"timestamp"`
-	Comment         *string        `json:"comment"`
-	Customerid      *int32         `json:"customerid"`
-	Restaurantid    *int32         `json:"restaurantid"`
-	Deliveryagentid *int32         `json:"deliveryagentid"`
-	Paymentid       *int32         `json:"paymentid"`
-	Bonusid         *int32         `json:"bonusid"`
-	Feeid           *int32         `json:"feeid"`
+	Totalamount     float64    `json:"totalamount"`
+	Vatamount       float64    `json:"vatamount"`
+	Status          string     `json:"status"`
+	Timestamp       *time.Time `json:"timestamp"`
+	Comment         *string    `json:"comment"`
+	Customerid      *int32     `json:"customerid"`
+	Restaurantid    *int32     `json:"restaurantid"`
+	Deliveryagentid *int32     `json:"deliveryagentid"`
+	Paymentid       *int32     `json:"paymentid"`
+	Bonusid         *int32     `json:"bonusid"`
+	Feeid           *int32     `json:"feeid"`
 }
 
 // Create a new Order
@@ -98,10 +97,10 @@ RETURNING ID
 `
 
 type CreateOrderItemParams struct {
-	Orderid  int32          `json:"orderid"`
-	Name     string         `json:"name"`
-	Price    pgtype.Numeric `json:"price"`
-	Quantity pgtype.Numeric `json:"quantity"`
+	Orderid  int32   `json:"orderid"`
+	Name     string  `json:"name"`
+	Price    float64 `json:"price"`
+	Quantity float64 `json:"quantity"`
 }
 
 // Create a new Order Item
@@ -218,7 +217,7 @@ func (q *Queries) GetBonusById(ctx context.Context, id int32) (Bonu, error) {
 }
 
 const getFeeById = `-- name: GetFeeById :one
-SELECT ID, Amount, Description
+SELECT ID, Percentage, Amount, Description
 FROM Fee
 WHERE ID = $1
 `
@@ -227,7 +226,12 @@ WHERE ID = $1
 func (q *Queries) GetFeeById(ctx context.Context, id int32) (Fee, error) {
 	row := q.db.QueryRow(ctx, getFeeById, id)
 	var i Fee
-	err := row.Scan(&i.ID, &i.Amount, &i.Description)
+	err := row.Scan(
+		&i.ID,
+		&i.Percentage,
+		&i.Amount,
+		&i.Description,
+	)
 	return i, err
 }
 

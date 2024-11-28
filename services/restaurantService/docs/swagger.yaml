@@ -16,6 +16,8 @@ definitions:
     type: object
   generated.Restaurant:
     properties:
+      address:
+        type: string
       category:
         type: string
       id:
@@ -24,9 +26,39 @@ definitions:
         type: string
       rating:
         $ref: '#/definitions/pgtype.Numeric'
-      street:
-        type: string
       zip_code:
+        type: integer
+    type: object
+  handlers.MenuItemSelection:
+    properties:
+      customerId:
+        example: 1
+        type: integer
+      name:
+        example: Cheese Burger
+        type: string
+      price:
+        example: 10
+        type: number
+      quantity:
+        example: 2
+        type: integer
+      restaurantId:
+        example: 10
+        type: integer
+    type: object
+  handlers.SelectItemParams:
+    properties:
+      customerId:
+        example: 1
+        type: integer
+      id:
+        type: integer
+      quantity:
+        example: 2
+        type: integer
+      restaurantId:
+        example: 10
         type: integer
     type: object
   pgtype.InfinityModifier:
@@ -170,4 +202,34 @@ paths:
       summary: Get menu item by restaurant and id
       tags:
       - menu_items
+  /api/restaurants/menu/select:
+    post:
+      consumes:
+      - application/json
+      description: Select Menu Item
+      parameters:
+      - description: Menu item selection details
+        in: body
+        name: customer
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.SelectItemParams'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Menu item successfully selected
+          schema:
+            $ref: '#/definitions/handlers.MenuItemSelection'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Select Menuitem
+      tags:
+      - customers
 swagger: "2.0"

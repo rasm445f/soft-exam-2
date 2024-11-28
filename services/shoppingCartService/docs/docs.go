@@ -63,17 +63,17 @@ const docTemplate = `{
         },
         "/api/shopping/consume": {
             "get": {
-                "description": "Fetches a list of items based on the customerId",
+                "description": "Consumes the Shopping Cart's Menu Items for a Customer",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "Broker"
                 ],
-                "summary": "View items for a customer",
+                "summary": "Consume the chosen Menu Items for a Customer",
                 "responses": {
                     "200": {
-                        "description": "Cart cleared",
+                        "description": "Shopping Cart's Menu Items Consumed",
                         "schema": {
                             "type": "string"
                         }
@@ -103,7 +103,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "Broker"
                 ],
                 "summary": "Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment",
                 "parameters": [
@@ -120,7 +120,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.PublishOrderRequest"
+                            "$ref": "#/definitions/handlers.PublishShoppingCartRequest"
                         }
                     }
                 ],
@@ -302,7 +302,7 @@ const docTemplate = `{
         "db.AddItemParams": {
             "type": "object",
             "properties": {
-                "customer_id": {
+                "customerId": {
                     "type": "integer"
                 },
                 "name": {
@@ -314,17 +314,17 @@ const docTemplate = `{
                 "quantity": {
                     "type": "integer"
                 },
-                "restaurant_id": {
+                "restaurantId": {
                     "type": "integer"
                 }
             }
         },
-        "handlers.PublishOrderRequest": {
+        "handlers.PublishShoppingCartRequest": {
             "type": "object",
             "properties": {
                 "comment": {
                     "type": "string",
-                    "example": "No vegetables on the pizza."
+                    "example": "No vegetables"
                 }
             }
         },

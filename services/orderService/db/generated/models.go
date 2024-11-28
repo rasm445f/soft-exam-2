@@ -6,44 +6,43 @@ package generated
 
 import (
 	"time"
-
-	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Bonu struct {
-	ID              int32          `json:"id"`
-	Description     *string        `json:"description"`
-	Earlylateamount pgtype.Numeric `json:"earlylateamount"`
-	Percentage      pgtype.Numeric `json:"percentage"`
+	ID              int32    `json:"id"`
+	Description     *string  `json:"description"`
+	Earlylateamount *float64 `json:"earlylateamount"`
+	Percentage      *float64 `json:"percentage"`
 }
 
 type Fee struct {
-	ID          int32          `json:"id"`
-	Amount      pgtype.Numeric `json:"amount"`
-	Description *string        `json:"description"`
+	ID          int32    `json:"id"`
+	Percentage  *float64 `json:"percentage"`
+	Amount      *float64 `json:"amount"`
+	Description *string  `json:"description"`
 }
 
 type Order struct {
-	ID              int32          `json:"id"`
-	Totalamount     pgtype.Numeric `json:"totalamount"`
-	Vatamount       pgtype.Numeric `json:"vatamount"`
-	Status          string         `json:"status"`
-	Timestamp       *time.Time     `json:"timestamp"`
-	Comment         *string        `json:"comment"`
-	Customerid      *int32         `json:"customerid"`
-	Restaurantid    *int32         `json:"restaurantid"`
-	Deliveryagentid *int32         `json:"deliveryagentid"`
-	Paymentid       *int32         `json:"paymentid"`
-	Bonusid         *int32         `json:"bonusid"`
-	Feeid           *int32         `json:"feeid"`
+	ID              int32      `json:"id"`
+	Totalamount     float64    `json:"totalamount"`
+	Vatamount       float64    `json:"vatamount"`
+	Status          string     `json:"status"`
+	Timestamp       *time.Time `json:"timestamp"`
+	Comment         *string    `json:"comment"`
+	Customerid      *int32     `json:"customerid"`
+	Restaurantid    *int32     `json:"restaurantid"`
+	Deliveryagentid *int32     `json:"deliveryagentid"`
+	Paymentid       *int32     `json:"paymentid"`
+	Bonusid         *int32     `json:"bonusid"`
+	Feeid           *int32     `json:"feeid"`
 }
 
 type Orderitem struct {
-	ID       int32          `json:"id"`
-	Orderid  int32          `json:"orderid"`
-	Name     string         `json:"name"`
-	Price    pgtype.Numeric `json:"price"`
-	Quantity pgtype.Numeric `json:"quantity"`
+	ID       int32   `json:"id"`
+	Orderid  int32   `json:"orderid"`
+	Name     string  `json:"name"`
+	Price    float64 `json:"price"`
+	Quantity float64 `json:"quantity"`
 }
 
 type Payment struct {

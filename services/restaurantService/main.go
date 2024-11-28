@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	_ "github.com/rasm445f/soft-exam-2/docs"
@@ -36,6 +37,7 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("GET /api/restaurants/{restaurantId}/menu-items/{menuitemId}", restaurantHandler.GetMenuItemByRestaurantAndId())
 	mux.HandleFunc("GET /api/categories", restaurantHandler.GetAllCategories())
 	mux.HandleFunc("GET /api/filter/{category}", restaurantHandler.FilterRestaurantByCategory())
+	mux.HandleFunc("POST /api/restaurants/menu/select", restaurantHandler.SelectMenuitem())
 
 	//CORS stuff
 	handler := cors.Default().Handler(mux)
@@ -44,6 +46,9 @@ func run() (http.Handler, error) {
 }
 
 func main() {
+	broker.InitRabbitMQ()
+	defer broker.CloseRabbitMQ()
+
 	mux, err := run()
 	if err != nil {
 		log.Fatal(err)

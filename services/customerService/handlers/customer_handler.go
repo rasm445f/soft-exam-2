@@ -263,7 +263,7 @@ type MenuItemSelection struct {
 	CustomerID   int32 `json:"customerId" example:"1"`
 	RestaurantId int32 `json:"restaurantId" example:"10"`
 	Name   string `json:"name" example:"Cheese Burger"`
-	Price  float64 `json:"price" example:"9.99"`
+	Price  float64 `json:"price" example:"10.00"`
 	Quantity     int   `json:"quantity" example:"2"`
 }
 // SelectMenuItem godoc
