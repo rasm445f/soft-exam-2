@@ -79,3 +79,5 @@ RETURNING ID;
 SELECT ID, Description, EarlyLateAmount, Percentage
 FROM Bonus
 WHERE ID = $1;
+
+-- Create
