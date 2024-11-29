@@ -233,6 +233,38 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/order/bonus/{orderId}": {
+            "get": {
+                "description": "calculates the order bonus",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "calculate order bonus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Order"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/consume": {
             "get": {
                 "description": "Consume the created order for customer",
@@ -258,6 +290,53 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/status-agent/{orderId}": {
+            "patch": {
+                "description": "Updates the status of an order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Update Order Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Order Status",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateOrderStatusRequestWithDeliveryAgentId"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order status updated successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
                         "schema": {
                             "type": "string"
                         }
@@ -520,6 +599,18 @@ const docTemplate = `{
         "handlers.UpdateOrderStatusRequest": {
             "type": "object",
             "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "Pending/On its way/Delivered"
+                }
+            }
+        },
+        "handlers.UpdateOrderStatusRequestWithDeliveryAgentId": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "status": {
                     "type": "string",
                     "example": "Pending/On its way/Delivered"

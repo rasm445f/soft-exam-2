@@ -3,7 +3,6 @@ package domain
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"github.com/rasm445f/soft-exam-2/db/generated"
 )
@@ -22,7 +21,7 @@ func (d *DeliveryAgentDomain) GetAllDeliveryAgentsDomain(ctx context.Context) ([
 	if err != nil {
 		return nil, errors.New("failed to fetch deliveryAgents")
 	}
-	
+
 	return deliveryAgents, nil
 }
 
@@ -31,17 +30,16 @@ func (d *DeliveryAgentDomain) GetDeliveryAgentByIdDomain(ctx context.Context, de
 	if err != nil {
 		return nil, errors.New("failed to get deliveryAgent by id")
 	}
-	
+
 	return &deliveryAgent, nil
 }
 
-
 func (d *DeliveryAgentDomain) CreateDeliveryAgentDomain(ctx context.Context, deliveryAgentParams generated.CreateDeliveryAgentParams) (int32, error) {
-		deliveryAgentId, err := d.repo.CreateDeliveryAgent(ctx, deliveryAgentParams)
-		if err != nil {
-			return 0, errors.New("failed to create delivery agent: " + err.Error())
-		}
-		return deliveryAgentId, nil
+	deliveryAgentId, err := d.repo.CreateDeliveryAgent(ctx, deliveryAgentParams)
+	if err != nil {
+		return 0, errors.New("failed to create delivery agent: " + err.Error())
+	}
+	return deliveryAgentId, nil
 }
 
 // func (d *DeliveryAgentDomain) UpdateDeliveryAgentRatingDomain(ctx context.Context, deliveryAgentId int32) error {

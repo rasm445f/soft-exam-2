@@ -23,13 +23,13 @@ func run() (http.Handler, error) {
 	}
 
 	// Initialize Queries with DB
-		queries := generated.New(db)
-		orderDomain := domain.NewOrderDomain(queries)
-		orderHandler := handlers.NewOrderHandler(orderDomain)
-		feedbackDomain := domain.NewFeedbackDomain(queries)
-		feedbackHandler := handlers.NewFeedbackHandler(feedbackDomain)
-		deliveryAgentDomain := domain.NewDeliveryAgentDomain(queries)
-		deliveryAgentHandler := handlers.NewDeliveryAgentHandler(deliveryAgentDomain)
+	queries := generated.New(db)
+	orderDomain := domain.NewOrderDomain(queries)
+	orderHandler := handlers.NewOrderHandler(orderDomain)
+	feedbackDomain := domain.NewFeedbackDomain(queries)
+	feedbackHandler := handlers.NewFeedbackHandler(feedbackDomain)
+	deliveryAgentDomain := domain.NewDeliveryAgentDomain(queries)
+	deliveryAgentHandler := handlers.NewDeliveryAgentHandler(deliveryAgentDomain)
 
 	mux := http.NewServeMux()
 
@@ -39,6 +39,8 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("GET /api/orders/{orderId}", orderHandler.GetOrderById())
 	mux.HandleFunc("PATCH /api/order/status/{orderId}", orderHandler.UpdateOrderStatus())
 	mux.HandleFunc("DELETE /api/orders/{orderId}", orderHandler.DeleteOrder())
+	mux.HandleFunc("PATCH /api/order/status-agent/{orderId}", orderHandler.UpdateOrderStatusWithDeliveryAgentId())
+	mux.HandleFunc("GET /api/order/bonus/{orderId}", orderHandler.CalculateOrderBonus())
 	// Feedback
 	mux.HandleFunc("GET /api/feedbacks", feedbackHandler.GetAllFeedbacks())
 	mux.HandleFunc("GET /api/feedbacks/{orderId}", feedbackHandler.GetFeedbackByOrderId())

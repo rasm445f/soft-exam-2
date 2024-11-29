@@ -12,8 +12,9 @@ import (
 
 const createBonus = `-- name: CreateBonus :one
 INSERT INTO Bonus (Description, EarlyLateAmount, Percentage)
-VALUES ($1, $2, $3)
-RETURNING ID
+    VALUES ($1, $2, $3)
+RETURNING
+    ID
 `
 
 type CreateBonusParams struct {
@@ -32,8 +33,9 @@ func (q *Queries) CreateBonus(ctx context.Context, arg CreateBonusParams) (int32
 
 const createDeliveryAgent = `-- name: CreateDeliveryAgent :one
 INSERT INTO DeliveryAgent (FullName, ContactInfo, Availability, Rating)
-VALUES ($1, $2, $3, $4)
-RETURNING ID
+    VALUES ($1, $2, $3, $4)
+RETURNING
+    ID
 `
 
 type CreateDeliveryAgentParams struct {
@@ -58,8 +60,9 @@ func (q *Queries) CreateDeliveryAgent(ctx context.Context, arg CreateDeliveryAge
 
 const createFee = `-- name: CreateFee :one
 INSERT INTO Fee (Percentage, Amount, Description)
-VALUES ($1, $2, $3)
-RETURNING ID
+    VALUES ($1, $2, $3)
+RETURNING
+    ID
 `
 
 type CreateFeeParams struct {
@@ -78,8 +81,9 @@ func (q *Queries) CreateFee(ctx context.Context, arg CreateFeeParams) (int32, er
 
 const createFeedback = `-- name: CreateFeedback :one
 INSERT INTO Feedback (OrderID, CustomerID, DeliveryAgentRating, RestaurantRating, Comment)
-VALUES ($1, $2, $3, $4, $5)
-RETURNING ID
+    VALUES ($1, $2, $3, $4, $5)
+RETURNING
+    ID
 `
 
 type CreateFeedbackParams struct {
@@ -106,8 +110,9 @@ func (q *Queries) CreateFeedback(ctx context.Context, arg CreateFeedbackParams) 
 
 const createOrder = `-- name: CreateOrder :one
 INSERT INTO "Order" (TotalAmount, VATAmount, Status, Timestamp, Comment, CustomerID, RestaurantID, DeliveryAgentID, PaymentID, BonusID, FeeID)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-RETURNING ID
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+RETURNING
+    ID
 `
 
 type CreateOrderParams struct {
@@ -146,8 +151,9 @@ func (q *Queries) CreateOrder(ctx context.Context, arg CreateOrderParams) (int32
 
 const createOrderItem = `-- name: CreateOrderItem :one
 INSERT INTO OrderItem (OrderID, Name, Price, Quantity)
-VALUES ($1, $2, $3, $4)
-RETURNING ID
+    VALUES ($1, $2, $3, $4)
+RETURNING
+    ID
 `
 
 type CreateOrderItemParams struct {
@@ -172,8 +178,9 @@ func (q *Queries) CreateOrderItem(ctx context.Context, arg CreateOrderItemParams
 
 const createPayment = `-- name: CreatePayment :one
 INSERT INTO Payment (PaymentStatus, PaymentMethod)
-VALUES ($1, $2)
-RETURNING ID
+    VALUES ($1, $2)
+RETURNING
+    ID
 `
 
 type CreatePaymentParams struct {
@@ -212,9 +219,12 @@ func (q *Queries) DeleteOrderItemsByOrderId(ctx context.Context, orderid int32) 
 }
 
 const getAllDeliveryAgents = `-- name: GetAllDeliveryAgents :many
-SELECT id, fullname, contactinfo, availability, rating
-FROM DeliveryAgent
-ORDER BY ID DESC
+SELECT
+    id, fullname, contactinfo, availability, rating
+FROM
+    DeliveryAgent
+ORDER BY
+    ID DESC
 `
 
 // Fetch all DeliveryAgents
@@ -245,9 +255,12 @@ func (q *Queries) GetAllDeliveryAgents(ctx context.Context) ([]Deliveryagent, er
 }
 
 const getAllFeedbacks = `-- name: GetAllFeedbacks :many
-SELECT id, orderid, customerid, deliveryagentrating, restaurantrating, comment
-FROM Feedback
-ORDER BY ID DESC
+SELECT
+    id, orderid, customerid, deliveryagentrating, restaurantrating, comment
+FROM
+    Feedback
+ORDER BY
+    ID DESC
 `
 
 // Fetch all Feedbacks
@@ -278,8 +291,8 @@ func (q *Queries) GetAllFeedbacks(ctx context.Context) ([]Feedback, error) {
 	return items, nil
 }
 
-const getAllFeedbacksByDeliveryAgentId = `-- name: GetAllFeedbacksByDeliveryAgentId :many
-SELECT 
+const getAllFeedbacksFromDeliveryAgentByOrderId = `-- name: GetAllFeedbacksFromDeliveryAgentByOrderId :many
+SELECT
     f.ID,
     f.OrderID,
     f.CustomerID,
@@ -287,12 +300,21 @@ SELECT
     f.RestaurantRating,
     f.Comment,
     o.DeliveryAgentID
-FROM Feedback f
-JOIN "Order" o ON f.OrderID = o.ID
-WHERE o.DeliveryAgentID = $1
+FROM
+    Feedback f
+    JOIN "Order" o ON f.OrderID = o.ID
+WHERE
+    o.DeliveryAgentID = (
+        SELECT
+            DeliveryAgentID
+        FROM
+            "Order"
+        WHERE
+            OrderID = $1
+        LIMIT 1)
 `
 
-type GetAllFeedbacksByDeliveryAgentIdRow struct {
+type GetAllFeedbacksFromDeliveryAgentByOrderIdRow struct {
 	ID                  int32   `json:"id"`
 	Orderid             int32   `json:"orderid"`
 	Customerid          int32   `json:"customerid"`
@@ -303,15 +325,15 @@ type GetAllFeedbacksByDeliveryAgentIdRow struct {
 }
 
 // Get all Feedbacks for a Delivery Agent
-func (q *Queries) GetAllFeedbacksByDeliveryAgentId(ctx context.Context, deliveryagentid *int32) ([]GetAllFeedbacksByDeliveryAgentIdRow, error) {
-	rows, err := q.db.Query(ctx, getAllFeedbacksByDeliveryAgentId, deliveryagentid)
+func (q *Queries) GetAllFeedbacksFromDeliveryAgentByOrderId(ctx context.Context, orderid int32) ([]GetAllFeedbacksFromDeliveryAgentByOrderIdRow, error) {
+	rows, err := q.db.Query(ctx, getAllFeedbacksFromDeliveryAgentByOrderId, orderid)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []GetAllFeedbacksByDeliveryAgentIdRow
+	var items []GetAllFeedbacksFromDeliveryAgentByOrderIdRow
 	for rows.Next() {
-		var i GetAllFeedbacksByDeliveryAgentIdRow
+		var i GetAllFeedbacksFromDeliveryAgentByOrderIdRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.Orderid,
@@ -332,9 +354,23 @@ func (q *Queries) GetAllFeedbacksByDeliveryAgentId(ctx context.Context, delivery
 }
 
 const getAllOrders = `-- name: GetAllOrders :many
-SELECT ID, TotalAmount, VATAmount, Status, Timestamp, Comment, CustomerID, RestaurantID, DeliveryAgentID, PaymentID, BonusID, FeeID
-FROM "Order"
-ORDER BY Timestamp DESC
+SELECT
+    ID,
+    TotalAmount,
+    VATAmount,
+    Status,
+    Timestamp,
+    Comment,
+    CustomerID,
+    RestaurantID,
+    DeliveryAgentID,
+    PaymentID,
+    BonusID,
+    FeeID
+FROM
+    "Order"
+ORDER BY
+    Timestamp DESC
 `
 
 // Fetch all Orders
@@ -372,9 +408,15 @@ func (q *Queries) GetAllOrders(ctx context.Context) ([]Order, error) {
 }
 
 const getBonusById = `-- name: GetBonusById :one
-SELECT ID, Description, EarlyLateAmount, Percentage
-FROM Bonus
-WHERE ID = $1
+SELECT
+    ID,
+    Description,
+    EarlyLateAmount,
+    Percentage
+FROM
+    Bonus
+WHERE
+    ID = $1
 `
 
 // Fetch a Bonus by ID
@@ -391,9 +433,12 @@ func (q *Queries) GetBonusById(ctx context.Context, id int32) (Bonu, error) {
 }
 
 const getDeliveryAgentById = `-- name: GetDeliveryAgentById :one
-SELECT id, fullname, contactinfo, availability, rating
-FROM DeliveryAgent
-WHERE ID = $1
+SELECT
+    id, fullname, contactinfo, availability, rating
+FROM
+    DeliveryAgent
+WHERE
+    ID = $1
 `
 
 // Fetch an Order by ID
@@ -411,9 +456,15 @@ func (q *Queries) GetDeliveryAgentById(ctx context.Context, id int32) (Deliverya
 }
 
 const getFeeById = `-- name: GetFeeById :one
-SELECT ID, Percentage, Amount, Description
-FROM Fee
-WHERE ID = $1
+SELECT
+    ID,
+    Percentage,
+    Amount,
+    Description
+FROM
+    Fee
+WHERE
+    ID = $1
 `
 
 // Fetch a Fee by ID
@@ -430,9 +481,12 @@ func (q *Queries) GetFeeById(ctx context.Context, id int32) (Fee, error) {
 }
 
 const getFeedbackById = `-- name: GetFeedbackById :one
-SELECT id, orderid, customerid, deliveryagentrating, restaurantrating, comment
-FROM Feedback
-WHERE ID = $1
+SELECT
+    id, orderid, customerid, deliveryagentrating, restaurantrating, comment
+FROM
+    Feedback
+WHERE
+    ID = $1
 `
 
 // Fetch a Feedback by ID
@@ -451,9 +505,12 @@ func (q *Queries) GetFeedbackById(ctx context.Context, id int32) (Feedback, erro
 }
 
 const getFeedbackByOrderId = `-- name: GetFeedbackByOrderId :one
-SELECT id, orderid, customerid, deliveryagentrating, restaurantrating, comment
-FROM Feedback
-WHERE OrderID = $1
+SELECT
+    id, orderid, customerid, deliveryagentrating, restaurantrating, comment
+FROM
+    Feedback
+WHERE
+    OrderID = $1
 `
 
 // Fetch a Feedback by OrderID
@@ -472,9 +529,23 @@ func (q *Queries) GetFeedbackByOrderId(ctx context.Context, orderid int32) (Feed
 }
 
 const getOrderById = `-- name: GetOrderById :one
-SELECT ID, TotalAmount, VATAmount, Status, Timestamp, Comment, CustomerID, RestaurantID, DeliveryAgentID, PaymentID, BonusID, FeeID
-FROM "Order"
-WHERE ID = $1
+SELECT
+    ID,
+    TotalAmount,
+    VATAmount,
+    Status,
+    Timestamp,
+    Comment,
+    CustomerID,
+    RestaurantID,
+    DeliveryAgentID,
+    PaymentID,
+    BonusID,
+    FeeID
+FROM
+    "Order"
+WHERE
+    ID = $1
 `
 
 // Fetch an Order by ID
@@ -499,9 +570,16 @@ func (q *Queries) GetOrderById(ctx context.Context, id int32) (Order, error) {
 }
 
 const getOrderItemsByOrderId = `-- name: GetOrderItemsByOrderId :many
-SELECT ID, OrderID, Name, Price, Quantity
-FROM OrderItem
-WHERE OrderID = $1
+SELECT
+    ID,
+    OrderID,
+    Name,
+    Price,
+    Quantity
+FROM
+    OrderItem
+WHERE
+    OrderID = $1
 `
 
 // Fetch all Order Items by Order ID
@@ -532,9 +610,14 @@ func (q *Queries) GetOrderItemsByOrderId(ctx context.Context, orderid int32) ([]
 }
 
 const getPaymentById = `-- name: GetPaymentById :one
-SELECT ID, PaymentStatus, PaymentMethod
-FROM Payment
-WHERE ID = $1
+SELECT
+    ID,
+    PaymentStatus,
+    PaymentMethod
+FROM
+    Payment
+WHERE
+    ID = $1
 `
 
 // Fetch a Payment by ID
@@ -546,9 +629,12 @@ func (q *Queries) GetPaymentById(ctx context.Context, id int32) (Payment, error)
 }
 
 const updateDeliveryAgentAvailability = `-- name: UpdateDeliveryAgentAvailability :exec
-UPDATE DeliveryAgent
-SET Availability = $1
-WHERE ID = $2
+UPDATE
+    DeliveryAgent
+SET
+    Availability = $1
+WHERE
+    ID = $2
 `
 
 type UpdateDeliveryAgentAvailabilityParams struct {
@@ -563,9 +649,12 @@ func (q *Queries) UpdateDeliveryAgentAvailability(ctx context.Context, arg Updat
 }
 
 const updateDeliveryAgentRating = `-- name: UpdateDeliveryAgentRating :exec
-UPDATE DeliveryAgent
-SET Rating = $1
-WHERE ID = $2
+UPDATE
+    DeliveryAgent
+SET
+    Rating = $1
+WHERE
+    ID = $2
 `
 
 type UpdateDeliveryAgentRatingParams struct {
@@ -579,10 +668,33 @@ func (q *Queries) UpdateDeliveryAgentRating(ctx context.Context, arg UpdateDeliv
 	return err
 }
 
+const updateOrderBonus = `-- name: UpdateOrderBonus :exec
+UPDATE
+    "Order"
+SET
+    BonusID = $1
+WHERE
+    ID = $2
+`
+
+type UpdateOrderBonusParams struct {
+	Bonusid *int32 `json:"bonusid"`
+	ID      int32  `json:"id"`
+}
+
+// Update an Order's bonus
+func (q *Queries) UpdateOrderBonus(ctx context.Context, arg UpdateOrderBonusParams) error {
+	_, err := q.db.Exec(ctx, updateOrderBonus, arg.Bonusid, arg.ID)
+	return err
+}
+
 const updateOrderStatus = `-- name: UpdateOrderStatus :exec
-UPDATE "Order"
-SET Status = $1
-WHERE ID = $2
+UPDATE
+    "Order"
+SET
+    Status = $1
+WHERE
+    ID = $2
 `
 
 type UpdateOrderStatusParams struct {
@@ -593,5 +705,27 @@ type UpdateOrderStatusParams struct {
 // Update an Order's status
 func (q *Queries) UpdateOrderStatus(ctx context.Context, arg UpdateOrderStatusParams) error {
 	_, err := q.db.Exec(ctx, updateOrderStatus, arg.Status, arg.ID)
+	return err
+}
+
+const updateOrderStatusAndDeliveryAgent = `-- name: UpdateOrderStatusAndDeliveryAgent :exec
+UPDATE
+    "Order"
+SET
+    Status = $1,
+    DeliveryAgentID = $2
+WHERE
+    ID = $3
+`
+
+type UpdateOrderStatusAndDeliveryAgentParams struct {
+	Status          string `json:"status"`
+	Deliveryagentid *int32 `json:"deliveryagentid"`
+	ID              int32  `json:"id"`
+}
+
+// Update an Order's status and deliveryAgent
+func (q *Queries) UpdateOrderStatusAndDeliveryAgent(ctx context.Context, arg UpdateOrderStatusAndDeliveryAgentParams) error {
+	_, err := q.db.Exec(ctx, updateOrderStatusAndDeliveryAgent, arg.Status, arg.Deliveryagentid, arg.ID)
 	return err
 }
