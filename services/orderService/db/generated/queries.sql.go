@@ -30,6 +30,32 @@ func (q *Queries) CreateBonus(ctx context.Context, arg CreateBonusParams) (int32
 	return id, err
 }
 
+const createDeliveryAgent = `-- name: CreateDeliveryAgent :one
+INSERT INTO DeliveryAgent (FullName, ContactInfo, Availability, Rating)
+VALUES ($1, $2, $3, $4)
+RETURNING ID
+`
+
+type CreateDeliveryAgentParams struct {
+	Fullname     *string  `json:"fullname"`
+	Contactinfo  *string  `json:"contactinfo"`
+	Availability *bool    `json:"availability"`
+	Rating       *float64 `json:"rating"`
+}
+
+// Create DeliveryAgent
+func (q *Queries) CreateDeliveryAgent(ctx context.Context, arg CreateDeliveryAgentParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createDeliveryAgent,
+		arg.Fullname,
+		arg.Contactinfo,
+		arg.Availability,
+		arg.Rating,
+	)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
 const createFee = `-- name: CreateFee :one
 INSERT INTO Fee (Percentage, Amount, Description)
 VALUES ($1, $2, $3)
@@ -45,6 +71,34 @@ type CreateFeeParams struct {
 // Create a Fee
 func (q *Queries) CreateFee(ctx context.Context, arg CreateFeeParams) (int32, error) {
 	row := q.db.QueryRow(ctx, createFee, arg.Percentage, arg.Amount, arg.Description)
+	var id int32
+	err := row.Scan(&id)
+	return id, err
+}
+
+const createFeedback = `-- name: CreateFeedback :one
+INSERT INTO Feedback (OrderID, CustomerID, DeliveryAgentRating, RestaurantRating, Comment)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING ID
+`
+
+type CreateFeedbackParams struct {
+	Orderid             int32   `json:"orderid"`
+	Customerid          int32   `json:"customerid"`
+	Deliveryagentrating *int32  `json:"deliveryagentrating"`
+	Restaurantrating    *int32  `json:"restaurantrating"`
+	Comment             *string `json:"comment"`
+}
+
+// Create Feedback
+func (q *Queries) CreateFeedback(ctx context.Context, arg CreateFeedbackParams) (int32, error) {
+	row := q.db.QueryRow(ctx, createFeedback,
+		arg.Orderid,
+		arg.Customerid,
+		arg.Deliveryagentrating,
+		arg.Restaurantrating,
+		arg.Comment,
+	)
 	var id int32
 	err := row.Scan(&id)
 	return id, err
@@ -157,6 +211,126 @@ func (q *Queries) DeleteOrderItemsByOrderId(ctx context.Context, orderid int32) 
 	return err
 }
 
+const getAllDeliveryAgents = `-- name: GetAllDeliveryAgents :many
+SELECT id, fullname, contactinfo, availability, rating
+FROM DeliveryAgent
+ORDER BY ID DESC
+`
+
+// Fetch all DeliveryAgents
+func (q *Queries) GetAllDeliveryAgents(ctx context.Context) ([]Deliveryagent, error) {
+	rows, err := q.db.Query(ctx, getAllDeliveryAgents)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Deliveryagent
+	for rows.Next() {
+		var i Deliveryagent
+		if err := rows.Scan(
+			&i.ID,
+			&i.Fullname,
+			&i.Contactinfo,
+			&i.Availability,
+			&i.Rating,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllFeedbacks = `-- name: GetAllFeedbacks :many
+SELECT id, orderid, customerid, deliveryagentrating, restaurantrating, comment
+FROM Feedback
+ORDER BY ID DESC
+`
+
+// Fetch all Feedbacks
+func (q *Queries) GetAllFeedbacks(ctx context.Context) ([]Feedback, error) {
+	rows, err := q.db.Query(ctx, getAllFeedbacks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Feedback
+	for rows.Next() {
+		var i Feedback
+		if err := rows.Scan(
+			&i.ID,
+			&i.Orderid,
+			&i.Customerid,
+			&i.Deliveryagentrating,
+			&i.Restaurantrating,
+			&i.Comment,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getAllFeedbacksByDeliveryAgentId = `-- name: GetAllFeedbacksByDeliveryAgentId :many
+SELECT 
+    f.ID,
+    f.OrderID,
+    f.CustomerID,
+    f.DeliveryAgentRating,
+    f.RestaurantRating,
+    f.Comment,
+    o.DeliveryAgentID
+FROM Feedback f
+JOIN "Order" o ON f.OrderID = o.ID
+WHERE o.DeliveryAgentID = $1
+`
+
+type GetAllFeedbacksByDeliveryAgentIdRow struct {
+	ID                  int32   `json:"id"`
+	Orderid             int32   `json:"orderid"`
+	Customerid          int32   `json:"customerid"`
+	Deliveryagentrating *int32  `json:"deliveryagentrating"`
+	Restaurantrating    *int32  `json:"restaurantrating"`
+	Comment             *string `json:"comment"`
+	Deliveryagentid     *int32  `json:"deliveryagentid"`
+}
+
+// Get all Feedbacks for a Delivery Agent
+func (q *Queries) GetAllFeedbacksByDeliveryAgentId(ctx context.Context, deliveryagentid *int32) ([]GetAllFeedbacksByDeliveryAgentIdRow, error) {
+	rows, err := q.db.Query(ctx, getAllFeedbacksByDeliveryAgentId, deliveryagentid)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllFeedbacksByDeliveryAgentIdRow
+	for rows.Next() {
+		var i GetAllFeedbacksByDeliveryAgentIdRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.Orderid,
+			&i.Customerid,
+			&i.Deliveryagentrating,
+			&i.Restaurantrating,
+			&i.Comment,
+			&i.Deliveryagentid,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getAllOrders = `-- name: GetAllOrders :many
 SELECT ID, TotalAmount, VATAmount, Status, Timestamp, Comment, CustomerID, RestaurantID, DeliveryAgentID, PaymentID, BonusID, FeeID
 FROM "Order"
@@ -216,6 +390,26 @@ func (q *Queries) GetBonusById(ctx context.Context, id int32) (Bonu, error) {
 	return i, err
 }
 
+const getDeliveryAgentById = `-- name: GetDeliveryAgentById :one
+SELECT id, fullname, contactinfo, availability, rating
+FROM DeliveryAgent
+WHERE ID = $1
+`
+
+// Fetch an Order by ID
+func (q *Queries) GetDeliveryAgentById(ctx context.Context, id int32) (Deliveryagent, error) {
+	row := q.db.QueryRow(ctx, getDeliveryAgentById, id)
+	var i Deliveryagent
+	err := row.Scan(
+		&i.ID,
+		&i.Fullname,
+		&i.Contactinfo,
+		&i.Availability,
+		&i.Rating,
+	)
+	return i, err
+}
+
 const getFeeById = `-- name: GetFeeById :one
 SELECT ID, Percentage, Amount, Description
 FROM Fee
@@ -231,6 +425,48 @@ func (q *Queries) GetFeeById(ctx context.Context, id int32) (Fee, error) {
 		&i.Percentage,
 		&i.Amount,
 		&i.Description,
+	)
+	return i, err
+}
+
+const getFeedbackById = `-- name: GetFeedbackById :one
+SELECT id, orderid, customerid, deliveryagentrating, restaurantrating, comment
+FROM Feedback
+WHERE ID = $1
+`
+
+// Fetch a Feedback by ID
+func (q *Queries) GetFeedbackById(ctx context.Context, id int32) (Feedback, error) {
+	row := q.db.QueryRow(ctx, getFeedbackById, id)
+	var i Feedback
+	err := row.Scan(
+		&i.ID,
+		&i.Orderid,
+		&i.Customerid,
+		&i.Deliveryagentrating,
+		&i.Restaurantrating,
+		&i.Comment,
+	)
+	return i, err
+}
+
+const getFeedbackByOrderId = `-- name: GetFeedbackByOrderId :one
+SELECT id, orderid, customerid, deliveryagentrating, restaurantrating, comment
+FROM Feedback
+WHERE OrderID = $1
+`
+
+// Fetch a Feedback by OrderID
+func (q *Queries) GetFeedbackByOrderId(ctx context.Context, orderid int32) (Feedback, error) {
+	row := q.db.QueryRow(ctx, getFeedbackByOrderId, orderid)
+	var i Feedback
+	err := row.Scan(
+		&i.ID,
+		&i.Orderid,
+		&i.Customerid,
+		&i.Deliveryagentrating,
+		&i.Restaurantrating,
+		&i.Comment,
 	)
 	return i, err
 }
@@ -307,6 +543,40 @@ func (q *Queries) GetPaymentById(ctx context.Context, id int32) (Payment, error)
 	var i Payment
 	err := row.Scan(&i.ID, &i.Paymentstatus, &i.Paymentmethod)
 	return i, err
+}
+
+const updateDeliveryAgentAvailability = `-- name: UpdateDeliveryAgentAvailability :exec
+UPDATE DeliveryAgent
+SET Availability = $1
+WHERE ID = $2
+`
+
+type UpdateDeliveryAgentAvailabilityParams struct {
+	Availability *bool `json:"availability"`
+	ID           int32 `json:"id"`
+}
+
+// Update Delivery Agent Availability
+func (q *Queries) UpdateDeliveryAgentAvailability(ctx context.Context, arg UpdateDeliveryAgentAvailabilityParams) error {
+	_, err := q.db.Exec(ctx, updateDeliveryAgentAvailability, arg.Availability, arg.ID)
+	return err
+}
+
+const updateDeliveryAgentRating = `-- name: UpdateDeliveryAgentRating :exec
+UPDATE DeliveryAgent
+SET Rating = $1
+WHERE ID = $2
+`
+
+type UpdateDeliveryAgentRatingParams struct {
+	Rating *float64 `json:"rating"`
+	ID     int32    `json:"id"`
+}
+
+// Update Delivery Agent Rating
+func (q *Queries) UpdateDeliveryAgentRating(ctx context.Context, arg UpdateDeliveryAgentRatingParams) error {
+	_, err := q.db.Exec(ctx, updateDeliveryAgentRating, arg.Rating, arg.ID)
+	return err
 }
 
 const updateOrderStatus = `-- name: UpdateOrderStatus :exec

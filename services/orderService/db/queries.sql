@@ -80,4 +80,70 @@ SELECT ID, Description, EarlyLateAmount, Percentage
 FROM Bonus
 WHERE ID = $1;
 
--- Create
+-- Fetch all Feedbacks
+-- name: GetAllFeedbacks :many
+SELECT *
+FROM Feedback
+ORDER BY ID DESC;
+
+-- Create Feedback
+-- name: CreateFeedback :one
+INSERT INTO Feedback (OrderID, CustomerID, DeliveryAgentRating, RestaurantRating, Comment)
+VALUES ($1, $2, $3, $4, $5)
+RETURNING ID;
+
+-- Fetch a Feedback by ID
+-- name: GetFeedbackById :one
+SELECT *
+FROM Feedback
+WHERE ID = $1;
+
+-- Fetch a Feedback by OrderID
+-- name: GetFeedbackByOrderId :one
+SELECT *
+FROM Feedback
+WHERE OrderID = $1;
+
+-- Fetch all DeliveryAgents
+-- name: GetAllDeliveryAgents :many
+SELECT *
+FROM DeliveryAgent
+ORDER BY ID DESC;
+
+-- Create DeliveryAgent
+-- name: CreateDeliveryAgent :one
+INSERT INTO DeliveryAgent (FullName, ContactInfo, Availability, Rating)
+VALUES ($1, $2, $3, $4)
+RETURNING ID;
+
+-- Fetch an Order by ID
+-- name: GetDeliveryAgentById :one
+SELECT *
+FROM DeliveryAgent
+WHERE ID = $1;
+
+-- Update Delivery Agent Availability
+-- name: UpdateDeliveryAgentAvailability :exec
+UPDATE DeliveryAgent
+SET Availability = $1
+WHERE ID = $2;
+
+-- Update Delivery Agent Rating
+-- name: UpdateDeliveryAgentRating :exec
+UPDATE DeliveryAgent
+SET Rating = $1
+WHERE ID = $2;
+
+-- Get all Feedbacks for a Delivery Agent
+-- name: GetAllFeedbacksByDeliveryAgentId :many
+SELECT 
+    f.ID,
+    f.OrderID,
+    f.CustomerID,
+    f.DeliveryAgentRating,
+    f.RestaurantRating,
+    f.Comment
+    o.DeliveryAgentID
+FROM Feedback f
+JOIN "Order" o ON f.OrderID = o.ID
+WHERE o.OrderID = $1;

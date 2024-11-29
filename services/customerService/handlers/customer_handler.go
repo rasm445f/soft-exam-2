@@ -20,6 +20,7 @@ func NewCustomerHandler(domain *domain.CustomerDomain) *CustomerHandler {
 }
 
 // GetAllCustomers godoc
+//
 // @Summary Get all customers
 // @Description Fetches a list of all customers from the database
 // @Tags customers
@@ -44,6 +45,7 @@ func (h *CustomerHandler) GetAllCustomers() http.HandlerFunc {
 }
 
 // GetCustomerById godoc
+//
 // @Summary Get customer
 // @Description Fetches a customer based on the id from the database
 // @Tags customers
@@ -80,6 +82,7 @@ func (h *CustomerHandler) GetCustomerById() http.HandlerFunc {
 }
 
 // DeleteCustomer godoc
+//
 // @Summary Delete customer
 // @Description Deletes a customer based on the id from the database
 // @Tags customers
@@ -115,6 +118,7 @@ func (h *CustomerHandler) DeleteCustomer() http.HandlerFunc {
 }
 
 // CreateCustomer godoc
+//
 // @Summary Create a new customer
 // @Description Creates a new customer entry in the database
 // @Tags customers
@@ -142,8 +146,7 @@ func (h *CustomerHandler) CreateCustomer() http.HandlerFunc {
 			return
 		}
 
-		createdCustomer, err := h.domain.CreateCustomerDomain(ctx, customer)
-		err = h.domain.CreateCustomer(ctx, customer)
+		err = h.domain.CreateCustomerDomain(ctx, customer)
 		if err != nil {
 			http.Error(w, "Failed to create customer", http.StatusInternalServerError)
 			log.Println(err)
@@ -168,6 +171,7 @@ type UpdateCustomerWithAddress struct {
 }
 
 // UpdateCustomer godoc
+//
 // @Summary Update a customer
 // @Description Updates a customer's details based on the ID provided in the URL path. This may include personal information as well as optional address updates.
 // @Tags customers
@@ -269,6 +273,7 @@ type MenuItemSelection struct {
 	Quantity     int   `json:"quantity" example:"2"`
 }
 // SelectMenuItem godoc
+//
 // @Summary Select Menuitem
 // @Description Select Menu Item
 // @Tags customers
