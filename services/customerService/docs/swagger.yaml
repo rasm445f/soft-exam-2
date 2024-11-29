@@ -1,8 +1,6 @@
 definitions:
   generated.CreateCustomerParams:
     properties:
-      address:
-        type: string
       email:
         type: string
       name:
@@ -11,11 +9,15 @@ definitions:
         type: string
       phonenumber:
         type: string
+      street_address:
+        type: string
+      zip_code:
+        type: integer
     type: object
   generated.Customer:
     properties:
-      address:
-        type: string
+      addressid:
+        type: integer
       email:
         type: string
       id:
@@ -27,20 +29,30 @@ definitions:
       phonenumber:
         type: string
     type: object
-  generated.UpdateCustomerParams:
+  handlers.UpdateCustomerWithAddress:
+    description: Update customer details including name, email, and address information.
     properties:
-      address:
+      city:
+        example: New York
         type: string
       email:
+        example: john.doe@example.com
         type: string
-      id:
-        type: integer
       name:
+        example: John Doe
         type: string
       password:
+        example: Password123!
         type: string
       phonenumber:
+        example: "1234567890"
         type: string
+      street_address:
+        example: 123 Main St
+        type: string
+      zip_code:
+        example: 12345
+        type: integer
     type: object
   handlers.MenuItemSelection:
     properties:
@@ -155,35 +167,48 @@ paths:
     patch:
       consumes:
       - application/json
-      description: Updates a customer's details based on the ID from the database
+      description: Updates a customer's details based on the ID provided in the URL
+        path. This may include personal information as well as optional address updates.
       parameters:
       - description: Customer ID
         in: path
         name: id
         required: true
-        type: string
+        type: integer
       - description: Updated customer details
         in: body
         name: customer
         required: true
         schema:
-          $ref: '#/definitions/generated.UpdateCustomerParams'
+          $ref: '#/definitions/handlers.UpdateCustomerWithAddress'
       produces:
       - application/json
       responses:
         "200":
           description: Customer updated successfully
           schema:
-            type: string
+            additionalProperties:
+              type: string
+            type: object
         "400":
           description: Invalid input
           schema:
-            type: string
+            additionalProperties:
+              type: string
+            type: object
         "404":
           description: Customer not found
           schema:
-            type: string
-      summary: Update customer
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Internal server error
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Update a customer
       tags:
       - customers
   /api/customer/menu/select:

@@ -196,7 +196,7 @@ const docTemplate = `{
                 }
             },
             "patch": {
-                "description": "Updates a customer's details based on the ID from the database",
+                "description": "Updates a customer's details based on the ID provided in the URL path. This may include personal information as well as optional address updates.",
                 "consumes": [
                     "application/json"
                 ],
@@ -206,10 +206,10 @@ const docTemplate = `{
                 "tags": [
                     "customers"
                 ],
-                "summary": "Update customer",
+                "summary": "Update a customer",
                 "parameters": [
                     {
-                        "type": "string",
+                        "type": "integer",
                         "description": "Customer ID",
                         "name": "id",
                         "in": "path",
@@ -221,7 +221,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/generated.UpdateCustomerParams"
+                            "$ref": "#/definitions/handlers.UpdateCustomerWithAddress"
                         }
                     }
                 ],
@@ -229,19 +229,37 @@ const docTemplate = `{
                     "200": {
                         "description": "Customer updated successfully",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "400": {
                         "description": "Invalid input",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "404": {
                         "description": "Customer not found",
                         "schema": {
-                            "type": "string"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
@@ -252,9 +270,6 @@ const docTemplate = `{
         "generated.CreateCustomerParams": {
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
-                },
                 "email": {
                     "type": "string"
                 },
@@ -266,14 +281,20 @@ const docTemplate = `{
                 },
                 "phonenumber": {
                     "type": "string"
+                },
+                "street_address": {
+                    "type": "string"
+                },
+                "zip_code": {
+                    "type": "integer"
                 }
             }
         },
         "generated.Customer": {
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
+                "addressid": {
+                    "type": "integer"
                 },
                 "email": {
                     "type": "string"
@@ -292,26 +313,37 @@ const docTemplate = `{
                 }
             }
         },
-        "generated.UpdateCustomerParams": {
+        "handlers.UpdateCustomerWithAddress": {
+            "description": "Update customer details including name, email, and address information.",
             "type": "object",
             "properties": {
-                "address": {
-                    "type": "string"
+                "city": {
+                    "type": "string",
+                    "example": "New York"
                 },
                 "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "integer"
+                    "type": "string",
+                    "example": "john.doe@example.com"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John Doe"
                 },
                 "password": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Password123!"
                 },
                 "phonenumber": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1234567890"
+                },
+                "street_address": {
+                    "type": "string",
+                    "example": "123 Main St"
+                },
+                "zip_code": {
+                    "type": "integer",
+                    "example": 12345
                 }
             }
         },
