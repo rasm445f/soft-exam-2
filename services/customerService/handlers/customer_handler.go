@@ -143,30 +143,42 @@ func (h *CustomerHandler) CreateCustomer() http.HandlerFunc {
 		}
 
 		createdCustomer, err := h.domain.CreateCustomerDomain(ctx, customer)
+		err = h.domain.CreateCustomer(ctx, customer)
 		if err != nil {
 			http.Error(w, "Failed to create customer", http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
 
-		res, _ := json.Marshal(createdCustomer)
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
-		w.Write(res)
 	}
 }
 
+// UpdateCustomerWithAddress represents a customer update with optional address fields.
+// @Description Update customer details including name, email, and address information.
+type UpdateCustomerWithAddress struct {
+	Name          *string `json:"name" example:"John Doe"`
+	Email         *string `json:"email" example:"john.doe@example.com"`
+	Phonenumber   *string `json:"phonenumber" example:"1234567890"`
+	Password      *string `json:"password" example:"Password123!"`
+	StreetAddress *string `json:"street_address" example:"123 Main St" `
+	ZipCode       *int32  `json:"zip_code" example:"12345"`
+	City          *string `json:"city" example:"New York"`
+}
+
 // UpdateCustomer godoc
-// @Summary Update customer
-// @Description Updates a customer's details based on the ID from the database
+// @Summary Update a customer
+// @Description Updates a customer's details based on the ID provided in the URL path. This may include personal information as well as optional address updates.
 // @Tags customers
 // @Accept application/json
 // @Produce application/json
-// @Param id path string true "Customer ID"
-// @Param customer body generated.UpdateCustomerParams true "Updated customer details"
-// @Success 200 {string} string "Customer updated successfully"
-// @Failure 400 {string} string "Invalid input"
-// @Failure 404 {string} string "Customer not found"
+// @Param id path int true "Customer ID"
+// @Param customer body UpdateCustomerWithAddress true "Updated customer details"
+// @Success 200 {object} map[string]string "Customer updated successfully"
+// @Failure 400 {object} map[string]string "Invalid input"
+// @Failure 404 {object} map[string]string "Customer not found"
+// @Failure 500 {object} map[string]string "Internal server error"
 // @Router /api/customer/{id} [patch]
 func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -180,27 +192,65 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 			return
 		}
 
-		// Decode the incoming JSON request
-		var customerUpdates generated.UpdateCustomerParams
-		if err := json.NewDecoder(r.Body).Decode(&customerUpdates); err != nil {
+		// Decode the incoming JSON request into a map to capture all fields
+		var updatePayload map[string]interface{}
+		if err := json.NewDecoder(r.Body).Decode(&updatePayload); err != nil {
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			log.Println("Error decoding request body:", err)
 			return
 		}
 
-		// Ensure the ID matches the customer's ID being updated
-		customerUpdates.ID = int32(id)
+		// Create an UpdateCustomerParams struct and fill it based on the JSON payload
+		customerUpdates := generated.UpdateCustomerParams{
+			ID: int32(id),
+		}
+		if name, ok := updatePayload["name"].(string); ok {
+			customerUpdates.Name = &name
+		}
+		if email, ok := updatePayload["email"].(string); ok {
+			customerUpdates.Email = &email
+		}
+		if phoneNumber, ok := updatePayload["phonenumber"].(string); ok {
+			customerUpdates.Phonenumber = &phoneNumber
+		}
+		if password, ok := updatePayload["password"].(string); ok {
+			customerUpdates.Password = &password
+		}
 
 		// Call the query to update the customer in the database
 		err = h.domain.UpdateCustomerDomain(ctx, customerUpdates)
+		// Update the customer information in the database
 		if err != nil {
-			if err.Error() == "Customer not found" {
+			if err.Error() == "customer not found" {
 				http.Error(w, "Customer not found", http.StatusNotFound)
 			} else {
 				http.Error(w, "Failed to update customer", http.StatusInternalServerError)
 			}
 			log.Println("Error updating customer:", err)
 			return
+		}
+
+		// Check if the address needs to be updated
+		if streetAddress, ok := updatePayload["street_address"].(string); ok || updatePayload["zip_code"] != nil {
+			addressUpdates := generated.UpdateAddressParams{
+				ID: int32(id),
+			}
+
+			if ok {
+				addressUpdates.StreetAddress = &streetAddress
+			}
+			if zipCode, ok := updatePayload["zip_code"].(float64); ok {
+				zipCodeInt32 := int32(zipCode)
+				addressUpdates.ZipCode = &zipCodeInt32
+			}
+
+			// Update the address in the database
+			err = h.domain.UpdateAddress(ctx, addressUpdates)
+			if err != nil {
+				http.Error(w, "Failed to update address", http.StatusInternalServerError)
+				log.Println("Error updating address:", err)
+				return
+			}
 		}
 
 		// Return a success response
