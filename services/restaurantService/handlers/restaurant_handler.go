@@ -20,19 +20,22 @@ func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
 }
 
 // GetAllRestaurants godoc
+//
 // @Summary Get all restaurants
 // @Description Fetches a list of all restaurants from the database
 // @Tags restaurants
 // @Produce application/json
 // @Success 200 {array} generated.Restaurant
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/restaurants [get]
 func (h *RestaurantHandler) GetAllRestaurants() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		restaurants, err := h.domain.FetchAllRestaurants(ctx)
+		restaurants, err := h.domain.GetAllRestaurantsDomain(ctx)
 		if err != nil {
-			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
+			http.Error(w, "Failed to get restaurants", http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
@@ -45,12 +48,15 @@ func (h *RestaurantHandler) GetAllRestaurants() http.HandlerFunc {
 }
 
 // GetRestaurantById godoc
+//
 // @Summary Get restaurant by id
 // @Description Fetches a restaurant based on the id from the database
 // @Tags restaurants
 // @Produce application/json
 // @Param id path string true "Restaurant ID"
 // @Success 200 {object} generated.Restaurant
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/restaurants/{id} [get]
 func (h *RestaurantHandler) GetRestaurantById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -68,7 +74,7 @@ func (h *RestaurantHandler) GetRestaurantById() http.HandlerFunc {
 			return
 		}
 
-		restaurant, err := h.domain.GetRestaurantById(ctx, int32(restaurantId))
+		restaurant, err := h.domain.GetRestaurantByIdDomain(ctx, int32(restaurantId))
 		if err != nil {
 			http.Error(w, "Restaurant not found", http.StatusNotFound)
 			log.Println(err)
@@ -83,12 +89,15 @@ func (h *RestaurantHandler) GetRestaurantById() http.HandlerFunc {
 }
 
 // GetMenuItemsByRestaurant godoc
+//
 // @Summary Get menu items by restaurant ID
 // @Description Fetches all menu items associated with a specific restaurant ID
 // @Tags menu_items
 // @Produce application/json
 // @Param restaurantId path string true "Restaurant ID"
 // @Success 200 {array} generated.Menuitem
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/restaurants/{restaurantId}/menu-items [get]
 func (h *RestaurantHandler) GetMenuItemsByRestaurant() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -106,9 +115,9 @@ func (h *RestaurantHandler) GetMenuItemsByRestaurant() http.HandlerFunc {
 			return
 		}
 
-		menuItems, err := h.domain.FetchMenuItemsByRestaurantId(ctx, int32(restaurantId))
+		menuItems, err := h.domain.GetMenuItemsByRestaurantIdDomain(ctx, int32(restaurantId))
 		if err != nil {
-			http.Error(w, "Failed to fetch menu items", http.StatusInternalServerError)
+			http.Error(w, "Failed to get menu items", http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
@@ -121,6 +130,7 @@ func (h *RestaurantHandler) GetMenuItemsByRestaurant() http.HandlerFunc {
 }
 
 // GetMenuItemByRestaurantAndId godoc
+//
 // @Summary Get menu item by restaurant and id
 // @Description Fetches a menu item based on the restaurant and id from the database
 // @Tags menu_items
@@ -128,6 +138,8 @@ func (h *RestaurantHandler) GetMenuItemsByRestaurant() http.HandlerFunc {
 // @Param restaurantId path string true "Restaurant ID"
 // @Param menuitemId path string true "Menu Item ID"
 // @Success 200 {object} generated.Menuitem
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/restaurants/{restaurantId}/menu-items/{menuitemId} [get]
 func (h *RestaurantHandler) GetMenuItemByRestaurantAndId() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -157,7 +169,7 @@ func (h *RestaurantHandler) GetMenuItemByRestaurantAndId() http.HandlerFunc {
 			ID:           int32(menuitemId),
 		}
 
-		menuItem, err := h.domain.GetMenuItemByRestaurantAndId(ctx, params)
+		menuItem, err := h.domain.GetMenuItemByRestaurantAndIdDomain(ctx, params)
 		if err != nil {
 			http.Error(w, "Menu Item not found", http.StatusNotFound)
 			log.Println(err)
@@ -171,22 +183,25 @@ func (h *RestaurantHandler) GetMenuItemByRestaurantAndId() http.HandlerFunc {
 	}
 }
 
-// Categories
+/* CATEGORIES */
 
 // GetAllCategories godoc
+//
 // @Summary Get all categories
 // @Description Fetches a list of all unique categories from the restaurant
 // @Tags categories
 // @Produce application/json
 // @Success 200 {array} string
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/categories [get]
 func (h *RestaurantHandler) GetAllCategories() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		categories, err := h.domain.FetchAllCategories(ctx)
+		categories, err := h.domain.GetAllCategoriesDomain(ctx)
 		if err != nil {
-			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
+			http.Error(w, "Get to fetch restaurants", http.StatusInternalServerError)
 			log.Println(err)
 			return
 		}
@@ -199,12 +214,15 @@ func (h *RestaurantHandler) GetAllCategories() http.HandlerFunc {
 }
 
 // FilterRestaurantByCategory godoc
+//
 // @Summary Filter restaurants by category
 // @Description Fetches all restaurants for a given category
 // @Tags categories
 // @Produce application/json
 // @Param category path string true "Restaurant Category"
 // @Success 200 {array} generated.Restaurant
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/filter/{category} [get]
 func (h *RestaurantHandler) FilterRestaurantByCategory() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -216,7 +234,7 @@ func (h *RestaurantHandler) FilterRestaurantByCategory() http.HandlerFunc {
 			return
 		}
 
-		restaurants, err := h.domain.FilterRestaurantsByCategory(ctx, category)
+		restaurants, err := h.domain.FilterRestaurantsByCategoryDomain(ctx, category)
 		if err != nil {
 			http.Error(w, "Failed to fetch restaurants", http.StatusInternalServerError)
 			log.Println(err)
@@ -246,9 +264,10 @@ type MenuItemSelection struct {
 }
 
 // SelectMenuItem godoc
-// @Summary Select Menuitem
+//
+// @Summary Select MenuItem
 // @Description Select Menu Item
-// @Tags customers
+// @Tags BrokerCustomers
 // @Accept  application/json
 // @Produce application/json
 // @Param customer body SelectItemParams true "Menu item selection details"
@@ -256,7 +275,7 @@ type MenuItemSelection struct {
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/restaurants/menu/select [post]
-func (h *RestaurantHandler) SelectMenuitem() http.HandlerFunc {
+func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var selectionParams SelectItemParams
 		err := json.NewDecoder(r.Body).Decode(&selectionParams)
@@ -273,7 +292,7 @@ func (h *RestaurantHandler) SelectMenuitem() http.HandlerFunc {
 			ID:           selectionParams.ItemId,
 		}
 
-		intermediateMenuItem, err := h.domain.GetMenuItemByRestaurantAndId(ctx, menuSelectionParams)
+		intermediateMenuItem, err := h.domain.GetMenuItemByRestaurantAndIdDomain(ctx, menuSelectionParams)
 		if err != nil {
 			http.Error(w, "Menu Item not found", http.StatusNotFound)
 			log.Println(err)

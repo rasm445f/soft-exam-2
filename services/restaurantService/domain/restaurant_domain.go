@@ -16,7 +16,7 @@ func NewRestaurantDomain(repo *generated.Queries) *RestaurantDomain {
 	return &RestaurantDomain{repo: repo}
 }
 
-func (d *RestaurantDomain) FetchAllRestaurants(ctx context.Context) ([]generated.Restaurant, error) {
+func (d *RestaurantDomain) GetAllRestaurantsDomain(ctx context.Context) ([]generated.Restaurant, error) {
 	rows, err := d.repo.FetchAllRestaurants(ctx)
 	if err != nil {
 		return nil, errors.New("failed to fetch restaurants")
@@ -36,7 +36,7 @@ func (d *RestaurantDomain) FetchAllRestaurants(ctx context.Context) ([]generated
 	return restaurants, nil
 }
 
-func (d *RestaurantDomain) GetRestaurantById(ctx context.Context, restaurantId int32) (*generated.Restaurant, error) {
+func (d *RestaurantDomain) GetRestaurantByIdDomain(ctx context.Context, restaurantId int32) (*generated.Restaurant, error) {
 	if restaurantId <= 0 {
 		return nil, errors.New("invalid restaurant id")
 	}
@@ -58,7 +58,7 @@ func (d *RestaurantDomain) GetRestaurantById(ctx context.Context, restaurantId i
 	return restaurant, nil
 }
 
-func (d *RestaurantDomain) FetchMenuItemsByRestaurantId(ctx context.Context, restaurantId int32) ([]generated.Menuitem, error) {
+func (d *RestaurantDomain) GetMenuItemsByRestaurantIdDomain(ctx context.Context, restaurantId int32) ([]generated.Menuitem, error) {
 	if restaurantId <= 0 {
 		return nil, errors.New("invalid restaurant id")
 	}
@@ -70,7 +70,7 @@ func (d *RestaurantDomain) FetchMenuItemsByRestaurantId(ctx context.Context, res
 	return menuitems, nil
 }
 
-func (d *RestaurantDomain) GetMenuItemByRestaurantAndId(ctx context.Context, params generated.GetMenuItemByRestaurantAndIdParams) (*generated.Menuitem, error) {
+func (d *RestaurantDomain) GetMenuItemByRestaurantAndIdDomain(ctx context.Context, params generated.GetMenuItemByRestaurantAndIdParams) (*generated.Menuitem, error) {
 	row, err := d.repo.GetMenuItemByRestaurantAndId(ctx, params)
 	if err != nil {
 		return nil, errors.New("menuitem not found")
@@ -87,7 +87,7 @@ func (d *RestaurantDomain) GetMenuItemByRestaurantAndId(ctx context.Context, par
 	return menuitem, nil
 } 
 
-func (d* RestaurantDomain) FetchAllCategories(ctx context.Context) ([]string, error) {
+func (d* RestaurantDomain) GetAllCategoriesDomain(ctx context.Context) ([]string, error) {
 	rows, err := d.repo.FetchAllCategories(ctx)
 	if err != nil {
 		return nil, errors.New("failed to fetch categories")
@@ -103,7 +103,7 @@ func (d* RestaurantDomain) FetchAllCategories(ctx context.Context) ([]string, er
 	return categories, nil
 }
 
-func (d* RestaurantDomain) FilterRestaurantsByCategory(ctx context.Context, category string) ([]generated.Restaurant, error) {
+func (d* RestaurantDomain) FilterRestaurantsByCategoryDomain(ctx context.Context, category string) ([]generated.Restaurant, error) {
 	if len(category) == 0 {
 		return nil, errors.New("category cannot be empty")
 	}

@@ -29,7 +29,7 @@ func NewCustomerHandler(domain *domain.CustomerDomain) *CustomerHandler {
 func (h *CustomerHandler) GetAllCustomers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		customers, err := h.domain.GetAllCustomers(ctx)
+		customers, err := h.domain.GetAllCustomersDomain(ctx)
 		if err != nil {
 			http.Error(w, "Failed to fetch customers", http.StatusInternalServerError)
 			log.Println(err)
@@ -64,7 +64,7 @@ func (h *CustomerHandler) GetCustomerById() http.HandlerFunc {
 			return
 		}
 
-		customer, err := h.domain.GetCustomerByID(ctx, int32(id))
+		customer, err := h.domain.GetCustomerByIdDomain(ctx, int32(id))
 		if err != nil {
 			http.Error(w, "Customer not found", http.StatusNotFound)
 			log.Println(err)
@@ -101,7 +101,7 @@ func (h *CustomerHandler) DeleteCustomer() http.HandlerFunc {
 			return
 		}
 
-		err = h.domain.DeleteCustomer(ctx, int32(id))
+		err = h.domain.DeleteCustomerDomain(ctx, int32(id))
 		if err != nil {
 			http.Error(w, "Customer not found", http.StatusNotFound)
 			log.Println(err)
@@ -142,6 +142,7 @@ func (h *CustomerHandler) CreateCustomer() http.HandlerFunc {
 			return
 		}
 
+		createdCustomer, err := h.domain.CreateCustomerDomain(ctx, customer)
 		err = h.domain.CreateCustomer(ctx, customer)
 		if err != nil {
 			http.Error(w, "Failed to create customer", http.StatusInternalServerError)
@@ -216,8 +217,9 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 			customerUpdates.Password = &password
 		}
 
+		// Call the query to update the customer in the database
+		err = h.domain.UpdateCustomerDomain(ctx, customerUpdates)
 		// Update the customer information in the database
-		err = h.domain.UpdateCustomer(ctx, customerUpdates)
 		if err != nil {
 			if err.Error() == "customer not found" {
 				http.Error(w, "Customer not found", http.StatusNotFound)
@@ -277,7 +279,7 @@ type MenuItemSelection struct {
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
 // @Router /api/customer/menu/select [post]
-func (h *CustomerHandler) SelectMenuitem() http.HandlerFunc {
+func (h *CustomerHandler) SelectMenuItem() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var selection MenuItemSelection
 		err := json.NewDecoder(r.Body).Decode(&selection)

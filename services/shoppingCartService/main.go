@@ -33,6 +33,7 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("PATCH /api/shopping/{customerId}/{itemId}", shoppingHandler.UpdateCart())
 	mux.HandleFunc("GET /api/shopping/{customerId}", shoppingHandler.ViewCart())
 	mux.HandleFunc("DELETE /api/shopping/{customerId}", shoppingHandler.ClearCart())
+	// Broker
 	mux.HandleFunc("GET /api/shopping/consume", shoppingHandler.ConsumeMenuItem())
 	mux.HandleFunc("POST /api/shopping/publish/{customerId}", shoppingHandler.PublishShoppingCart())
 

@@ -38,12 +38,6 @@ else
 	$(MAKE) run-unix
 endif
 
-# run:
-# 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"
-# run:
-# 	DBSTRING="postgres://postgres:test@127.0.0.1:5434/customer?sslmode=disable" \
-# 		air --build.cmd "go build -o bin\\api.exe" --build.bin "bin\\api.exe"
-
 build:
 	go build -o bin/api
 
