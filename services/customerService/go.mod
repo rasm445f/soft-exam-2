@@ -9,6 +9,8 @@ require (
 	github.com/swaggo/swag v1.16.4
 )
 
+require github.com/streadway/amqp v1.1.0 // indirect
+
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect

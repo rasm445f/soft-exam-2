@@ -1,0 +1,10 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672" # Port for RabbitMQ
+      - "15672:15672" # Port for RabbitMQ Management UI
+    restart: unless-stopped

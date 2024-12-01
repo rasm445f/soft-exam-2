@@ -67,6 +67,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Running server on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	fmt.Println("Running server on port 8082")
+	log.Fatal(http.ListenAndServe(":8082", mux))
 }
