@@ -15,6 +15,256 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/api/delivery-agent": {
+            "get": {
+                "description": "Fetches a list of all deliveryAgent from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveryAgent"
+                ],
+                "summary": "Get all deliveryAgent",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Deliveryagent"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Creates a new deliveryAgent entry in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveryAgent"
+                ],
+                "summary": "Create a new deliveryAgent",
+                "parameters": [
+                    {
+                        "description": "DeliveryAgent object",
+                        "name": "deliveryAgent",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/generated.CreateDeliveryAgentParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Deliveryagent"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/delivery-agent/{deliveryAgentId}": {
+            "get": {
+                "description": "Fetches a deliveryAgent based on the id from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "deliveryAgent"
+                ],
+                "summary": "Get deliveryAgent by deliveryAgent id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "DeliveryAgent ID",
+                        "name": "deliveryAgentId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Deliveryagent"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "DeliveryAgent not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/feedback": {
+            "post": {
+                "description": "Creates a new feedback entry in the database",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feedbacks"
+                ],
+                "summary": "Create a new feedback",
+                "parameters": [
+                    {
+                        "description": "Feedback object",
+                        "name": "feedback",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/generated.CreateFeedbackParams"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Feedback"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/feedbacks": {
+            "get": {
+                "description": "Fetches a list of all feedbacks from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feedbacks"
+                ],
+                "summary": "Get all feedbacks",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Feedback"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/feedbacks/{orderId}": {
+            "get": {
+                "description": "Fetches a feedback based on the order id from the database",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "feedbacks"
+                ],
+                "summary": "Get feedback by order id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/generated.Feedback"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Feedback not found",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/bonus/{orderId}": {
+            "get": {
+                "description": "calculates the order bonus",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "calculate order bonus",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/generated.Order"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/order/consume": {
             "get": {
                 "description": "Consume the created order for customer",
@@ -40,6 +290,53 @@ const docTemplate = `{
                     },
                     "500": {
                         "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/order/status-agent/{orderId}": {
+            "patch": {
+                "description": "Updates the status of an order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orders"
+                ],
+                "summary": "Update Order Status",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Order ID",
+                        "name": "orderId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "New Order Status",
+                        "name": "status",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UpdateOrderStatusRequestWithDeliveryAgentId"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Order status updated successfully",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "404": {
+                        "description": "Order not found",
                         "schema": {
                             "type": "string"
                         }
@@ -178,6 +475,86 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "generated.CreateDeliveryAgentParams": {
+            "type": "object",
+            "properties": {
+                "availability": {
+                    "type": "boolean"
+                },
+                "contactinfo": {
+                    "type": "string"
+                },
+                "fullname": {
+                    "type": "string"
+                },
+                "rating": {
+                    "type": "number"
+                }
+            }
+        },
+        "generated.CreateFeedbackParams": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "customerid": {
+                    "type": "integer"
+                },
+                "deliveryagentrating": {
+                    "type": "integer"
+                },
+                "orderid": {
+                    "type": "integer"
+                },
+                "restaurantrating": {
+                    "type": "integer"
+                }
+            }
+        },
+        "generated.Deliveryagent": {
+            "type": "object",
+            "properties": {
+                "availability": {
+                    "type": "boolean"
+                },
+                "contactinfo": {
+                    "type": "string"
+                },
+                "fullname": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "rating": {
+                    "type": "number"
+                }
+            }
+        },
+        "generated.Feedback": {
+            "type": "object",
+            "properties": {
+                "comment": {
+                    "type": "string"
+                },
+                "customerid": {
+                    "type": "integer"
+                },
+                "deliveryagentrating": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "orderid": {
+                    "type": "integer"
+                },
+                "restaurantrating": {
+                    "type": "integer"
+                }
+            }
+        },
         "generated.Order": {
             "type": "object",
             "properties": {
@@ -222,6 +599,18 @@ const docTemplate = `{
         "handlers.UpdateOrderStatusRequest": {
             "type": "object",
             "properties": {
+                "status": {
+                    "type": "string",
+                    "example": "Pending/On its way/Delivered"
+                }
+            }
+        },
+        "handlers.UpdateOrderStatusRequestWithDeliveryAgentId": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
                 "status": {
                     "type": "string",
                     "example": "Pending/On its way/Delivered"

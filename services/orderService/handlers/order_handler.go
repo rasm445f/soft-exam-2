@@ -153,6 +153,75 @@ func (h *OrderHandler) UpdateOrderStatus() http.HandlerFunc {
 	}
 }
 
+type UpdateOrderStatusRequestWithDeliveryAgentId struct {
+	DeliveryAgentId int32  `json:"id"`
+	Status          string `json:"status" example:"Pending/On its way/Delivered"`
+}
+
+// UpdateOrderStatus godoc
+//
+// @Summary Update Order Status
+// @Description Updates the status of an order
+// @Tags orders
+// @Accept application/json
+// @Produce application/json
+// @Param orderId path int true "Order ID"
+// @Param status body UpdateOrderStatusRequestWithDeliveryAgentId true "New Order Status"
+// @Success 200 {string} string "Order status updated successfully"
+// @Failure 404 {string} string "Order not found"
+// @Router /api/order/status-agent/{orderId} [patch]
+func (h *OrderHandler) UpdateOrderStatusWithDeliveryAgentId() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+
+		orderIdStr := r.PathValue("orderId")
+		orderId, err := strconv.Atoi(orderIdStr)
+		if err != nil {
+			http.Error(w, "Invalid Order ID", http.StatusBadRequest)
+			return
+		}
+
+		// Parse the new status from the request body
+		var requestPayload struct {
+			DeliveryAgentId int32  `json:"id"`
+			Status          string `json:"status"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&requestPayload); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		// Validate the new status
+		validStates := []string{"Pending", "On its way", "Delivered"}
+		isValid := false
+		for _, validStatus := range validStates {
+			if requestPayload.Status == validStatus {
+				isValid = true
+				break
+			}
+		}
+		if !isValid {
+			http.Error(w, "Invalid status value, you can only choose between: Pending/On its way/Delivered", http.StatusBadRequest)
+			return
+		}
+
+		// Call the domain fucntion to update the order status
+		err = h.domain.UpdateOrderStatusAndDeliveryAgentDomain(ctx, int32(orderId), requestPayload.Status, requestPayload.DeliveryAgentId)
+		if err != nil {
+			if err.Error() == "order not found" {
+				http.Error(w, "Order not found", http.StatusNotFound)
+			} else {
+				http.Error(w, "Failed to update order status", http.StatusInternalServerError)
+			}
+			return
+		}
+
+		// Respond with success
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Order status updated successfully}`))
+	}
+}
+
 // DeleteOrder godoc
 //
 // @Summary Delete an order
@@ -249,8 +318,6 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 			}
 			log.Printf("Received payload: %+v", payload)
 
-			// 
-
 			// Create Order
 			orderParams := generated.CreateOrderParams{
 				Totalamount:     payload.Totalamount,
@@ -305,5 +372,43 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]string{
 			"message": "Order consumption started",
 		})
+	}
+}
+
+// CalculateOrderBonus godoc
+//
+// @Summary calculate order bonus
+// @Description calculates the order bonus
+// @Tags orders
+// @Param orderId path string true "Order ID"
+// @Produce application/json
+// @Success 200 {array} generated.Order
+// @Router /api/order/bonus/{orderId} [get]
+func (h *OrderHandler) CalculateOrderBonus() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		ctx := r.Context()
+		orderIdStr := r.PathValue("orderId")
+		if orderIdStr == "" {
+			http.Error(w, "Missing orderId query parameter", http.StatusBadRequest)
+			return
+		}
+
+		orderId, err := strconv.Atoi(orderIdStr)
+		if err != nil {
+			http.Error(w, "Invalid Order ID", http.StatusBadRequest)
+			return
+		}
+
+		totalBonus, err := h.domain.CalculateBonus(ctx, int32(orderId))
+		if err != nil {
+			http.Error(w, "Failed to calculate fee", http.StatusInternalServerError)
+			log.Println(err)
+			return
+		}
+
+		res, _ := json.Marshal(totalBonus)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(res)
 	}
 }

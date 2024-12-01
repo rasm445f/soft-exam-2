@@ -27,18 +27,18 @@ func (d *OrderDomain) GetAllOrdersDomain(ctx context.Context) ([]generated.Order
 	var orders []generated.Order
 	for _, row := range rows {
 		orders = append(orders, generated.Order{
-			ID: row.ID,
-			Totalamount: row.Totalamount,
-			Vatamount: row.Vatamount,
-			Status: row.Status,
-			Timestamp: row.Timestamp,
-			Comment: row.Comment,
-			Customerid: row.Customerid,
-			Restaurantid: row.Restaurantid,
+			ID:              row.ID,
+			Totalamount:     row.Totalamount,
+			Vatamount:       row.Vatamount,
+			Status:          row.Status,
+			Timestamp:       row.Timestamp,
+			Comment:         row.Comment,
+			Customerid:      row.Customerid,
+			Restaurantid:    row.Restaurantid,
 			Deliveryagentid: row.Deliveryagentid,
-			Paymentid: row.Paymentid,
-			Bonusid: row.Bonusid,
-			Feeid: row.Feeid,
+			Paymentid:       row.Paymentid,
+			Bonusid:         row.Bonusid,
+			Feeid:           row.Feeid,
 		})
 	}
 	return orders, nil
@@ -55,24 +55,24 @@ func (d *OrderDomain) GetOrderByIdDomain(ctx context.Context, orderId int32) (*g
 	}
 
 	order := &generated.Order{
-		ID: row.ID,
-		Totalamount: row.Totalamount,
-		Vatamount: row.Vatamount,
-		Status: row.Status,
-		Timestamp: row.Timestamp,
-		Comment: row.Comment,
-		Customerid: row.Customerid,
-		Restaurantid: row.Restaurantid,
+		ID:              row.ID,
+		Totalamount:     row.Totalamount,
+		Vatamount:       row.Vatamount,
+		Status:          row.Status,
+		Timestamp:       row.Timestamp,
+		Comment:         row.Comment,
+		Customerid:      row.Customerid,
+		Restaurantid:    row.Restaurantid,
 		Deliveryagentid: row.Deliveryagentid,
-		Paymentid: row.Paymentid,
-		Bonusid: row.Bonusid,
-		Feeid: row.Feeid,
+		Paymentid:       row.Paymentid,
+		Bonusid:         row.Bonusid,
+		Feeid:           row.Feeid,
 	}
 
 	return order, nil
 }
 
-func (d *OrderDomain) CreateOrderDomain(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {	
+func (d *OrderDomain) CreateOrderDomain(ctx context.Context, orderParams generated.CreateOrderParams) (int32, error) {
 	amountExcludingVAT := orderParams.Totalamount - orderParams.Vatamount
 
 	feeid, err := d.CalculateFee(ctx, amountExcludingVAT)
@@ -95,7 +95,7 @@ func (d *OrderDomain) UpdateOrderStatusDomain(ctx context.Context, orderId int32
 	// Call the repository layer to update the order
 	err := d.repo.UpdateOrderStatus(ctx, generated.UpdateOrderStatusParams{
 		Status: status,
-		ID: orderId,
+		ID:     orderId,
 	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -107,7 +107,38 @@ func (d *OrderDomain) UpdateOrderStatusDomain(ctx context.Context, orderId int32
 	return nil
 }
 
-func (d *OrderDomain) DeleteOrderDomain(ctx context.Context, orderId int32) (error) {
+func boolPtr(i bool) *bool {
+	value := bool(i)
+	return &value
+}
+func (d *OrderDomain) UpdateOrderStatusAndDeliveryAgentDomain(ctx context.Context, orderId int32, status string, deliveryAgentId int32) error {
+	// Call the repository layer to update the order
+	err := d.repo.UpdateOrderStatusAndDeliveryAgent(ctx, generated.UpdateOrderStatusAndDeliveryAgentParams{
+		Status:          status,
+		ID:              orderId,
+		Deliveryagentid: &deliveryAgentId,
+	})
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("order not found")
+		}
+		return err
+	}
+
+	// Set availability to false for the delivery agent
+	availability := generated.UpdateDeliveryAgentAvailabilityParams{
+		ID:           deliveryAgentId,
+		Availability: boolPtr(false),
+	}
+	err = d.repo.UpdateDeliveryAgentAvailability(ctx, availability)
+	if err != nil {
+		return errors.New("cant update delivery agent availability")
+	}
+
+	return nil
+}
+
+func (d *OrderDomain) DeleteOrderDomain(ctx context.Context, orderId int32) error {
 	err := d.repo.DeleteOrderItemsByOrderId(ctx, orderId)
 	if err != nil {
 		return errors.New("failed to delete order items: " + err.Error())
@@ -153,9 +184,9 @@ func (d *OrderDomain) CalculateFee(ctx context.Context, amount float64) (int32, 
 
 	desc := "some description"
 	newFee := generated.CreateFeeParams{
-		Percentage: &percent,
-		Amount: &fee,
-		Description: &desc ,
+		Percentage:  &percent,
+		Amount:      &fee,
+		Description: &desc,
 	}
 
 	feeid, err := d.repo.CreateFee(ctx, newFee)
@@ -166,8 +197,91 @@ func (d *OrderDomain) CalculateFee(ctx context.Context, amount float64) (int32, 
 	return feeid, nil
 }
 
+func (d *OrderDomain) CalculateBonus(ctx context.Context, orderId int32) (int32, error) {
+	// Retrieve the order
+	order, err := d.repo.GetOrderById(ctx, orderId)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get order with id: %d, error: %w", orderId, err)
+	}
+
+	// Retrieve the fee
+	fee, err := d.repo.GetFeeById(ctx, *order.Feeid)
+	if err != nil {
+		return 0, fmt.Errorf("failed to get fee for order id: %d, error: %w", orderId, err)
+	}
+
+	// Check for feedback
+	var feedbackRating *int32
+	feedback, err := d.repo.GetFeedbackByOrderId(ctx, orderId)
+	if err == nil && feedback.Deliveryagentrating != nil {
+		feedbackRating = feedback.Deliveryagentrating
+	}
+
+	// Bonus Calculation
+	earlyLateBonus := 0.0
+	percentage := 0.0
+	maxBonus := *fee.Amount*0.5 + 5 // Ensure bonus does not exceed fee amount
+
+	// Factor 1: Feedback Rating
+	if feedbackRating != nil {
+		switch *feedbackRating {
+		case 5:
+			percentage = 0.5
+		case 4:
+			percentage = 0.3
+		case 3:
+			percentage = 0.1
+		case 2:
+			percentage = 0.05
+		default:
+			percentage = 0.0
+		}
+	}
+
+	// Factor 2: Early or Late Working Hours
+	if order.Timestamp != nil {
+		hour := order.Timestamp.Hour()
+		if hour < 9 || hour > 21 { // Early or late hours
+			earlyLateBonus = 5.0
+		}
+	}
+
+	// Calculate total bonus amount
+	feedbackBonus := percentage * maxBonus
+	totalBonus := feedbackBonus + earlyLateBonus
+
+	// Ensure total bonus does not exceed maxBonus
+	if totalBonus > maxBonus {
+		totalBonus = maxBonus
+	}
+
+	// Prepare CreateBonusParams
+	desc := "Bonus based on feedback and working hours"
+	createBonusParams := generated.CreateBonusParams{
+		Description:     &desc,
+		Earlylateamount: &earlyLateBonus,
+		Percentage:      &percentage,
+	}
+
+	// Save the bonus
+	bonusId, err := d.repo.CreateBonus(ctx, createBonusParams)
+	if err != nil {
+		return 0, fmt.Errorf("failed to create bonus for order id: %d, error: %w", orderId, err)
+	}
+	bonusOrderParams := generated.UpdateOrderBonusParams{
+		Bonusid: &bonusId,
+		ID:      orderId,
+	}
+	err = d.repo.UpdateOrderBonus(ctx, bonusOrderParams)
+	if err != nil {
+		return 0, fmt.Errorf("failed to add bonus to order")
+	}
+
+	return int32(totalBonus), nil
+}
 
 // TODO: implement
 // create fee
 // create bonus
 // create payment
+

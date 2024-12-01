@@ -15,11 +15,28 @@ type Bonu struct {
 	Percentage      *float64 `json:"percentage"`
 }
 
+type Deliveryagent struct {
+	ID           int32    `json:"id"`
+	Fullname     *string  `json:"fullname"`
+	Contactinfo  *string  `json:"contactinfo"`
+	Availability *bool    `json:"availability"`
+	Rating       *float64 `json:"rating"`
+}
+
 type Fee struct {
 	ID          int32    `json:"id"`
 	Percentage  *float64 `json:"percentage"`
 	Amount      *float64 `json:"amount"`
 	Description *string  `json:"description"`
+}
+
+type Feedback struct {
+	ID                  int32   `json:"id"`
+	Orderid             int32   `json:"orderid"`
+	Customerid          int32   `json:"customerid"`
+	Deliveryagentrating *int32  `json:"deliveryagentrating"`
+	Restaurantrating    *int32  `json:"restaurantrating"`
+	Comment             *string `json:"comment"`
 }
 
 type Order struct {

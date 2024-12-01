@@ -214,7 +214,6 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 type PublishShoppingCartRequest struct {
 	Comment string `json:"comment" example:"No vegetables on the pizza."`
 }
-
 // PublishShoppingCart godoc
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
