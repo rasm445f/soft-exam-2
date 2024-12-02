@@ -29,6 +29,24 @@ definitions:
       phonenumber:
         type: string
     type: object
+  handlers.MenuItemSelection:
+    properties:
+      customerId:
+        example: 1
+        type: integer
+      name:
+        example: Cheese Burger
+        type: string
+      price:
+        example: 10
+        type: number
+      quantity:
+        example: 2
+        type: integer
+      restaurantId:
+        example: 10
+        type: integer
+    type: object
   handlers.UpdateCustomerWithAddress:
     description: Update customer details including name, email, and address information.
     properties:
@@ -54,26 +72,14 @@ definitions:
         example: 12345
         type: integer
     type: object
-  handlers.MenuItemSelection:
-    properties:
-      customerId:
-        example: 1
-        type: integer
-      name:
-        example: Cheese Burger
-        type: string
-      price:
-        example: 9.99
-        type: number
-      quantity:
-        example: 2
-        type: integer
-      restaurantId:
-        example: 10
-        type: integer
-    type: object
+host: localhost:8081
 info:
-  contact: {}
+  contact:
+    email: support@example.com
+    name: API Support
+  description: This is the API documentation for the Customer Service.
+  title: Customer Service API
+  version: "1.0"
 paths:
   /api/customer:
     get:

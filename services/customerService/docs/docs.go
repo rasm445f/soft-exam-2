@@ -9,7 +9,10 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -313,6 +316,31 @@ const docTemplate = `{
                 }
             }
         },
+        "handlers.MenuItemSelection": {
+            "type": "object",
+            "properties": {
+                "customerId": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Cheese Burger"
+                },
+                "price": {
+                    "type": "number",
+                    "example": 10
+                },
+                "quantity": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "restaurantId": {
+                    "type": "integer",
+                    "example": 10
+                }
+            }
+        },
         "handlers.UpdateCustomerWithAddress": {
             "description": "Update customer details including name, email, and address information.",
             "type": "object",
@@ -346,43 +374,18 @@ const docTemplate = `{
                     "example": 12345
                 }
             }
-        },
-        "handlers.MenuItemSelection": {
-            "type": "object",
-            "properties": {
-                "customerId": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Cheese Burger"
-                },
-                "price": {
-                    "type": "number",
-                    "example": 9.99
-                },
-                "quantity": {
-                    "type": "integer",
-                    "example": 2
-                },
-                "restaurantId": {
-                    "type": "integer",
-                    "example": 10
-                }
-            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
+	Version:          "1.0",
+	Host:             "localhost:8081",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Customer Service API",
+	Description:      "This is the API documentation for the Customer Service.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

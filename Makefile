@@ -37,3 +37,7 @@ run-all:
 	$(MAKE) run-restaurant & \
 	$(MAKE) run-shoppingcart & \
 	wait
+
+docs-all:
+	@echo "Generating docs..."
+	go-swagger-merger -o apiGateway/swagger-config.json  services/customerService/docs/swagger.json services/orderService/docs/swagger.json services/restaurantService/docs/swagger.json services/shoppingCartService/docs/swagger.json

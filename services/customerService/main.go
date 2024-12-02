@@ -44,6 +44,12 @@ func run() (http.Handler, error) {
 	return handler, err
 }
 
+// @title Customer Service API
+// @version 1.0
+// @description This is the API documentation for the Customer Service.
+// @contact.name API Support
+// @contact.email support@example.com
+// @host localhost:8081
 func main() {
 	// Initialize RabbitMQ
 	broker.InitRabbitMQ()

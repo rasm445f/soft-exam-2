@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: "swagger-ui"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./swagger-config.json:/swagger-config.json # Maps the host file to the container
+    environment:
+      SWAGGER_JSON: /swagger-config.json
