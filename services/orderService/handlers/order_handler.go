@@ -25,9 +25,11 @@ func NewOrderHandler(domain *domain.OrderDomain) *OrderHandler {
 //
 // @Summary Get all orders
 // @Description Fetches a list of all orders from the database
-// @Tags orders
+// @Tags CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Order
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/orders [get]
 func (h *OrderHandler) GetAllOrders() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -51,10 +53,12 @@ func (h *OrderHandler) GetAllOrders() http.HandlerFunc {
 //
 // @Summary Get order by id
 // @Description Fetches an order based on the id from the database
-// @Tags orders
+// @Tags CRUD
 // @Produce application/json
 // @Param id path string true "Order ID"
 // @Success 200 {object} generated.Order
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/orders/{id} [get]
 func (h *OrderHandler) GetOrderById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -94,13 +98,14 @@ type UpdateOrderStatusRequest struct {
 //
 // @Summary Update Order Status
 // @Description Updates the status of an order
-// @Tags orders
+// @Tags CRUD
 // @Accept application/json
 // @Produce application/json
 // @Param orderId path int true "Order ID"
 // @Param status body UpdateOrderStatusRequest true "New Order Status"
 // @Success 200 {string} string "Order status updated successfully"
-// @Failure 404 {string} string "Order not found"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/order/status/{orderId} [patch]
 func (h *OrderHandler) UpdateOrderStatus() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -162,13 +167,14 @@ type UpdateOrderStatusRequestWithDeliveryAgentId struct {
 //
 // @Summary Update Order Status
 // @Description Updates the status of an order
-// @Tags orders
+// @Tags CRUD
 // @Accept application/json
 // @Produce application/json
 // @Param orderId path int true "Order ID"
 // @Param status body UpdateOrderStatusRequestWithDeliveryAgentId true "New Order Status"
 // @Success 200 {string} string "Order status updated successfully"
-// @Failure 404 {string} string "Order not found"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/order/status-agent/{orderId} [patch]
 func (h *OrderHandler) UpdateOrderStatusWithDeliveryAgentId() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -226,10 +232,11 @@ func (h *OrderHandler) UpdateOrderStatusWithDeliveryAgentId() http.HandlerFunc {
 //
 // @Summary Delete an order
 // @Description Deletes an order by its id from the database
-// @Tags orders
+// @Tags CRUD
 // @Param id path int true "Order ID"
 // @Success 200 {string} string "Order deleted successfully"
-// @Failure 404 {string} string "Order not found"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/orders/{id} [delete]
 func (h *OrderHandler) DeleteOrder() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -280,7 +287,7 @@ func toTimeNowPtr() *time.Time {
 //
 //	@Summary		Consume Order for a Customer
 //	@Description	Consume the created order for customer
-//	@Tags			order
+//	@Tags			CRUD
 //	@Produce		application/json
 //	@Success		200	{string}	string	"Order Consumed Successfully"
 //	@Failure		400	{string}	string	"Bad request"
@@ -379,10 +386,12 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 //
 // @Summary calculate order bonus
 // @Description calculates the order bonus
-// @Tags orders
+// @Tags CalculationBonus
 // @Param orderId path string true "Order ID"
 // @Produce application/json
 // @Success 200 {array} generated.Order
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/order/bonus/{orderId} [get]
 func (h *OrderHandler) CalculateOrderBonus() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {

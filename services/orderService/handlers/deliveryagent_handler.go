@@ -20,11 +20,13 @@ func NewDeliveryAgentHandler(domain *domain.DeliveryAgentDomain) *DeliveryAgentH
 
 // GetAllDeliveryAgents godoc
 //
-// @Summary Get all deliveryAgent
-// @Description Fetches a list of all deliveryAgent from the database
-// @Tags deliveryAgent
+// @Summary Get all deliveryAgents
+// @Description Fetches a list of all Delivery Agents from the database
+// @Tags CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Deliveryagent
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/delivery-agent [get]
 func (h *DeliveryAgentHandler) GetAllDeliveryAgents() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -48,12 +50,12 @@ func (h *DeliveryAgentHandler) GetAllDeliveryAgents() http.HandlerFunc {
 //
 // @Summary Get deliveryAgent by deliveryAgent id
 // @Description Fetches a deliveryAgent based on the id from the database
-// @Tags deliveryAgent
+// @Tags CRUD
 // @Produce application/json
 // @Param deliveryAgentId path string true "DeliveryAgent ID"
 // @Success 200 {object} generated.Deliveryagent
 // @Failure 400 {string} string "Bad request"
-// @Failure 404 {string} string "DeliveryAgent not found"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/delivery-agent/{deliveryAgentId} [get]
 func (h *DeliveryAgentHandler) GetDeliveryAgentById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -89,7 +91,7 @@ func (h *DeliveryAgentHandler) GetDeliveryAgentById() http.HandlerFunc {
 //
 // @Summary Create a new deliveryAgent
 // @Description Creates a new deliveryAgent entry in the database
-// @Tags deliveryAgent
+// @Tags CRUD
 // @Accept  application/json
 // @Produce application/json
 // @Param deliveryAgent body generated.CreateDeliveryAgentParams true "DeliveryAgent object"

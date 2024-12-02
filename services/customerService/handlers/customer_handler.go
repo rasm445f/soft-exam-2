@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
 )
@@ -23,9 +22,11 @@ func NewCustomerHandler(domain *domain.CustomerDomain) *CustomerHandler {
 //
 // @Summary Get all customers
 // @Description Fetches a list of all customers from the database
-// @Tags customers
+// @Tags CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Customer
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/customer [get]
 func (h *CustomerHandler) GetAllCustomers() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -46,12 +47,14 @@ func (h *CustomerHandler) GetAllCustomers() http.HandlerFunc {
 
 // GetCustomerById godoc
 //
-// @Summary Get customer
+// @Summary Get customer by Id
 // @Description Fetches a customer based on the id from the database
-// @Tags customers
+// @Tags CRUD
 // @Produce application/json
 // @Param id path string true "Customer ID"
 // @Success 200 {object} generated.Customer
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/customer/{id} [get]
 func (h *CustomerHandler) GetCustomerById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -85,12 +88,12 @@ func (h *CustomerHandler) GetCustomerById() http.HandlerFunc {
 //
 // @Summary Delete customer
 // @Description Deletes a customer based on the id from the database
-// @Tags customers
+// @Tags CRUD
 // @Produce application/json
 // @Param id path string true "Customer ID"
 // @Success 200 {string} string "Customer deleted"
 // @Failure 400 {string} string "Bad request"
-// @Failure 404 {string} string "Customer not found"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/customer/{id} [delete]
 func (h *CustomerHandler) DeleteCustomer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +124,7 @@ func (h *CustomerHandler) DeleteCustomer() http.HandlerFunc {
 //
 // @Summary Create a new customer
 // @Description Creates a new customer entry in the database
-// @Tags customers
+// @Tags CRUD
 // @Accept  application/json
 // @Produce application/json
 // @Param customer body generated.CreateCustomerParams true "Customer object"
@@ -174,15 +177,14 @@ type UpdateCustomerWithAddress struct {
 //
 // @Summary Update a customer
 // @Description Updates a customer's details based on the ID provided in the URL path. This may include personal information as well as optional address updates.
-// @Tags customers
+// @Tags CRUD
 // @Accept application/json
 // @Produce application/json
 // @Param id path int true "Customer ID"
 // @Param customer body UpdateCustomerWithAddress true "Updated customer details"
 // @Success 200 {object} map[string]string "Customer updated successfully"
-// @Failure 400 {object} map[string]string "Invalid input"
-// @Failure 404 {object} map[string]string "Customer not found"
-// @Failure 500 {object} map[string]string "Internal server error"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 // @Router /api/customer/{id} [patch]
 func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -261,51 +263,5 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"message": "Customer updated successfully"}`))
-	}
-}
-
-/* BROKER */
-type MenuItemSelection struct {
-	CustomerID   int32 `json:"customerId" example:"1"`
-	RestaurantId int32 `json:"restaurantId" example:"10"`
-	Name   string `json:"name" example:"Cheese Burger"`
-	Price  float64 `json:"price" example:"10.00"`
-	Quantity     int   `json:"quantity" example:"2"`
-}
-// SelectMenuItem godoc
-//
-// @Summary Select Menuitem
-// @Description Select Menu Item
-// @Tags customers
-// @Accept  application/json
-// @Produce application/json
-// @Param customer body MenuItemSelection true "Menu item selection details"
-// @Success 201 {object} MenuItemSelection "Menu item successfully selected"
-// @Failure 400 {string} string "Bad request"
-// @Failure 500 {string} string "Internal server error"
-// @Router /api/customer/menu/select [post]
-func (h *CustomerHandler) SelectMenuItem() http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var selection MenuItemSelection
-		err := json.NewDecoder(r.Body).Decode(&selection)
-		if err != nil {
-			http.Error(w, "Invalid request payload", http.StatusBadRequest)
-			return
-		}
-
-		// Publish event to RabbitMQ
-		event := broker.Event{
-			Type:    broker.MenuItemSelected,
-			Payload: selection,
-		}
-		err = broker.Publish("menu_item_selected_queue", event)
-		if err != nil {
-			log.Printf("Failed to publish event: %v", err)
-			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
-			return
-		}
-
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Menu item selected successfully}`))
 	}
 }

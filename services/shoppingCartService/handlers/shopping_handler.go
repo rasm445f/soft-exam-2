@@ -23,9 +23,9 @@ func NewShoppingCartHandler(domain *domain.ShoppingCartDomain) *ShoppingCartHand
 
 // AddItem godoc
 //
-//	@Summary		Add an item
-//	@Description	Add an item to the shopping cart
-//	@Tags			shoppingCart
+//	@Summary		Add a MenuItem
+//	@Description	Add a MenuItem to the shopping cart
+//	@Tags			CRUD
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			item	body		db.AddItemParams	true	"item object"
@@ -60,16 +60,15 @@ type UpdateQuantityRequest struct {
 //
 //	@Summary		Update an item in the cart
 //	@Description	Update the quantity of an existing item in the shopping cart. If the quantity is set to 0, the item will be removed.
-//	@Tags			shoppingCart
+//	@Tags			CRUD
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int						true	"customer ID"
 //	@Param			itemId		path		int						true	"Item ID"
 //	@Param			body		body		UpdateQuantityRequest	true	"New quantity for the item"
 //	@Success		200			{string}	string					"ShoppingCart updated successfully"
-//	@Failure		400			{string}	string					"Invalid input"
-//	@Failure		404			{string}	string					"Item not found"
-//	@Failure		500			{string}	string					"Internal server error"
+// @Failure 400 {string} string "Bad request"
+// @Failure 500 {string} string "Internal server error"
 //	@Router			/api/shopping/{customerId}/{itemId} [patch]
 func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -101,9 +100,9 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 
 // ViewCart godoc
 //
-//	@Summary		View items for a customer
-//	@Description	Fetches a list of items based on the customerId
-//	@Tags			shoppingCart
+//	@Summary		View MenuItems for a customer's ShoppingCart
+//	@Description	Fetches a list of MenuItems for a specific Customer, to view the ShoppingCart
+//	@Tags			CRUD
 //	@Produce		application/json
 //	@Param			id	path		string	true	"customer ID"
 //	@Success		200	{string}	string	"Viewed Cart"
@@ -135,9 +134,9 @@ func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 
 // ClearCart godoc
 //
-//	@Summary		Clears the cart
-//	@Description	Clears the cart for the specified customer
-//	@Tags			shoppingCart
+//	@Summary		Clears the ShoppingCart
+//	@Description	Clears the ShoppingCart for a specific customer
+//	@Tags			CRUD
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int		true	"customer ID"
