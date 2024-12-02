@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "categories"
+                    "Category(Restaurant) CRUD"
                 ],
                 "summary": "Get all categories",
                 "responses": {
@@ -60,7 +60,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "categories"
+                    "Category(Restaurant) CRUD"
                 ],
                 "summary": "Filter restaurants by category",
                 "parameters": [
@@ -104,7 +104,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "restaurants"
+                    "Restaurant CRUD"
                 ],
                 "summary": "Get all restaurants",
                 "responses": {
@@ -134,7 +134,7 @@ const docTemplate = `{
         },
         "/api/restaurants/menu/select": {
             "post": {
-                "description": "Select Menu Item",
+                "description": "Customer selects a MenuItem or more",
                 "consumes": [
                     "application/json"
                 ],
@@ -142,9 +142,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "BrokerCustomers"
+                    "Restaurant Broker"
                 ],
-                "summary": "Select MenuItem",
+                "summary": "Selecting MenuItems",
                 "parameters": [
                     {
                         "description": "Menu item selection details",
@@ -185,7 +185,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "restaurants"
+                    "Restaurant CRUD"
                 ],
                 "summary": "Get restaurant by id",
                 "parameters": [
@@ -226,7 +226,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "menu_items"
+                    "MenuItem(Restaurant) CRUD"
                 ],
                 "summary": "Get menu items by restaurant ID",
                 "parameters": [
@@ -270,7 +270,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "menu_items"
+                    "MenuItem(Restaurant) CRUD"
                 ],
                 "summary": "Get menu item by restaurant and id",
                 "parameters": [
@@ -407,8 +407,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:",
-	BasePath:         "8083",
+	Host:             "localhost:8083",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Restaurant Service API",
 	Description:      "This is the API documentation for the Restaurant Service.",

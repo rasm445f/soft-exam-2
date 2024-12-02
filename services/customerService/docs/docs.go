@@ -25,7 +25,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Get all customers",
                 "responses": {
@@ -36,6 +36,18 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/generated.Customer"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -49,7 +61,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Create a new customer",
                 "parameters": [
@@ -85,52 +97,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/api/customer/menu/select": {
-            "post": {
-                "description": "Select Menu Item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "customers"
-                ],
-                "summary": "Select Menuitem",
-                "parameters": [
-                    {
-                        "description": "Menu item selection details",
-                        "name": "customer",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.MenuItemSelection"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Menu item successfully selected",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.MenuItemSelection"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/api/customer/{id}": {
             "get": {
                 "description": "Fetches a customer based on the id from the database",
@@ -138,9 +104,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
-                "summary": "Get customer",
+                "summary": "Get customer by Id",
                 "parameters": [
                     {
                         "type": "string",
@@ -156,6 +122,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/generated.Customer"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -165,7 +143,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Delete customer",
                 "parameters": [
@@ -190,8 +168,8 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Customer not found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -207,7 +185,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Update a customer",
                 "parameters": [
@@ -239,30 +217,15 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
+                        "description": "Bad request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Customer not found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -316,31 +279,6 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.MenuItemSelection": {
-            "type": "object",
-            "properties": {
-                "customerId": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Cheese Burger"
-                },
-                "price": {
-                    "type": "number",
-                    "example": 10
-                },
-                "quantity": {
-                    "type": "integer",
-                    "example": 2
-                },
-                "restaurantId": {
-                    "type": "integer",
-                    "example": 10
-                }
-            }
-        },
         "handlers.UpdateCustomerWithAddress": {
             "description": "Update customer details including name, email, and address information.",
             "type": "object",
@@ -381,8 +319,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:",
-	BasePath:         "8081",
+	Host:             "localhost:8081",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Customer Service API",
 	Description:      "This is the API documentation for the Customer Service.",

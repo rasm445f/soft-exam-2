@@ -20,14 +20,14 @@ const docTemplate = `{
     "paths": {
         "/api/delivery-agent": {
             "get": {
-                "description": "Fetches a list of all deliveryAgent from the database",
+                "description": "Fetches a list of all Delivery Agents from the database",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "deliveryAgent"
+                    "DeliveryAgent CRUD"
                 ],
-                "summary": "Get all deliveryAgent",
+                "summary": "Get all deliveryAgents",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -36,6 +36,18 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/generated.Deliveryagent"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -49,7 +61,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "deliveryAgent"
+                    "DeliveryAgent CRUD"
                 ],
                 "summary": "Create a new deliveryAgent",
                 "parameters": [
@@ -92,7 +104,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "deliveryAgent"
+                    "DeliveryAgent CRUD"
                 ],
                 "summary": "Get deliveryAgent by deliveryAgent id",
                 "parameters": [
@@ -117,8 +129,8 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "DeliveryAgent not found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -136,7 +148,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "feedbacks"
+                    "Feedback CRUD"
                 ],
                 "summary": "Create a new feedback",
                 "parameters": [
@@ -179,7 +191,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "feedbacks"
+                    "Feedback CRUD"
                 ],
                 "summary": "Get all feedbacks",
                 "responses": {
@@ -190,6 +202,18 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/generated.Feedback"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -202,7 +226,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "feedbacks"
+                    "Feedback CRUD"
                 ],
                 "summary": "Get feedback by order id",
                 "parameters": [
@@ -227,8 +251,8 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Feedback not found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -243,7 +267,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order Calculation Bonus"
                 ],
                 "summary": "calculate order bonus",
                 "parameters": [
@@ -264,6 +288,18 @@ const docTemplate = `{
                                 "$ref": "#/definitions/generated.Order"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -275,7 +311,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "order"
+                    "Order CRUD"
                 ],
                 "summary": "Consume Order for a Customer",
                 "responses": {
@@ -310,7 +346,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Update Order Status",
                 "parameters": [
@@ -338,8 +374,14 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Order not found",
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -357,7 +399,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Update Order Status",
                 "parameters": [
@@ -385,8 +427,14 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Order not found",
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -401,7 +449,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Get all orders",
                 "responses": {
@@ -412,6 +460,18 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/generated.Order"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -424,7 +484,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Get order by id",
                 "parameters": [
@@ -442,13 +502,25 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/generated.Order"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
             "delete": {
                 "description": "Deletes an order by its id from the database",
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Delete an order",
                 "parameters": [
@@ -467,8 +539,14 @@ const docTemplate = `{
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Order not found",
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -626,8 +704,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:",
-	BasePath:         "8082",
+	Host:             "localhost:8082",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Order Service API",
 	Description:      "This is the API documentation for the Order Service.",

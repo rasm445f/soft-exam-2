@@ -9,12 +9,11 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:",
-    "basePath": "8084",
+    "host": "localhost:8084",
     "paths": {
         "/api/shopping": {
             "post": {
-                "description": "Add an item to the shopping cart",
+                "description": "Add a MenuItem to the shopping cart",
                 "consumes": [
                     "application/json"
                 ],
@@ -22,9 +21,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
-                "summary": "Add an item",
+                "summary": "Add a MenuItem",
                 "parameters": [
                     {
                         "description": "item object",
@@ -65,7 +64,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Broker"
+                    "ShoppingCart Broker"
                 ],
                 "summary": "Consume the chosen Menu Items for a Customer",
                 "responses": {
@@ -100,7 +99,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Broker"
+                    "ShoppingCart Broker"
                 ],
                 "summary": "Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment",
                 "parameters": [
@@ -145,7 +144,7 @@
         },
         "/api/shopping/{customerId}": {
             "delete": {
-                "description": "Clears the cart for the specified customer",
+                "description": "Clears the ShoppingCart for a specific customer",
                 "consumes": [
                     "application/json"
                 ],
@@ -153,9 +152,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
-                "summary": "Clears the cart",
+                "summary": "Clears the ShoppingCart",
                 "parameters": [
                     {
                         "type": "integer",
@@ -197,7 +196,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
                 "summary": "Update an item in the cart",
                 "parameters": [
@@ -233,13 +232,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Item not found",
+                        "description": "Bad request",
                         "schema": {
                             "type": "string"
                         }
@@ -255,14 +248,14 @@
         },
         "/api/shopping/{id}": {
             "get": {
-                "description": "Fetches a list of items based on the customerId",
+                "description": "Fetches a list of MenuItems for a specific Customer, to view the ShoppingCart",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
-                "summary": "View items for a customer",
+                "summary": "View MenuItems for a customer's ShoppingCart",
                 "parameters": [
                     {
                         "type": "string",
