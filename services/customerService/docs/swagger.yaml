@@ -1,3 +1,4 @@
+basePath: "8081"
 definitions:
   generated.CreateCustomerParams:
     properties:
@@ -72,7 +73,7 @@ definitions:
         example: 12345
         type: integer
     type: object
-host: localhost:8081
+host: 'localhost:'
 info:
   contact:
     email: support@example.com

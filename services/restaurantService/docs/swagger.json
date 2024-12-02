@@ -1,8 +1,16 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is the API documentation for the Restaurant Service.",
+        "title": "Restaurant Service API",
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        },
+        "version": "1.0"
     },
+    "host": "localhost:",
+    "basePath": "8083",
     "paths": {
         "/api/categories": {
             "get": {
@@ -22,6 +30,18 @@
                             "items": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -55,6 +75,18 @@
                                 "$ref": "#/definitions/generated.Restaurant"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -78,6 +110,18 @@
                                 "$ref": "#/definitions/generated.Restaurant"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -92,9 +136,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "BrokerCustomers"
                 ],
-                "summary": "Select Menuitem",
+                "summary": "Select MenuItem",
                 "parameters": [
                     {
                         "description": "Menu item selection details",
@@ -153,6 +197,18 @@
                         "schema": {
                             "$ref": "#/definitions/generated.Restaurant"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -184,6 +240,18 @@
                             "items": {
                                 "$ref": "#/definitions/generated.Menuitem"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -221,15 +289,24 @@
                         "schema": {
                             "$ref": "#/definitions/generated.Menuitem"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "big.Int": {
-            "type": "object"
-        },
         "generated.Menuitem": {
             "type": "object",
             "properties": {
@@ -243,7 +320,7 @@
                     "type": "string"
                 },
                 "price": {
-                    "$ref": "#/definitions/pgtype.Numeric"
+                    "type": "number"
                 },
                 "restaurantid": {
                     "type": "integer"
@@ -266,7 +343,7 @@
                     "type": "string"
                 },
                 "rating": {
-                    "$ref": "#/definitions/pgtype.Numeric"
+                    "type": "number"
                 },
                 "zip_code": {
                     "type": "integer"
@@ -315,39 +392,6 @@
                 "restaurantId": {
                     "type": "integer",
                     "example": 10
-                }
-            }
-        },
-        "pgtype.InfinityModifier": {
-            "type": "integer",
-            "enum": [
-                1,
-                0,
-                -1
-            ],
-            "x-enum-varnames": [
-                "Infinity",
-                "Finite",
-                "NegativeInfinity"
-            ]
-        },
-        "pgtype.Numeric": {
-            "type": "object",
-            "properties": {
-                "exp": {
-                    "type": "integer"
-                },
-                "infinityModifier": {
-                    "$ref": "#/definitions/pgtype.InfinityModifier"
-                },
-                "int": {
-                    "$ref": "#/definitions/big.Int"
-                },
-                "naN": {
-                    "type": "boolean"
-                },
-                "valid": {
-                    "type": "boolean"
                 }
             }
         }

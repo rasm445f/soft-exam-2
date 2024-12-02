@@ -46,6 +46,12 @@ func run() (http.Handler, error) {
 	return handler, err
 }
 
+// @title Restaurant Service API
+// @version 1.0
+// @description This is the API documentation for the Restaurant Service.
+// @contact.name API Support
+// @contact.email support@example.com
+// @host localhost:8083
 func main() {
 	broker.InitRabbitMQ()
 	defer broker.CloseRabbitMQ()

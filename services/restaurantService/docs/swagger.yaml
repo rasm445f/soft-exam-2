@@ -1,6 +1,5 @@
+basePath: "8083"
 definitions:
-  big.Int:
-    type: object
   generated.Menuitem:
     properties:
       description:
@@ -10,7 +9,7 @@ definitions:
       name:
         type: string
       price:
-        $ref: '#/definitions/pgtype.Numeric'
+        type: number
       restaurantid:
         type: integer
     type: object
@@ -25,7 +24,7 @@ definitions:
       name:
         type: string
       rating:
-        $ref: '#/definitions/pgtype.Numeric'
+        type: number
       zip_code:
         type: integer
     type: object
@@ -61,31 +60,14 @@ definitions:
         example: 10
         type: integer
     type: object
-  pgtype.InfinityModifier:
-    enum:
-    - 1
-    - 0
-    - -1
-    type: integer
-    x-enum-varnames:
-    - Infinity
-    - Finite
-    - NegativeInfinity
-  pgtype.Numeric:
-    properties:
-      exp:
-        type: integer
-      infinityModifier:
-        $ref: '#/definitions/pgtype.InfinityModifier'
-      int:
-        $ref: '#/definitions/big.Int'
-      naN:
-        type: boolean
-      valid:
-        type: boolean
-    type: object
+host: 'localhost:'
 info:
-  contact: {}
+  contact:
+    email: support@example.com
+    name: API Support
+  description: This is the API documentation for the Restaurant Service.
+  title: Restaurant Service API
+  version: "1.0"
 paths:
   /api/categories:
     get:
@@ -99,6 +81,14 @@ paths:
             items:
               type: string
             type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Get all categories
       tags:
       - categories
@@ -120,6 +110,14 @@ paths:
             items:
               $ref: '#/definitions/generated.Restaurant'
             type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Filter restaurants by category
       tags:
       - categories
@@ -135,6 +133,14 @@ paths:
             items:
               $ref: '#/definitions/generated.Restaurant'
             type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Get all restaurants
       tags:
       - restaurants
@@ -154,6 +160,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/generated.Restaurant'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Get restaurant by id
       tags:
       - restaurants
@@ -175,6 +189,14 @@ paths:
             items:
               $ref: '#/definitions/generated.Menuitem'
             type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Get menu items by restaurant ID
       tags:
       - menu_items
@@ -199,6 +221,14 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/generated.Menuitem'
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Get menu item by restaurant and id
       tags:
       - menu_items
@@ -229,7 +259,7 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Select Menuitem
+      summary: Select MenuItem
       tags:
-      - customers
+      - BrokerCustomers
 swagger: "2.0"

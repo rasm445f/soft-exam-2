@@ -1,3 +1,4 @@
+basePath: "8084"
 definitions:
   db.AddItemParams:
     properties:
@@ -15,7 +16,7 @@ definitions:
   handlers.PublishShoppingCartRequest:
     properties:
       comment:
-        example: No vegetables
+        example: No vegetables on the pizza.
         type: string
     type: object
   handlers.UpdateQuantityRequest:
@@ -23,8 +24,14 @@ definitions:
       quantity:
         type: integer
     type: object
+host: 'localhost:'
 info:
-  contact: {}
+  contact:
+    email: support@example.com
+    name: API Support
+  description: This is the API documentation for the Shopping cart Service.
+  title: Order Shopping cart API
+  version: "1.0"
 paths:
   /api/shopping:
     post:
@@ -71,7 +78,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: cart cleared
+          description: Cart Cleared
           schema:
             type: string
         "400":
@@ -112,7 +119,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Item updated successfully
+          description: ShoppingCart updated successfully
           schema:
             type: string
         "400":
@@ -143,7 +150,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Cart cleared
+          description: Viewed Cart
           schema:
             type: string
         "400":

@@ -1,12 +1,21 @@
 version: "3.9"
-
 services:
   swagger-ui:
     image: swaggerapi/swagger-ui
-    container_name: "swagger-ui"
+    container_name: swagger-ui
     ports:
-      - "8080:8080"
+      - 8080:8080
+    restart: always
     volumes:
-      - ./swagger-config.json:/swagger-config.json # Maps the host file to the container
+      - ../services/customerService/docs:/usr/share/nginx/html/api/customerService
+      - ../services/orderService/docs:/usr/share/nginx/html/api/orderService
+      - ../services/restaurantService/docs:/usr/share/nginx/html/api/restaurantService
+      - ../services/shoppingCartService/docs:/usr/share/nginx/html/api/shoppingCartService
     environment:
-      SWAGGER_JSON: /swagger-config.json
+      URLS: >
+        [
+          { url: "/api/customerService/swagger.json", name: "Customer Service" },
+          { url: "/api/orderService/swagger.json", name: "Order Service" },
+          { url: "/api/restaurantService/swagger.json", name: "Restaurant Service" },
+          { url: "/api/shoppingCartService/swagger.json", name: "Shopping Cart Service" }
+        ]

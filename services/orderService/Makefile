@@ -21,6 +21,9 @@ default:
 	@echo "  test-cover-html	# Show test coverage in the browser"
 	@echo "  test-mutation		# Run mutation testing with gremlins"
 
+run-go:
+	DBSTRING=$(DBSTRING) go run main.go
+
 # Unix-like systems (Linux/Mac)
 run-unix:
 	DBSTRING=$(DBSTRING) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"

@@ -58,6 +58,12 @@ func run() (http.Handler, error) {
 	return handler, err
 }
 
+// @title Order Service API
+// @version 1.0
+// @description This is the API documentation for the Order Service.
+// @contact.name API Support
+// @contact.email support@example.com
+// @host localhost:8082
 func main() {
 	broker.InitRabbitMQ()
 	defer broker.CloseRabbitMQ()

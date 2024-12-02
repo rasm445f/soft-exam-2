@@ -9,7 +9,8 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:8081",
+    "host": "localhost:",
+    "basePath": "8081",
     "paths": {
         "/api/customer": {
             "get": {

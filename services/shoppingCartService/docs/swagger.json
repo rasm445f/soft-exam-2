@@ -1,8 +1,16 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "This is the API documentation for the Shopping cart Service.",
+        "title": "Order Shopping cart API",
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        },
+        "version": "1.0"
     },
+    "host": "localhost:",
+    "basePath": "8084",
     "paths": {
         "/api/shopping": {
             "post": {
@@ -159,7 +167,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "cart cleared",
+                        "description": "Cart Cleared",
                         "schema": {
                             "type": "string"
                         }
@@ -219,7 +227,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Item updated successfully",
+                        "description": "ShoppingCart updated successfully",
                         "schema": {
                             "type": "string"
                         }
@@ -266,7 +274,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Cart cleared",
+                        "description": "Viewed Cart",
                         "schema": {
                             "type": "string"
                         }
@@ -313,7 +321,7 @@
             "properties": {
                 "comment": {
                     "type": "string",
-                    "example": "No vegetables"
+                    "example": "No vegetables on the pizza."
                 }
             }
         },
