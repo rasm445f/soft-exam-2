@@ -17,10 +17,13 @@ CREATE TABLE DeliveryAgent (
     Rating DECIMAL(10, 1)
 );
 
+
+
 -- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE Feedback CASCADE
 DROP TABLE DeliveryAgent CASCADE
+
 
 -- +goose StatementEnd
