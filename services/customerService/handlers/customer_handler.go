@@ -22,7 +22,7 @@ func NewCustomerHandler(domain *domain.CustomerDomain) *CustomerHandler {
 //
 // @Summary Get all customers
 // @Description Fetches a list of all customers from the database
-// @Tags CRUD
+// @Tags Customer CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Customer
 // @Failure 400 {string} string "Bad request"
@@ -49,7 +49,7 @@ func (h *CustomerHandler) GetAllCustomers() http.HandlerFunc {
 //
 // @Summary Get customer by Id
 // @Description Fetches a customer based on the id from the database
-// @Tags CRUD
+// @Tags Customer CRUD
 // @Produce application/json
 // @Param id path string true "Customer ID"
 // @Success 200 {object} generated.Customer
@@ -88,7 +88,7 @@ func (h *CustomerHandler) GetCustomerById() http.HandlerFunc {
 //
 // @Summary Delete customer
 // @Description Deletes a customer based on the id from the database
-// @Tags CRUD
+// @Tags Customer CRUD
 // @Produce application/json
 // @Param id path string true "Customer ID"
 // @Success 200 {string} string "Customer deleted"
@@ -124,7 +124,7 @@ func (h *CustomerHandler) DeleteCustomer() http.HandlerFunc {
 //
 // @Summary Create a new customer
 // @Description Creates a new customer entry in the database
-// @Tags CRUD
+// @Tags Customer CRUD
 // @Accept  application/json
 // @Produce application/json
 // @Param customer body generated.CreateCustomerParams true "Customer object"
@@ -177,7 +177,7 @@ type UpdateCustomerWithAddress struct {
 //
 // @Summary Update a customer
 // @Description Updates a customer's details based on the ID provided in the URL path. This may include personal information as well as optional address updates.
-// @Tags CRUD
+// @Tags Customer CRUD
 // @Accept application/json
 // @Produce application/json
 // @Param id path int true "Customer ID"
