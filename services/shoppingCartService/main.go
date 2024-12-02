@@ -43,6 +43,12 @@ func run() (http.Handler, error) {
 	return handler, nil
 }
 
+// @title Order Shopping cart API
+// @version 1.0
+// @description This is the API documentation for the Shopping cart Service.
+// @contact.name API Support
+// @contact.email support@example.com
+// @host localhost:8084
 func main() {
 	broker.InitRabbitMQ()
 	defer broker.CloseRabbitMQ()
@@ -52,6 +58,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("Running server on port 8081")
-	log.Fatal(http.ListenAndServe(":8081", mux))
+	fmt.Println("Running server on port 8084")
+	log.Fatal(http.ListenAndServe(":8084", mux))
 }

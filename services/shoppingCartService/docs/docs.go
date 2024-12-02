@@ -9,7 +9,10 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -170,7 +173,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "cart cleared",
+                        "description": "Cart Cleared",
                         "schema": {
                             "type": "string"
                         }
@@ -230,7 +233,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Item updated successfully",
+                        "description": "ShoppingCart updated successfully",
                         "schema": {
                             "type": "string"
                         }
@@ -277,7 +280,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Cart cleared",
+                        "description": "Viewed Cart",
                         "schema": {
                             "type": "string"
                         }
@@ -324,7 +327,7 @@ const docTemplate = `{
             "properties": {
                 "comment": {
                     "type": "string",
-                    "example": "No vegetables"
+                    "example": "No vegetables on the pizza."
                 }
             }
         },
@@ -341,12 +344,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:",
+	BasePath:         "8084",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Order Shopping cart API",
+	Description:      "This is the API documentation for the Shopping cart Service.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

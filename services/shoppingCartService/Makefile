@@ -22,6 +22,8 @@ default:
 	@echo "  test-mutation		# Run mutation testing with gremlins"
 
 
+run-go:
+	REDIS_HOST=$(REDIS_HOST) REDIS_PORT=$(REDIS_PORT) REDIS_PASSWORD=$(REDIS_PASSWORD) go run main.go
 # Unix-like systems (Linux/Mac)
 run-unix:
 	REDIS_HOST=$(REDIS_HOST) REDIS_PORT=$(REDIS_PORT) REDIS_PASSWORD=$(REDIS_PASSWORD) air --build.cmd "go build -o bin/api" --build.bin "./bin/api"

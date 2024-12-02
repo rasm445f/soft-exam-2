@@ -9,7 +9,10 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "contact": {
+            "name": "API Support",
+            "email": "support@example.com"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -33,6 +36,18 @@ const docTemplate = `{
                             "items": {
                                 "type": "string"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -66,6 +81,18 @@ const docTemplate = `{
                                 "$ref": "#/definitions/generated.Restaurant"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -89,6 +116,18 @@ const docTemplate = `{
                                 "$ref": "#/definitions/generated.Restaurant"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -103,9 +142,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "BrokerCustomers"
                 ],
-                "summary": "Select Menuitem",
+                "summary": "Select MenuItem",
                 "parameters": [
                     {
                         "description": "Menu item selection details",
@@ -164,6 +203,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/generated.Restaurant"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -195,6 +246,18 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/generated.Menuitem"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -232,15 +295,24 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/generated.Menuitem"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
         }
     },
     "definitions": {
-        "big.Int": {
-            "type": "object"
-        },
         "generated.Menuitem": {
             "type": "object",
             "properties": {
@@ -254,7 +326,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "price": {
-                    "$ref": "#/definitions/pgtype.Numeric"
+                    "type": "number"
                 },
                 "restaurantid": {
                     "type": "integer"
@@ -277,7 +349,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "rating": {
-                    "$ref": "#/definitions/pgtype.Numeric"
+                    "type": "number"
                 },
                 "zip_code": {
                     "type": "integer"
@@ -328,51 +400,18 @@ const docTemplate = `{
                     "example": 10
                 }
             }
-        },
-        "pgtype.InfinityModifier": {
-            "type": "integer",
-            "enum": [
-                1,
-                0,
-                -1
-            ],
-            "x-enum-varnames": [
-                "Infinity",
-                "Finite",
-                "NegativeInfinity"
-            ]
-        },
-        "pgtype.Numeric": {
-            "type": "object",
-            "properties": {
-                "exp": {
-                    "type": "integer"
-                },
-                "infinityModifier": {
-                    "$ref": "#/definitions/pgtype.InfinityModifier"
-                },
-                "int": {
-                    "$ref": "#/definitions/big.Int"
-                },
-                "naN": {
-                    "type": "boolean"
-                },
-                "valid": {
-                    "type": "boolean"
-                }
-            }
         }
     }
 }`
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
-	Host:             "",
-	BasePath:         "",
+	Version:          "1.0",
+	Host:             "localhost:",
+	BasePath:         "8083",
 	Schemes:          []string{},
-	Title:            "",
-	Description:      "",
+	Title:            "Restaurant Service API",
+	Description:      "This is the API documentation for the Restaurant Service.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",
