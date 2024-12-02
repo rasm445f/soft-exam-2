@@ -25,7 +25,7 @@ func NewShoppingCartHandler(domain *domain.ShoppingCartDomain) *ShoppingCartHand
 //
 //	@Summary		Add a MenuItem
 //	@Description	Add a MenuItem to the shopping cart
-//	@Tags			CRUD
+//	@Tags			ShoppingCart CRUD
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			item	body		db.AddItemParams	true	"item object"
@@ -60,7 +60,7 @@ type UpdateQuantityRequest struct {
 //
 //	@Summary		Update an item in the cart
 //	@Description	Update the quantity of an existing item in the shopping cart. If the quantity is set to 0, the item will be removed.
-//	@Tags			CRUD
+//	@Tags			ShoppingCart CRUD
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int						true	"customer ID"
@@ -102,7 +102,7 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 //
 //	@Summary		View MenuItems for a customer's ShoppingCart
 //	@Description	Fetches a list of MenuItems for a specific Customer, to view the ShoppingCart
-//	@Tags			CRUD
+//	@Tags			ShoppingCart CRUD
 //	@Produce		application/json
 //	@Param			id	path		string	true	"customer ID"
 //	@Success		200	{string}	string	"Viewed Cart"
@@ -136,7 +136,7 @@ func (h *ShoppingCartHandler) ViewCart() http.HandlerFunc {
 //
 //	@Summary		Clears the ShoppingCart
 //	@Description	Clears the ShoppingCart for a specific customer
-//	@Tags			CRUD
+//	@Tags			ShoppingCart CRUD
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int		true	"customer ID"
@@ -165,7 +165,7 @@ func (h *ShoppingCartHandler) ClearCart() http.HandlerFunc {
 //
 //	@Summary		Consume the chosen Menu Items for a Customer
 //	@Description	Consumes the Shopping Cart's Menu Items for a Customer
-//	@Tags			Broker
+//	@Tags			ShoppingCart Broker
 //	@Produce		application/json
 //	@Success		200	{string}	string	"Shopping Cart's Menu Items Consumed"
 //	@Failure		400	{string}	string	"Bad request"
@@ -217,7 +217,7 @@ type PublishShoppingCartRequest struct {
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment
 //	@Description	Selecting the cart for the specified customer with an optional comment
-//	@Tags			Broker
+//	@Tags			ShoppingCart Broker
 //	@Accept			application/json
 //	@Produce		application/json
 //	@Param			customerId	path		int		true	"Customer ID"

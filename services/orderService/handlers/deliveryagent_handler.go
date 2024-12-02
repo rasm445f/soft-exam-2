@@ -22,7 +22,7 @@ func NewDeliveryAgentHandler(domain *domain.DeliveryAgentDomain) *DeliveryAgentH
 //
 // @Summary Get all deliveryAgents
 // @Description Fetches a list of all Delivery Agents from the database
-// @Tags CRUD
+// @Tags DeliveryAgent CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Deliveryagent
 // @Failure 400 {string} string "Bad request"
@@ -50,7 +50,7 @@ func (h *DeliveryAgentHandler) GetAllDeliveryAgents() http.HandlerFunc {
 //
 // @Summary Get deliveryAgent by deliveryAgent id
 // @Description Fetches a deliveryAgent based on the id from the database
-// @Tags CRUD
+// @Tags DeliveryAgent CRUD
 // @Produce application/json
 // @Param deliveryAgentId path string true "DeliveryAgent ID"
 // @Success 200 {object} generated.Deliveryagent
@@ -91,7 +91,7 @@ func (h *DeliveryAgentHandler) GetDeliveryAgentById() http.HandlerFunc {
 //
 // @Summary Create a new deliveryAgent
 // @Description Creates a new deliveryAgent entry in the database
-// @Tags CRUD
+// @Tags DeliveryAgent CRUD
 // @Accept  application/json
 // @Produce application/json
 // @Param deliveryAgent body generated.CreateDeliveryAgentParams true "DeliveryAgent object"

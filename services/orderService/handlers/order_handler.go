@@ -25,7 +25,7 @@ func NewOrderHandler(domain *domain.OrderDomain) *OrderHandler {
 //
 // @Summary Get all orders
 // @Description Fetches a list of all orders from the database
-// @Tags CRUD
+// @Tags Order CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Order
 // @Failure 400 {string} string "Bad request"
@@ -53,7 +53,7 @@ func (h *OrderHandler) GetAllOrders() http.HandlerFunc {
 //
 // @Summary Get order by id
 // @Description Fetches an order based on the id from the database
-// @Tags CRUD
+// @Tags Order CRUD
 // @Produce application/json
 // @Param id path string true "Order ID"
 // @Success 200 {object} generated.Order
@@ -98,7 +98,7 @@ type UpdateOrderStatusRequest struct {
 //
 // @Summary Update Order Status
 // @Description Updates the status of an order
-// @Tags CRUD
+// @Tags Order CRUD
 // @Accept application/json
 // @Produce application/json
 // @Param orderId path int true "Order ID"
@@ -167,7 +167,7 @@ type UpdateOrderStatusRequestWithDeliveryAgentId struct {
 //
 // @Summary Update Order Status
 // @Description Updates the status of an order
-// @Tags CRUD
+// @Tags Order CRUD
 // @Accept application/json
 // @Produce application/json
 // @Param orderId path int true "Order ID"
@@ -232,7 +232,7 @@ func (h *OrderHandler) UpdateOrderStatusWithDeliveryAgentId() http.HandlerFunc {
 //
 // @Summary Delete an order
 // @Description Deletes an order by its id from the database
-// @Tags CRUD
+// @Tags Order CRUD
 // @Param id path int true "Order ID"
 // @Success 200 {string} string "Order deleted successfully"
 // @Failure 400 {string} string "Bad request"
@@ -287,7 +287,7 @@ func toTimeNowPtr() *time.Time {
 //
 //	@Summary		Consume Order for a Customer
 //	@Description	Consume the created order for customer
-//	@Tags			CRUD
+//	@Tags			Order CRUD
 //	@Produce		application/json
 //	@Success		200	{string}	string	"Order Consumed Successfully"
 //	@Failure		400	{string}	string	"Bad request"
@@ -386,7 +386,7 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 //
 // @Summary calculate order bonus
 // @Description calculates the order bonus
-// @Tags CalculationBonus
+// @Tags Order Calculation Bonus
 // @Param orderId path string true "Order ID"
 // @Produce application/json
 // @Success 200 {array} generated.Order

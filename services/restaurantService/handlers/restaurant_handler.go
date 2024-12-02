@@ -23,7 +23,7 @@ func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
 //
 // @Summary Get all restaurants
 // @Description Fetches a list of all restaurants from the database
-// @Tags CRUDRestaurants
+// @Tags Restaurant CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Restaurant
 // @Failure 400 {string} string "Bad request"
@@ -51,7 +51,7 @@ func (h *RestaurantHandler) GetAllRestaurants() http.HandlerFunc {
 //
 // @Summary Get restaurant by id
 // @Description Fetches a restaurant based on the id from the database
-// @Tags CRUDRestaurants
+// @Tags Restaurant CRUD
 // @Produce application/json
 // @Param id path string true "Restaurant ID"
 // @Success 200 {object} generated.Restaurant
@@ -92,7 +92,7 @@ func (h *RestaurantHandler) GetRestaurantById() http.HandlerFunc {
 //
 // @Summary Get menu items by restaurant ID
 // @Description Fetches all menu items associated with a specific restaurant ID
-// @Tags CRUDMenuItems
+// @Tags MenuItem(Restaurant) CRUD
 // @Produce application/json
 // @Param restaurantId path string true "Restaurant ID"
 // @Success 200 {array} generated.Menuitem
@@ -133,7 +133,7 @@ func (h *RestaurantHandler) GetMenuItemsByRestaurant() http.HandlerFunc {
 //
 // @Summary Get menu item by restaurant and id
 // @Description Fetches a menu item based on the restaurant and id from the database
-// @Tags CRUDMenuItems
+// @Tags MenuItem(Restaurant) CRUD
 // @Produce application/json
 // @Param restaurantId path string true "Restaurant ID"
 // @Param menuitemId path string true "Menu Item ID"
@@ -189,7 +189,7 @@ func (h *RestaurantHandler) GetMenuItemByRestaurantAndId() http.HandlerFunc {
 //
 // @Summary Get all categories
 // @Description Fetches a list of all unique categories from the restaurant
-// @Tags CRUDCategories
+// @Tags Category(Restaurant) CRUD
 // @Produce application/json
 // @Success 200 {array} string
 // @Failure 400 {string} string "Bad request"
@@ -217,7 +217,7 @@ func (h *RestaurantHandler) GetAllCategories() http.HandlerFunc {
 //
 // @Summary Filter restaurants by category
 // @Description Fetches all restaurants for a given category
-// @Tags CRUDCategories
+// @Tags Category(Restaurant) CRUD
 // @Produce application/json
 // @Param category path string true "Restaurant Category"
 // @Success 200 {array} generated.Restaurant
@@ -267,7 +267,7 @@ type MenuItemSelection struct {
 //
 // @Summary Selecting MenuItems
 // @Description Customer selects a MenuItem or more
-// @Tags Broker
+// @Tags Restaurant Broker
 // @Accept  application/json
 // @Produce application/json
 // @Param customer body SelectItemParams true "Menu item selection details"

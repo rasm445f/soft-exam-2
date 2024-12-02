@@ -22,7 +22,7 @@ func NewFeedbackHandler(domain *domain.FeedbackDomain) *FeedbackHandler {
 //
 // @Summary Get all feedbacks
 // @Description Fetches a list of all feedbacks from the database
-// @Tags CRUD
+// @Tags Feedback CRUD
 // @Produce application/json
 // @Success 200 {array} generated.Feedback
 // @Failure 400 {string} string "Bad request"
@@ -50,7 +50,7 @@ func (h *FeedbackHandler) GetAllFeedbacks() http.HandlerFunc {
 //
 // @Summary Get feedback by order id
 // @Description Fetches a feedback based on the order id from the database
-// @Tags CRUD
+// @Tags Feedback CRUD
 // @Produce application/json
 // @Param orderId path string true "Order ID"
 // @Success 200 {object} generated.Feedback
@@ -91,7 +91,7 @@ func (h *FeedbackHandler) GetFeedbackByOrderId() http.HandlerFunc {
 // //
 // // @Summary Create a new feedback
 // // @Description Creates a new feedback entry in the database
-// // @Tags feedbacks
+// // @Tags Feedback CRUD
 // // @Accept  application/json
 // // @Produce application/json
 // // @Param feedback body generated.CreateFeedbackParams true "Feedback object"
@@ -127,7 +127,7 @@ func (h *FeedbackHandler) GetFeedbackByOrderId() http.HandlerFunc {
 //
 // @Summary Create a new feedback
 // @Description Creates a new feedback entry in the database
-// @Tags CRUD
+// @Tags Feedback CRUD
 // @Accept  application/json
 // @Produce application/json
 // @Param feedback body generated.CreateFeedbackParams true "Feedback object"
