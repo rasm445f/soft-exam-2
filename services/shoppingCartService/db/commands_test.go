@@ -3,14 +3,16 @@ package db
 import (
 	"context"
 	"encoding/json"
-	// "fmt"
+	"fmt"
+	"math"
+	"strings"
 	"testing"
 
-	_ "github.com/go-redis/redis/v8"
+	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redismock/v8"
 )
 
-func TestAddItem(t *testing.T) {
+func TestGetCart(t *testing.T) {
 	// Create a new mock Redis client
 	db, mock := redismock.NewClientMock()
 	defer db.Close()
@@ -18,114 +20,234 @@ func TestAddItem(t *testing.T) {
 	// Initialize the repository with the mock Redis client
 	repo := &ShoppingCartRepository{redisClient: db}
 
-	// Define the test input
-	item := AddItemParams{
-		Name:         "Sample Item",
-		Price:        29.0,
-		Quantity:     2,
+	// Test data
+	cart := &ShoppingCart{
 		CustomerId:   123,
 		RestaurantId: 456,
-	}
-
-	// Define Redis keys
-	cartKey := "cart:123"          // Cart key based on CustomerId
-	itemIdKey := "cart:123:nextId" // Key for generating unique item IDs
-
-	// Step 1: Simulate no existing cart for the customer
-	mock.ExpectGet(cartKey).RedisNil() // Simulate no existing cart in Redis
-
-	// Step 2: Simulate the first item ID being generated
-	mock.ExpectIncr(itemIdKey).SetVal(1)
-
-	// Step 3: Define the expected cart after the item is added
-	expectedCart := ShoppingCart{
-		CustomerId:   123,
-		RestaurantId: 456,
-		TotalAmount:  58, // 29 * 2
-		VatAmount:    11, // 20% of TotalAmount
-		Comment:      "", // No initial comment
+		TotalAmount:  58.0,
+		VatAmount:    11,
 		Items: []ShoppingCartItem{
 			{
-				Id:       1, // First item ID
-				Name:     item.Name,
-				Price:    item.Price,
-				Quantity: item.Quantity,
+				Id:       1,
+				Name:     "Sample Item",
+				Price:    29.0,
+				Quantity: 2,
 			},
 		},
 	}
 
-	// Marshal the expected cart to JSON
-	expectedCartData, err := json.Marshal(expectedCart)
+	cartData, err := json.Marshal(cart)
 	if err != nil {
-		t.Fatalf("unexpected error while marshalling expected cart: %v", err)
+		t.Fatalf("unexpected error marshalling cart: %v", err)
 	}
 
-	// Step 4: Expect the updated cart to be saved in Redis
-	mock.ExpectSet(cartKey, expectedCartData, 0).SetVal("OK")
+	t.Run("successful get", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).SetVal(string(cartData))
 
-	// Call AddItem
-	err = repo.AddItem(context.Background(), item)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+		result, err := repo.GetCart(context.Background(), 123)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
 
-	// Ensure all expectations were met
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("unmet expectations: %s", err)
-	}
+		if result.CustomerId != cart.CustomerId {
+			t.Errorf("got CustomerId %d, want %d", result.CustomerId, cart.CustomerId)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	t.Run("non-existent cart", func(t *testing.T) {
+		cartKey := "cart:69"
+		mock.ExpectGet(cartKey).RedisNil()
+
+		_, err := repo.GetCart(context.Background(), 69)
+		if err != redis.Nil {
+			t.Error("expected redis.Nil error, got nil")
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+	t.Run("redis error", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).SetErr(fmt.Errorf("network error"))
+
+		_, err := repo.GetCart(context.Background(), 123)
+		if err == nil {
+			t.Error("expected error, got nil")
+		}
+
+		expectedErr := "failed to retrieve shopping cart: network error"
+		if err.Error() != expectedErr {
+			t.Errorf("got error %v, want %v", err, expectedErr)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	t.Run("unmarshal error", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).SetVal("{invalid json}")
+
+		_, err := repo.GetCart(context.Background(), 123)
+		if err == nil {
+			t.Error("expected error, got nil")
+		}
+
+		if !strings.Contains(err.Error(), "failed to unmarshal shopping cart") {
+			t.Errorf("got error %v, want error containing 'failed to unmarshal shopping cart'", err)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
 }
 
-// TODO: test!
-// func TestViewCart(t *testing.T) {
-// 	// Create a new mock Redis client
-// 	db, mock := redismock.NewClientMock()
-// 	defer db.Close()
-//
-// 	// Initialize the repository with the mock Redis client
-// 	repo := &ShoppingCartRepository{redisClient: db}
-//
-// 	// Define the user ID and Redis cart key
-// 	userId := 123
-// 	cartKey := fmt.Sprintf("cart:%d", userId)
-//
-// 	// Define multiple items expected in the user's cart
-// 	items := []ShoppingCartItem{
-// 		{Id: 1, Name: "Item 1", Quantity: 2, Price: 29.0},
-// 		{Id: 2, Name: "Item 2", Quantity: 1, Price: 15.5},
-// 	}
-//
-// 	// Serialize each item as it would be stored in Redis
-// 	redisData := make(map[string]string)
-// 	for _, item := range items {
-// 		itemData, err := json.Marshal(item)
-// 		if err != nil {
-// 			t.Fatalf("unexpected error marshalling item data: %s", err)
-// 		}
-// 		redisData[fmt.Sprintf("%v", item.Id)] = string(itemData)
-// 	}
-//
-// 	// Set up expected Redis behavior for HGetAll
-// 	mock.ExpectHGetAll(cartKey).SetVal(redisData)
-//
-// 	// Call viewCart and check the result
-// 	retrievedItems, err := repo.ViewCart(context.Background(), userId)
-// 	if err != nil {
-// 		t.Errorf("unexpected error: %s", err)
-// 	}
-//
-// 	// Verify that the retrieved items match the expected data
-// 	if len(retrievedItems) != len(items) {
-// 		t.Errorf("retrieved item count does not match: got %d, want %d", len(retrievedItems), len(items))
-// 	}
-// 	for i, item := range items {
-// 		if retrievedItems[i].Id != item.Id || retrievedItems[i].Name != item.Name ||
-// 			retrievedItems[i].Quantity != item.Quantity || retrievedItems[i].Price != item.Price {
-// 			t.Errorf("retrieved item does not match expected item at index %d: got %+v, want %+v", i, retrievedItems[i], item)
-// 		}
-// 	}
-//
-// 	// Ensure all expectations were met
-// 	if err := mock.ExpectationsWereMet(); err != nil {
-// 		t.Errorf("unmet expectations: %s", err)
-// 	}
-// }
+func TestSaveCart(t *testing.T) {
+	// Create a new mock Redis client
+	db, mock := redismock.NewClientMock()
+	defer db.Close()
+
+	// Initialize the repository with the mock Redis client
+	repo := &ShoppingCartRepository{redisClient: db}
+
+	// Test data
+	cart := &ShoppingCart{
+		CustomerId:   123,
+		RestaurantId: 456,
+		TotalAmount:  58.0,
+		VatAmount:    11,
+		Items: []ShoppingCartItem{
+			{
+				Id:       1,
+				Name:     "Sample Item",
+				Price:    29.0,
+				Quantity: 2,
+			},
+		},
+	}
+
+	t.Run("successful save", func(t *testing.T) {
+		cartData, err := json.Marshal(cart)
+		if err != nil {
+			t.Fatalf("unexpected error marshalling cart: %v", err)
+		}
+
+		cartKey := "cart:123"
+		mock.ExpectSet(cartKey, cartData, 0).SetVal("OK")
+
+		err = repo.SaveCart(context.Background(), cart)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	t.Run("marshal error", func(t *testing.T) {
+		invalidCart := &ShoppingCart{
+			CustomerId: 123,
+			Items: []ShoppingCartItem{
+				{
+					// Create an invalid field that can't be marshaled
+					Price: math.Inf(1),
+				},
+			},
+		}
+
+		err := repo.SaveCart(context.Background(), invalidCart)
+		if err == nil {
+			t.Error("expected error, got nil")
+		}
+
+		if !strings.Contains(err.Error(), "failed to marshal cart") {
+			t.Errorf("got error %v, want error containing 'failed to marshal cart'", err)
+		}
+	})
+
+	t.Run("redis error", func(t *testing.T) {
+		cartData, _ := json.Marshal(cart)
+		cartKey := "cart:123"
+		mock.ExpectSet(cartKey, cartData, 0).SetErr(fmt.Errorf("network error"))
+
+		err := repo.SaveCart(context.Background(), cart)
+		if err == nil {
+			t.Error("expected error, got nil")
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+}
+
+func TestClearCart(t *testing.T) {
+	// Create a new mock Redis client
+	db, mock := redismock.NewClientMock()
+	defer db.Close()
+
+	// Initialize the repository with the mock Redis client
+	repo := &ShoppingCartRepository{redisClient: db}
+
+	t.Run("successful clear", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectDel(cartKey).SetVal(2)
+
+		err := repo.ClearCart(context.Background(), 123)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	t.Run("non-existent cart", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectDel(cartKey).SetVal(0)
+
+		err := repo.ClearCart(context.Background(), 123)
+		if err == nil {
+			t.Error("expected error, got nil")
+		}
+
+		expectedErr := "cart for customer ID 123 does not exist"
+		if err.Error() != expectedErr {
+			t.Errorf("got error %v, want %v", err, expectedErr)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	// Add to TestClearCart function
+	t.Run("redis error", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectDel(cartKey).SetErr(fmt.Errorf("network error"))
+
+		err := repo.ClearCart(context.Background(), 123)
+		if err == nil {
+			t.Error("expected error, got nil")
+		}
+
+		expectedErr := "failed to clear cart: network error"
+		if err.Error() != expectedErr {
+			t.Errorf("got error %v, want %v", err, expectedErr)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+}
