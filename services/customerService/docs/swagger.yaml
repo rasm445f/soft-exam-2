@@ -1,4 +1,3 @@
-basePath: "8081"
 definitions:
   generated.CreateCustomerParams:
     properties:
@@ -30,24 +29,6 @@ definitions:
       phonenumber:
         type: string
     type: object
-  handlers.MenuItemSelection:
-    properties:
-      customerId:
-        example: 1
-        type: integer
-      name:
-        example: Cheese Burger
-        type: string
-      price:
-        example: 10
-        type: number
-      quantity:
-        example: 2
-        type: integer
-      restaurantId:
-        example: 10
-        type: integer
-    type: object
   handlers.UpdateCustomerWithAddress:
     description: Update customer details including name, email, and address information.
     properties:
@@ -73,7 +54,7 @@ definitions:
         example: 12345
         type: integer
     type: object
-host: 'localhost:'
+host: localhost:8081
 info:
   contact:
     email: support@example.com
@@ -94,9 +75,17 @@ paths:
             items:
               $ref: '#/definitions/generated.Customer'
             type: array
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
       summary: Get all customers
       tags:
-      - customers
+      - Customer CRUD
     post:
       consumes:
       - application/json
@@ -125,7 +114,7 @@ paths:
             type: string
       summary: Create a new customer
       tags:
-      - customers
+      - Customer CRUD
   /api/customer/{id}:
     delete:
       description: Deletes a customer based on the id from the database
@@ -146,13 +135,13 @@ paths:
           description: Bad request
           schema:
             type: string
-        "404":
-          description: Customer not found
+        "500":
+          description: Internal server error
           schema:
             type: string
       summary: Delete customer
       tags:
-      - customers
+      - Customer CRUD
     get:
       description: Fetches a customer based on the id from the database
       parameters:
@@ -168,9 +157,17 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/generated.Customer'
-      summary: Get customer
+        "400":
+          description: Bad request
+          schema:
+            type: string
+        "500":
+          description: Internal server error
+          schema:
+            type: string
+      summary: Get customer by Id
       tags:
-      - customers
+      - Customer CRUD
     patch:
       consumes:
       - application/json
@@ -198,46 +195,6 @@ paths:
               type: string
             type: object
         "400":
-          description: Invalid input
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "404":
-          description: Customer not found
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-        "500":
-          description: Internal server error
-          schema:
-            additionalProperties:
-              type: string
-            type: object
-      summary: Update a customer
-      tags:
-      - customers
-  /api/customer/menu/select:
-    post:
-      consumes:
-      - application/json
-      description: Select Menu Item
-      parameters:
-      - description: Menu item selection details
-        in: body
-        name: customer
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.MenuItemSelection'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Menu item successfully selected
-          schema:
-            $ref: '#/definitions/handlers.MenuItemSelection'
-        "400":
           description: Bad request
           schema:
             type: string
@@ -245,7 +202,7 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Select Menuitem
+      summary: Update a customer
       tags:
-      - customers
+      - Customer CRUD
 swagger: "2.0"

@@ -20,7 +20,7 @@ const docTemplate = `{
     "paths": {
         "/api/shopping": {
             "post": {
-                "description": "Add an item to the shopping cart",
+                "description": "Add a MenuItem to the shopping cart",
                 "consumes": [
                     "application/json"
                 ],
@@ -28,9 +28,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
-                "summary": "Add an item",
+                "summary": "Add a MenuItem",
                 "parameters": [
                     {
                         "description": "item object",
@@ -71,7 +71,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Broker"
+                    "ShoppingCart Broker"
                 ],
                 "summary": "Consume the chosen Menu Items for a Customer",
                 "responses": {
@@ -106,7 +106,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Broker"
+                    "ShoppingCart Broker"
                 ],
                 "summary": "Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment",
                 "parameters": [
@@ -151,7 +151,7 @@ const docTemplate = `{
         },
         "/api/shopping/{customerId}": {
             "delete": {
-                "description": "Clears the cart for the specified customer",
+                "description": "Clears the ShoppingCart for a specific customer",
                 "consumes": [
                     "application/json"
                 ],
@@ -159,9 +159,9 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
-                "summary": "Clears the cart",
+                "summary": "Clears the ShoppingCart",
                 "parameters": [
                     {
                         "type": "integer",
@@ -203,7 +203,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
                 "summary": "Update an item in the cart",
                 "parameters": [
@@ -239,13 +239,7 @@ const docTemplate = `{
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "404": {
-                        "description": "Item not found",
+                        "description": "Bad request",
                         "schema": {
                             "type": "string"
                         }
@@ -261,14 +255,14 @@ const docTemplate = `{
         },
         "/api/shopping/{id}": {
             "get": {
-                "description": "Fetches a list of items based on the customerId",
+                "description": "Fetches a list of MenuItems for a specific Customer, to view the ShoppingCart",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "shoppingCart"
+                    "ShoppingCart CRUD"
                 ],
-                "summary": "View items for a customer",
+                "summary": "View MenuItems for a customer's ShoppingCart",
                 "parameters": [
                     {
                         "type": "string",
@@ -345,8 +339,8 @@ const docTemplate = `{
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
 	Version:          "1.0",
-	Host:             "localhost:",
-	BasePath:         "8084",
+	Host:             "localhost:8084",
+	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Order Shopping cart API",
 	Description:      "This is the API documentation for the Shopping cart Service.",

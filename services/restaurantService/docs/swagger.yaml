@@ -1,4 +1,3 @@
-basePath: "8083"
 definitions:
   generated.Menuitem:
     properties:
@@ -60,7 +59,7 @@ definitions:
         example: 10
         type: integer
     type: object
-host: 'localhost:'
+host: localhost:8083
 info:
   contact:
     email: support@example.com
@@ -91,7 +90,7 @@ paths:
             type: string
       summary: Get all categories
       tags:
-      - categories
+      - Category(Restaurant) CRUD
   /api/filter/{category}:
     get:
       description: Fetches all restaurants for a given category
@@ -120,7 +119,7 @@ paths:
             type: string
       summary: Filter restaurants by category
       tags:
-      - categories
+      - Category(Restaurant) CRUD
   /api/restaurants:
     get:
       description: Fetches a list of all restaurants from the database
@@ -143,7 +142,7 @@ paths:
             type: string
       summary: Get all restaurants
       tags:
-      - restaurants
+      - Restaurant CRUD
   /api/restaurants/{id}:
     get:
       description: Fetches a restaurant based on the id from the database
@@ -170,7 +169,7 @@ paths:
             type: string
       summary: Get restaurant by id
       tags:
-      - restaurants
+      - Restaurant CRUD
   /api/restaurants/{restaurantId}/menu-items:
     get:
       description: Fetches all menu items associated with a specific restaurant ID
@@ -199,7 +198,7 @@ paths:
             type: string
       summary: Get menu items by restaurant ID
       tags:
-      - menu_items
+      - MenuItem(Restaurant) CRUD
   /api/restaurants/{restaurantId}/menu-items/{menuitemId}:
     get:
       description: Fetches a menu item based on the restaurant and id from the database
@@ -231,12 +230,12 @@ paths:
             type: string
       summary: Get menu item by restaurant and id
       tags:
-      - menu_items
+      - MenuItem(Restaurant) CRUD
   /api/restaurants/menu/select:
     post:
       consumes:
       - application/json
-      description: Select Menu Item
+      description: Customer selects a MenuItem or more
       parameters:
       - description: Menu item selection details
         in: body
@@ -259,7 +258,7 @@ paths:
           description: Internal server error
           schema:
             type: string
-      summary: Select MenuItem
+      summary: Selecting MenuItems
       tags:
-      - BrokerCustomers
+      - Restaurant Broker
 swagger: "2.0"

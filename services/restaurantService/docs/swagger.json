@@ -9,8 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:",
-    "basePath": "8083",
+    "host": "localhost:8083",
     "paths": {
         "/api/categories": {
             "get": {
@@ -19,7 +18,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "categories"
+                    "Category(Restaurant) CRUD"
                 ],
                 "summary": "Get all categories",
                 "responses": {
@@ -54,7 +53,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "categories"
+                    "Category(Restaurant) CRUD"
                 ],
                 "summary": "Filter restaurants by category",
                 "parameters": [
@@ -98,7 +97,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "restaurants"
+                    "Restaurant CRUD"
                 ],
                 "summary": "Get all restaurants",
                 "responses": {
@@ -128,7 +127,7 @@
         },
         "/api/restaurants/menu/select": {
             "post": {
-                "description": "Select Menu Item",
+                "description": "Customer selects a MenuItem or more",
                 "consumes": [
                     "application/json"
                 ],
@@ -136,9 +135,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "BrokerCustomers"
+                    "Restaurant Broker"
                 ],
-                "summary": "Select MenuItem",
+                "summary": "Selecting MenuItems",
                 "parameters": [
                     {
                         "description": "Menu item selection details",
@@ -179,7 +178,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "restaurants"
+                    "Restaurant CRUD"
                 ],
                 "summary": "Get restaurant by id",
                 "parameters": [
@@ -220,7 +219,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "menu_items"
+                    "MenuItem(Restaurant) CRUD"
                 ],
                 "summary": "Get menu items by restaurant ID",
                 "parameters": [
@@ -264,7 +263,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "menu_items"
+                    "MenuItem(Restaurant) CRUD"
                 ],
                 "summary": "Get menu item by restaurant and id",
                 "parameters": [

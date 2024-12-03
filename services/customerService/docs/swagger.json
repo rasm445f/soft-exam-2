@@ -9,8 +9,7 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:",
-    "basePath": "8081",
+    "host": "localhost:8081",
     "paths": {
         "/api/customer": {
             "get": {
@@ -19,7 +18,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Get all customers",
                 "responses": {
@@ -30,6 +29,18 @@
                             "items": {
                                 "$ref": "#/definitions/generated.Customer"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -43,7 +54,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Create a new customer",
                 "parameters": [
@@ -79,52 +90,6 @@
                 }
             }
         },
-        "/api/customer/menu/select": {
-            "post": {
-                "description": "Select Menu Item",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "customers"
-                ],
-                "summary": "Select Menuitem",
-                "parameters": [
-                    {
-                        "description": "Menu item selection details",
-                        "name": "customer",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/handlers.MenuItemSelection"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Menu item successfully selected",
-                        "schema": {
-                            "$ref": "#/definitions/handlers.MenuItemSelection"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request",
-                        "schema": {
-                            "type": "string"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal server error",
-                        "schema": {
-                            "type": "string"
-                        }
-                    }
-                }
-            }
-        },
         "/api/customer/{id}": {
             "get": {
                 "description": "Fetches a customer based on the id from the database",
@@ -132,9 +97,9 @@
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
-                "summary": "Get customer",
+                "summary": "Get customer by Id",
                 "parameters": [
                     {
                         "type": "string",
@@ -150,6 +115,18 @@
                         "schema": {
                             "$ref": "#/definitions/generated.Customer"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -159,7 +136,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Delete customer",
                 "parameters": [
@@ -184,8 +161,8 @@
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Customer not found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -201,7 +178,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "customers"
+                    "Customer CRUD"
                 ],
                 "summary": "Update a customer",
                 "parameters": [
@@ -233,30 +210,15 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid input",
+                        "description": "Bad request",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Customer not found",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "type": "object",
-                            "additionalProperties": {
-                                "type": "string"
-                            }
+                            "type": "string"
                         }
                     }
                 }
@@ -307,31 +269,6 @@
                 },
                 "phonenumber": {
                     "type": "string"
-                }
-            }
-        },
-        "handlers.MenuItemSelection": {
-            "type": "object",
-            "properties": {
-                "customerId": {
-                    "type": "integer",
-                    "example": 1
-                },
-                "name": {
-                    "type": "string",
-                    "example": "Cheese Burger"
-                },
-                "price": {
-                    "type": "number",
-                    "example": 10
-                },
-                "quantity": {
-                    "type": "integer",
-                    "example": 2
-                },
-                "restaurantId": {
-                    "type": "integer",
-                    "example": 10
                 }
             }
         },

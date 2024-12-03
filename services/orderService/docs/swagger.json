@@ -9,19 +9,18 @@
         },
         "version": "1.0"
     },
-    "host": "localhost:",
-    "basePath": "8082",
+    "host": "localhost:8082",
     "paths": {
         "/api/delivery-agent": {
             "get": {
-                "description": "Fetches a list of all deliveryAgent from the database",
+                "description": "Fetches a list of all Delivery Agents from the database",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "deliveryAgent"
+                    "DeliveryAgent CRUD"
                 ],
-                "summary": "Get all deliveryAgent",
+                "summary": "Get all deliveryAgents",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -30,6 +29,18 @@
                             "items": {
                                 "$ref": "#/definitions/generated.Deliveryagent"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -43,7 +54,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "deliveryAgent"
+                    "DeliveryAgent CRUD"
                 ],
                 "summary": "Create a new deliveryAgent",
                 "parameters": [
@@ -86,7 +97,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "deliveryAgent"
+                    "DeliveryAgent CRUD"
                 ],
                 "summary": "Get deliveryAgent by deliveryAgent id",
                 "parameters": [
@@ -111,8 +122,8 @@
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "DeliveryAgent not found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -130,7 +141,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "feedbacks"
+                    "Feedback CRUD"
                 ],
                 "summary": "Create a new feedback",
                 "parameters": [
@@ -173,7 +184,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "feedbacks"
+                    "Feedback CRUD"
                 ],
                 "summary": "Get all feedbacks",
                 "responses": {
@@ -184,6 +195,18 @@
                             "items": {
                                 "$ref": "#/definitions/generated.Feedback"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -196,7 +219,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "feedbacks"
+                    "Feedback CRUD"
                 ],
                 "summary": "Get feedback by order id",
                 "parameters": [
@@ -221,8 +244,8 @@
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Feedback not found",
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -237,7 +260,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order Calculation Bonus"
                 ],
                 "summary": "calculate order bonus",
                 "parameters": [
@@ -258,6 +281,18 @@
                                 "$ref": "#/definitions/generated.Order"
                             }
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -269,7 +304,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "order"
+                    "Order CRUD"
                 ],
                 "summary": "Consume Order for a Customer",
                 "responses": {
@@ -304,7 +339,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Update Order Status",
                 "parameters": [
@@ -332,8 +367,14 @@
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Order not found",
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -351,7 +392,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Update Order Status",
                 "parameters": [
@@ -379,8 +420,14 @@
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Order not found",
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
@@ -395,7 +442,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Get all orders",
                 "responses": {
@@ -406,6 +453,18 @@
                             "items": {
                                 "$ref": "#/definitions/generated.Order"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -418,7 +477,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Get order by id",
                 "parameters": [
@@ -436,13 +495,25 @@
                         "schema": {
                             "$ref": "#/definitions/generated.Order"
                         }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
             "delete": {
                 "description": "Deletes an order by its id from the database",
                 "tags": [
-                    "orders"
+                    "Order CRUD"
                 ],
                 "summary": "Delete an order",
                 "parameters": [
@@ -461,8 +532,14 @@
                             "type": "string"
                         }
                     },
-                    "404": {
-                        "description": "Order not found",
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
                         "schema": {
                             "type": "string"
                         }
