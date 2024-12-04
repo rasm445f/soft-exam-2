@@ -27,9 +27,9 @@ func CloseMocks(mock pgxmock.PgxPoolIface) {
 }
 
 // Helper functions to create pointers for literals
-func int32Ptr(i int32) *int32 {
-	return &i
-}
+// func int32Ptr(i int32) *int32 {
+// 	return &i
+// }
 func float64Ptr(f float64) *float64 {
 	return &f
 }
