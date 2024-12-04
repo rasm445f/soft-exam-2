@@ -4,28 +4,23 @@ FROM golang:1.23.2 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
-COPY go.mod go.sum ./
+# Copy the entire repository into the build context
+COPY . .
+
+# Set the working directory to the shoppingCartService
+WORKDIR /app/services/shoppingCartService
+
+# Replace the broker module with the local path
+RUN go mod edit -replace github.com/rasm445f/soft-exam-2/broker=../../broker
+
+# Download dependencies
 RUN go mod download
-
-COPY . ./
-
 
 # Build the Go application
 RUN go build -o /api
-# RUN CGO_ENABLED=0 GOOS=linux go build -o /hello
 
-# Optional:
-# To bind to a TCP port, runtime parameters must be supplied to the docker command.
-# But we can document in the Dockerfile what ports
-# the application is going to listen on by default.
-# https://docs.docker.com/reference/dockerfile/#expose
+# Expose the service port
 EXPOSE 8084
 
-# # Start a new stage from a lightweight base image
-# FROM alpine:latest
-#
-# # Copy the compiled binary from the build stage
-# COPY --from=builder /app/hello /hello
-
-# Run the hello binary
+# Set the default command to run the application
 CMD ["/api"]
