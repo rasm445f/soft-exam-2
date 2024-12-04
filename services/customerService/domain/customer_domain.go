@@ -76,12 +76,16 @@ func (d *CustomerDomain) DeleteCustomerDomain(ctx context.Context, id int32) err
 	return d.Queries.DeleteCustomer(ctx, id)
 }
 
-func (d *CustomerDomain) CreateCustomerDomain(ctx context.Context, customerParams generated.CreateCustomerParams) (error) {
+func (d *CustomerDomain) CreateCustomerDomain(ctx context.Context, customerParams generated.CreateCustomerParams) error {
 	if *customerParams.Name == "" || *customerParams.Email == "" || *customerParams.Password == "" {
 		return errors.New("all required fields must be filled")
 	}
 
 	if err := ValidatePassword(*customerParams.Password); err != nil {
+		return err
+	}
+
+	if err := ValidateEmail(*customerParams.Email); err != nil {
 		return err
 	}
 
