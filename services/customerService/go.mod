@@ -4,15 +4,26 @@ go 1.23.1
 
 require (
 	github.com/jackc/pgx/v5 v5.7.1
+	github.com/pashagolub/pgxmock v1.8.0
 	github.com/rs/cors v1.11.1
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.4
 )
 
-require github.com/streadway/amqp v1.1.0 // indirect
+require (
+	github.com/jackc/chunkreader/v2 v2.0.1 // indirect
+	github.com/jackc/pgconn v1.13.0 // indirect
+	github.com/jackc/pgio v1.0.0 // indirect
+	github.com/jackc/pgproto3/v2 v2.3.1 // indirect
+	github.com/jackc/pgtype v1.12.0 // indirect
+	github.com/jackc/pgx/v4 v4.17.0 // indirect
+	github.com/jackc/puddle v1.2.1 // indirect
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/pashagolub/pgxmock/v4 v4.3.0 // indirect
+	golang.org/x/sync v0.9.0 // indirect
+)
 
 require (
-	github.com/DATA-DOG/go-sqlmock v1.5.2 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/go-openapi/jsonpointer v0.21.0 // indirect
 	github.com/go-openapi/jsonreference v0.21.0 // indirect
