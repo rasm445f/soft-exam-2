@@ -4,35 +4,23 @@ FROM golang:1.23.2 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
-# Copy the go.mod and go.sum files from the customerService directory
-COPY services/customerService/go.mod services/customerService/go.sum ./
+# Copy the entire repository into the build context
+COPY . .
 
-# Copy the broker directory again to ensure it is available for go mod download
-COPY broker ./broker
+# Set the working directory to the CustomerService
+WORKDIR /app/services/customerService
 
-# RUN go mod download
-RUN go mod edit -replace github.com/rasm445f/soft-exam-2/broker=./broker
+# Replace the broker module with the local path
+RUN go mod edit -replace github.com/rasm445f/soft-exam-2/broker=../../broker
+
+# Download dependencies
 RUN go mod download
-
-# Copy the rest of the customerService directory
-COPY services/customerService/ ./
 
 # Build the Go application
 RUN go build -o /api
-# RUN CGO_ENABLED=0 GOOS=linux go build -o /hello
 
-# Optional:
-# To bind to a TCP port, runtime parameters must be supplied to the docker command.
-# But we can document in the Dockerfile what ports
-# the application is going to listen on by default.
-# https://docs.docker.com/reference/dockerfile/#expose
+# Expose the service port
 EXPOSE 8081
 
-# # Start a new stage from a lightweight base image
-# FROM alpine:latest
-#
-# # Copy the compiled binary from the build stage
-# COPY --from=builder /app/hello /hello
-
-# Run the hello binary
+# Set the default command to run the application
 CMD ["/api"]
