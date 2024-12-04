@@ -108,4 +108,17 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 			t.Errorf("unmet mock expectations: %v", err)
 		}
 	})
+
+	t.Run("Correct Endpoint Validation", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/wrong-endpoint", nil)
+		rec := httptest.NewRecorder()
+
+		// Act
+		handler.GetAllRestaurants()(rec, req)
+
+		// Assert
+		if rec.Code == http.StatusOK {
+			t.Fatalf("expected failure for incorrect endpoint, but got status %d", rec.Code)
+		}
+	})
 }
