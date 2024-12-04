@@ -20,10 +20,10 @@ jobs:
       matrix:
         service:
           [
-            customerService,
-            orderService,
-            restaurantService,
-            shoppingCartService,
+            customer-service,
+            order-service,
+            restaurant-service,
+            shopping-cart-service,
           ]
     steps:
       - name: Checkout code
