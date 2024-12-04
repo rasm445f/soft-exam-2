@@ -19,7 +19,7 @@ RUN go build -o /api
 # But we can document in the Dockerfile what ports
 # the application is going to listen on by default.
 # https://docs.docker.com/reference/dockerfile/#expose
-EXPOSE 8080
+EXPOSE 8084
 
 # # Start a new stage from a lightweight base image
 # FROM alpine:latest

@@ -8,22 +8,47 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
-  ci:
-    name: "Run CI for ${{ matrix.service }}"
+  filter:
+    name: "Determine Changed Services"
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        service:
-          - customerService
-          - orderService
-          - restaurantService
-          - shoppingCartService
+    outputs:
+      services: ${{ steps.filter.outputs.services }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          fetch-depth: 1
+          fetch-depth: 0
+
+      - name: Filter Changed Services
+        id: filter
+        uses: dorny/paths-filter@v2
+        with:
+          filters:
+            customerService:
+              - "services/customerService/**"
+            orderService:
+              - "services/orderService/**"
+            restaurantService:
+              - "services/restaurantService/**"
+            shoppingCartService:
+              - "services/shoppingCartService/**"
+
+  ci:
+    name: "Run CI and Build Docker Images"
+    needs: filter
+    if: ${{ needs.filter.outputs.services != '[]' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: ${{ fromJson(needs.filter.outputs.services) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
 
       - name: Set up Go
         uses: actions/setup-go@v4
@@ -31,16 +56,20 @@ jobs:
           go-version: "1.23"
           check-latest: true
 
-      - name: Run Tests
-        working-directory: services/${{ matrix.service }}
-        run: go test ./...
+      - name: Install Staticcheck
+        run: go install honnef.co/go/tools/cmd/staticcheck@latest
 
-      - name: Run Go Vet
-        working-directory: services/${{ matrix.service }}
-        run: go vet ./...
-
-      - name: Install Staticcheck and Run
+      - name: Run Tests, Vet, and Staticcheck
         working-directory: services/${{ matrix.service }}
         run: |
-          go install honnef.co/go/tools/cmd/staticcheck@latest
+          go test ./...
+          go vet ./...
           staticcheck ./...
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: services/${{ matrix.service }}
+          file: services/${{ matrix.service }}/Dockerfile
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}:latest
