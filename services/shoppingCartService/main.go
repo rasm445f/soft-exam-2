@@ -40,6 +40,7 @@ func run() (http.Handler, error) {
 	//CORS stuff
 	handler := cors.Default().Handler(mux)
 
+	//test change for cicd
 	return handler, nil
 }
 
