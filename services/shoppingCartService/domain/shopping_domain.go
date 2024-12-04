@@ -30,7 +30,7 @@ func (d *ShoppingCartDomain) recalculateCartTotals(cart *db.ShoppingCart) {
 	for _, item := range cart.Items {
 		cart.TotalAmount += item.Price * float64(item.Quantity)
 	}
-	cart.VatAmount = int(float64(cart.TotalAmount) * 0.20)
+	cart.VatAmount = cart.TotalAmount * 0.20
 }
 
 func (d *ShoppingCartDomain) AddItemDomain(ctx context.Context, itemParams AddItemParams) error {
@@ -53,7 +53,7 @@ func (d *ShoppingCartDomain) AddItemDomain(ctx context.Context, itemParams AddIt
 
 	// Add item
 	item := db.ShoppingCartItem{
-		Id:       len(cart.Items) + 1, // Simple ID generation
+		Id:       len(cart.Items) + 1, // Simple ID generation instead of redis INCR command
 		Name:     itemParams.Name,
 		Price:    itemParams.Price,
 		Quantity: itemParams.Quantity,
@@ -62,14 +62,6 @@ func (d *ShoppingCartDomain) AddItemDomain(ctx context.Context, itemParams AddIt
 	cart.Items = append(cart.Items, item)
 
 	d.recalculateCartTotals(cart)
-
-	// Recalculate totals
-	for _, item := range cart.Items {
-		cart.TotalAmount += item.Price * float64(item.Quantity)
-	}
-
-	// TotalAmount with VAT included i.e. the VAT is 20% of TotalAmount
-	cart.VatAmount = int(float64(cart.TotalAmount) * 0.20)
 
 	return d.repo.SaveCart(ctx, cart)
 }

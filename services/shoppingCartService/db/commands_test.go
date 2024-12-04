@@ -18,7 +18,7 @@ func TestGetCart(t *testing.T) {
 	defer db.Close()
 
 	// Initialize the repository with the mock Redis client
-	repo := &ShoppingCartRepository{redisClient: db}
+	repo := NewShoppingCartRepository(db)
 
 	// Test data
 	cart := &ShoppingCart{
