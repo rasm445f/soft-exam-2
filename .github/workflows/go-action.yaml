@@ -13,47 +13,18 @@ permissions:
   packages: write
 
 jobs:
-  filter:
-    name: "Determine Changed Services"
-    runs-on: ubuntu-latest
-    outputs:
-      services: ${{ steps.filter.outputs.changes }}
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Filter Changed Services
-        id: filter
-        uses: dorny/paths-filter@v2
-        with:
-          base: ${{ github.ref }}
-          ref: ${{ github.event.pull_request.head.sha }}
-          filters: |
-            customerService:
-              - "services/customerService/**"
-            orderService:
-              - "services/orderService/**"
-            restaurantService:
-              - "services/restaurantService/**"
-            shoppingCartService:
-              - "services/shoppingCartService/**"
-          write_outputs: "json"
-
-      - name: Set matrix output
-        id: set-matrix
-        run: |
-          echo "matrix=$(echo '${{ steps.filter.outputs.changes }}' | jq -c .)" >> $GITHUB_OUTPUT
-
   ci:
-    name: "Run CI and Build Docker Images"
-    needs: filter
-    if: ${{ needs.filter.outputs.services != '' }}
+    name: "Run CI for ${{ matrix.service }}"
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        include: ${{ fromJSON(needs.filter.outputs.services) }}
+        service:
+          [
+            customerService,
+            orderService,
+            restaurantService,
+            shoppingCartService,
+          ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
