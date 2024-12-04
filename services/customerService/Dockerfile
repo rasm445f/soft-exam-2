@@ -4,11 +4,18 @@ FROM golang:1.23.2 AS builder
 # Set the working directory inside the container
 WORKDIR /app
 
-COPY go.mod go.sum ./
+# Copy the go.mod and go.sum files from the customerService directory
+COPY services/customerService/go.mod services/customerService/go.sum ./
+
+# Copy the broker directory again to ensure it is available for go mod download
+COPY broker ./broker
+
+# RUN go mod download
+RUN go mod edit -replace github.com/rasm445f/soft-exam-2/broker=./broker
 RUN go mod download
 
-COPY . ./
-
+# Copy the rest of the customerService directory
+COPY services/customerService/ ./
 
 # Build the Go application
 RUN go build -o /api
