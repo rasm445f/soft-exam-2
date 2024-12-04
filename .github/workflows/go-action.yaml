@@ -10,9 +10,15 @@ on:
 
 jobs:
   ci:
-    name: "Run CI"
+    name: "Run CI for ${{ matrix.service }}"
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix:
+        service:
+          - customerService
+          - orderService
+          - restaurantService
+          - shoppingCartService
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,12 +32,15 @@ jobs:
           check-latest: true
 
       - name: Run Tests
+        working-directory: services/${{ matrix.service }}
         run: go test ./...
 
       - name: Run Go Vet
+        working-directory: services/${{ matrix.service }}
         run: go vet ./...
 
       - name: Install Staticcheck and Run
+        working-directory: services/${{ matrix.service }}
         run: |
           go install honnef.co/go/tools/cmd/staticcheck@latest
           staticcheck ./...
