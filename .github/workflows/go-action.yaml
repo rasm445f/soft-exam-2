@@ -28,7 +28,7 @@ jobs:
         id: filter
         uses: dorny/paths-filter@v2
         with:
-          filters:
+          filters: |
             customerService:
               - "services/customerService/**"
             orderService:
