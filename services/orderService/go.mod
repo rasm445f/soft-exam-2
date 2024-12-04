@@ -4,12 +4,17 @@ go 1.23.1
 
 require (
 	github.com/jackc/pgx/v5 v5.7.1
+	github.com/pashagolub/pgxmock/v4 v4.3.0
 	github.com/rs/cors v1.11.1
 	github.com/swaggo/http-swagger/v2 v2.0.2
 	github.com/swaggo/swag v1.16.3
 )
 
-require github.com/rabbitmq/amqp091-go v1.10.0 // indirect
+require (
+	github.com/jackc/puddle/v2 v2.2.2 // indirect
+	github.com/rabbitmq/amqp091-go v1.10.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+)
 
 require (
 	github.com/KyleBanks/depth v1.2.1 // indirect
