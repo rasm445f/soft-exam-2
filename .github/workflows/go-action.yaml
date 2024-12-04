@@ -20,10 +20,10 @@ jobs:
       matrix:
         service:
           [
-            customer-service,
-            order-service,
-            restaurant-service,
-            shopping-cart-service,
+            customerService,
+            orderService,
+            restaurantService,
+            shoppingCartService,
           ]
     steps:
       - name: Checkout code
@@ -51,4 +51,4 @@ jobs:
           context: services/${{ matrix.service }}
           file: services/${{ matrix.service }}/Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/${{ matrix.service }}:latest
+          tags: ghcr.io/${{ github.repository_owner }}/${{ toLowerCase(matrix.service) }}:latest
