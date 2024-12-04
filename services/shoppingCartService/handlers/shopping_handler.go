@@ -9,7 +9,6 @@ import (
 	"strconv"
 
 	"github.com/rasm445f/soft-exam-2/broker"
-	"github.com/rasm445f/soft-exam-2/db"
 	"github.com/rasm445f/soft-exam-2/domain"
 )
 
@@ -28,15 +27,15 @@ func NewShoppingCartHandler(domain *domain.ShoppingCartDomain) *ShoppingCartHand
 //	@Tags			ShoppingCart CRUD
 //	@Accept			application/json
 //	@Produce		application/json
-//	@Param			item	body		db.AddItemParams	true	"item object"
-//	@Success		201		{object}	db.AddItemParams
+//	@Param			item	body		domain.AddItemParams	true	"item object"
+//	@Success		201		{object}	domain.AddItemParams
 //	@Failure		400		{string}	string	"Bad request"
 //	@Failure		500		{string}	string	"Internal server error"
 //	@Router			/api/shopping [post]
 func (h *ShoppingCartHandler) AddItem() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
-		var item db.AddItemParams
+		var item domain.AddItemParams
 
 		if err := json.NewDecoder(r.Body).Decode(&item); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -56,6 +55,7 @@ func (h *ShoppingCartHandler) AddItem() http.HandlerFunc {
 type UpdateQuantityRequest struct {
 	Quantity int `json:"quantity"`
 }
+
 // UpdateCartHandler godoc
 //
 //	@Summary		Update an item in the cart
@@ -67,8 +67,10 @@ type UpdateQuantityRequest struct {
 //	@Param			itemId		path		int						true	"Item ID"
 //	@Param			body		body		UpdateQuantityRequest	true	"New quantity for the item"
 //	@Success		200			{string}	string					"ShoppingCart updated successfully"
+//
 // @Failure 400 {string} string "Bad request"
 // @Failure 500 {string} string "Internal server error"
+//
 //	@Router			/api/shopping/{customerId}/{itemId} [patch]
 func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -189,7 +191,7 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 			fmt.Println(payloadBytes)
 
 			// Unmarshal JSON bytes
-			var item db.AddItemParams
+			var item domain.AddItemParams
 			if err := json.Unmarshal(payloadBytes, &item); err != nil {
 				log.Printf("Failed to unmarshal payload: %v", err)
 				return
@@ -213,6 +215,7 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 type PublishShoppingCartRequest struct {
 	Comment string `json:"comment" example:"No vegetables on the pizza."`
 }
+
 // PublishShoppingCart godoc
 //
 //	@Summary		Publish a Customer's shopping cart to RabbitMQ to be consumed by the Order service with an optional Comment

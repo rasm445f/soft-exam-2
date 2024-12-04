@@ -31,7 +31,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/db.AddItemParams"
+                            "$ref": "#/definitions/domain.AddItemParams"
                         }
                     }
                 ],
@@ -39,7 +39,7 @@
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/db.AddItemParams"
+                            "$ref": "#/definitions/domain.AddItemParams"
                         }
                     },
                     "400": {
@@ -289,7 +289,7 @@
         }
     },
     "definitions": {
-        "db.AddItemParams": {
+        "domain.AddItemParams": {
             "type": "object",
             "properties": {
                 "customerId": {

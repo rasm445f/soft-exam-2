@@ -1,5 +1,5 @@
 definitions:
-  db.AddItemParams:
+  domain.AddItemParams:
     properties:
       customerId:
         type: integer
@@ -43,14 +43,14 @@ paths:
         name: item
         required: true
         schema:
-          $ref: '#/definitions/db.AddItemParams'
+          $ref: '#/definitions/domain.AddItemParams'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/db.AddItemParams'
+            $ref: '#/definitions/domain.AddItemParams'
         "400":
           description: Bad request
           schema:

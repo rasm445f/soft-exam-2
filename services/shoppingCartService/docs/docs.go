@@ -38,7 +38,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/db.AddItemParams"
+                            "$ref": "#/definitions/domain.AddItemParams"
                         }
                     }
                 ],
@@ -46,7 +46,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/db.AddItemParams"
+                            "$ref": "#/definitions/domain.AddItemParams"
                         }
                     },
                     "400": {
@@ -296,7 +296,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "db.AddItemParams": {
+        "domain.AddItemParams": {
             "type": "object",
             "properties": {
                 "customerId": {

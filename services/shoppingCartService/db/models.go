@@ -4,7 +4,7 @@ type ShoppingCart struct {
 	CustomerId   int                `json:"customer_id"`
 	RestaurantId int                `json:"restaurant_id"`
 	TotalAmount  float64            `json:"total_amount"`
-	VatAmount    int                `json:"vat_amount"`
+	VatAmount    float64            `json:"vat_amount"`
 	Items        []ShoppingCartItem `json:"items"`
 }
 
