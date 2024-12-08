@@ -286,7 +286,7 @@ func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 
 		ctx := r.Context()
 
-		// get menu item based on restaurantId and menuItemId
+		// Get menuItem based on restaurantId and menuItemId
 		var menuSelectionParams = generated.GetMenuItemByRestaurantAndIdParams{
 			Restaurantid: selectionParams.RestaurantId,
 			ID:           selectionParams.ItemId,
@@ -299,7 +299,7 @@ func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 			return
 		}
 
-		// create final menuItem to send to rabbitMQ
+		// Create final menuItem to send to rabbitMQ
 		menuItemSelection := MenuItemSelection{
 			CustomerID:   selectionParams.CustomerId,
 			RestaurantId: intermediateMenuItem.Restaurantid,
