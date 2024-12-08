@@ -311,7 +311,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Order CRUD"
+                    "Order Broker"
                 ],
                 "summary": "Consume Order for a Customer",
                 "responses": {
