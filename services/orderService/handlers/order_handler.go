@@ -287,7 +287,7 @@ func toTimeNowPtr() *time.Time {
 //
 //	@Summary		Consume Order for a Customer
 //	@Description	Consume the created order for customer
-//	@Tags			Order CRUD
+//	@Tags			Order Broker
 //	@Produce		application/json
 //	@Success		200	{string}	string	"Order Consumed Successfully"
 //	@Failure		400	{string}	string	"Bad request"
