@@ -87,42 +87,6 @@ func (h *FeedbackHandler) GetFeedbackByOrderId() http.HandlerFunc {
 	}
 }
 
-// // CreateFeedback godoc
-// //
-// // @Summary Create a new feedback
-// // @Description Creates a new feedback entry in the database
-// // @Tags Feedback CRUD
-// // @Accept  application/json
-// // @Produce application/json
-// // @Param feedback body generated.CreateFeedbackParams true "Feedback object"
-// // @Success 201 {object} generated.Feedback
-// // @Failure 400 {string} string "Bad request"
-// // @Failure 500 {string} string "Internal server error"
-// // @Router /api/feedback [post]
-// func (h *FeedbackHandler) CreateFeedback() http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		ctx := r.Context()
-
-// 		var feedbackParams generated.CreateFeedbackParams
-// 		err := json.NewDecoder(r.Body).Decode(&feedbackParams)
-// 		if err != nil {
-// 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
-// 			log.Println(err)
-// 			return
-// 		}
-
-// 		_, err = h.domain.CreateFeedbackDomain(ctx, feedbackParams)
-// 		if err != nil {
-// 			http.Error(w, "Failed to create feedback", http.StatusInternalServerError)
-// 			log.Println(err)
-// 			return
-// 		}
-
-// 		w.Header().Set("Content-Type", "application/json")
-// 		w.WriteHeader(http.StatusCreated)
-// 	}
-// }
-
 // CreateFeedback godoc
 //
 // @Summary Create a new feedback
