@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/rasm445f/soft-exam-2/broker"
+	brokerrestaurant "github.com/rasm445f/soft-exam-2/brokerRestaurant"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
 )
@@ -248,21 +248,6 @@ func (h *RestaurantHandler) FilterRestaurantByCategory() http.HandlerFunc {
 	}
 }
 
-type SelectItemParams struct {
-	CustomerId   int32 `json:"customerId" example:"1"`
-	RestaurantId int32 `json:"restaurantId" example:"10"`
-	ItemId       int32 `json:"id"`
-	Quantity     int   `json:"quantity" example:"2"`
-}
-
-type MenuItemSelection struct {
-	CustomerID   int32   `json:"customerId" example:"1"`
-	RestaurantId int32   `json:"restaurantId" example:"10"`
-	Name         string  `json:"name" example:"Cheese Burger"`
-	Price        float64 `json:"price" example:"10.00"`
-	Quantity     int     `json:"quantity" example:"2"`
-}
-
 // SelectMenuItem godoc
 //
 // @Summary Selecting MenuItems
@@ -277,7 +262,7 @@ type MenuItemSelection struct {
 // @Router /api/restaurants/menu/select [post]
 func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var selectionParams SelectItemParams
+		var selectionParams brokerrestaurant.SelectItemParams
 		err := json.NewDecoder(r.Body).Decode(&selectionParams)
 		if err != nil {
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
@@ -286,39 +271,18 @@ func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 
 		ctx := r.Context()
 
-		// Get menuItem based on restaurantId and menuItemId
-		var menuSelectionParams = generated.GetMenuItemByRestaurantAndIdParams{
-			Restaurantid: selectionParams.RestaurantId,
-			ID:           selectionParams.ItemId,
-		}
-
-		intermediateMenuItem, err := h.domain.GetMenuItemByRestaurantAndIdDomain(ctx, menuSelectionParams)
-		if err != nil {
-			http.Error(w, "Menu Item not found", http.StatusNotFound)
-			log.Println(err)
-			return
-		}
-
-		// Create final menuItem to send to rabbitMQ
-		menuItemSelection := MenuItemSelection{
-			CustomerID:   selectionParams.CustomerId,
-			RestaurantId: intermediateMenuItem.Restaurantid,
-			Name:         intermediateMenuItem.Name,
-			Price:        intermediateMenuItem.Price,
-			Quantity:     selectionParams.Quantity,
-		}
-
-		// Publish event to RabbitMQ
-		event := broker.Event{
-			Type:    broker.MenuItemSelected,
-			Payload: menuItemSelection,
-		}
-		err = broker.Publish("menu_item_selected_queue", event)
+		err = brokerrestaurant.SelectMenuBroker(selectionParams, ctx, h.domain)
+		// if err != nil {
+		// 	http.Error(w, "Menu Item not found", http.StatusNotFound)
+		// 	log.Println(err)
+		// 	return
+		// }
 		if err != nil {
 			log.Printf("Failed to publish event: %v", err)
 			http.Error(w, "Failed to select menu item", http.StatusInternalServerError)
 			return
 		}
+		// Get menuItem based on restaurantId and menuItemId
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"message": "Menu item selected successfully}`))

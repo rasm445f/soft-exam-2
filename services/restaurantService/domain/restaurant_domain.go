@@ -25,12 +25,12 @@ func (d *RestaurantDomain) GetAllRestaurantsDomain(ctx context.Context) ([]gener
 	var restaurants []generated.Restaurant
 	for _, row := range rows {
 		restaurants = append(restaurants, generated.Restaurant{
-			ID: row.ID,
-			Name: row.Name,
-			Rating: row.Rating,
+			ID:       row.ID,
+			Name:     row.Name,
+			Rating:   row.Rating,
 			Category: row.Category,
-			Address: row.Address,
-			ZipCode: row.ZipCode,
+			Address:  row.Address,
+			ZipCode:  row.ZipCode,
 		})
 	}
 	return restaurants, nil
@@ -47,12 +47,12 @@ func (d *RestaurantDomain) GetRestaurantByIdDomain(ctx context.Context, restaura
 	}
 
 	restaurant := &generated.Restaurant{
-		ID: row.ID,
-		Name: row.Name,
-		Rating: row.Rating,
+		ID:       row.ID,
+		Name:     row.Name,
+		Rating:   row.Rating,
 		Category: row.Category,
-		Address: row.Address,
-		ZipCode: row.ZipCode,
+		Address:  row.Address,
+		ZipCode:  row.ZipCode,
 	}
 
 	return restaurant, nil
@@ -63,7 +63,7 @@ func (d *RestaurantDomain) GetMenuItemsByRestaurantIdDomain(ctx context.Context,
 		return nil, errors.New("invalid restaurant id")
 	}
 
-	menuitems, err := d.repo.FetchMenuItemsByRestaurantId(ctx, restaurantId) 
+	menuitems, err := d.repo.FetchMenuItemsByRestaurantId(ctx, restaurantId)
 	if err != nil {
 		return nil, errors.New("failed to fetch menuitems")
 	}
@@ -77,17 +77,17 @@ func (d *RestaurantDomain) GetMenuItemByRestaurantAndIdDomain(ctx context.Contex
 	}
 
 	menuitem := &generated.Menuitem{
-		ID: row.ID,
+		ID:           row.ID,
 		Restaurantid: row.Restaurantid,
-		Name: row.Name,
-		Price: row.Price,
-		Description: row.Description,
+		Name:         row.Name,
+		Price:        row.Price,
+		Description:  row.Description,
 	}
 
 	return menuitem, nil
-} 
+}
 
-func (d* RestaurantDomain) GetAllCategoriesDomain(ctx context.Context) ([]string, error) {
+func (d *RestaurantDomain) GetAllCategoriesDomain(ctx context.Context) ([]string, error) {
 	rows, err := d.repo.FetchAllCategories(ctx)
 	if err != nil {
 		return nil, errors.New("failed to fetch categories")
@@ -103,7 +103,7 @@ func (d* RestaurantDomain) GetAllCategoriesDomain(ctx context.Context) ([]string
 	return categories, nil
 }
 
-func (d* RestaurantDomain) FilterRestaurantsByCategoryDomain(ctx context.Context, category string) ([]generated.Restaurant, error) {
+func (d *RestaurantDomain) FilterRestaurantsByCategoryDomain(ctx context.Context, category string) ([]generated.Restaurant, error) {
 	if len(category) == 0 {
 		return nil, errors.New("category cannot be empty")
 	}
@@ -117,14 +117,13 @@ func (d* RestaurantDomain) FilterRestaurantsByCategoryDomain(ctx context.Context
 	var restaurants []generated.Restaurant
 	for _, row := range rows {
 		restaurants = append(restaurants, generated.Restaurant{
-			ID: row.ID,
-			Name: row.Name,
-			Rating: row.Rating,
+			ID:       row.ID,
+			Name:     row.Name,
+			Rating:   row.Rating,
 			Category: row.Category,
-			Address: row.Address,
-			ZipCode: row.ZipCode,
+			Address:  row.Address,
+			ZipCode:  row.ZipCode,
 		})
 	}
 	return restaurants, nil
 }
-
