@@ -8,14 +8,14 @@ import (
 
 	brokerrestaurant "github.com/rasm445f/soft-exam-2/brokerRestaurant"
 	"github.com/rasm445f/soft-exam-2/db/generated"
-	"github.com/rasm445f/soft-exam-2/domain"
+	"github.com/rasm445f/soft-exam-2/ports"
 )
 
 type RestaurantHandler struct {
-	domain *domain.RestaurantDomain
+	domain ports.DomainPort
 }
 
-func NewRestaurantHandler(domain *domain.RestaurantDomain) *RestaurantHandler {
+func NewRestaurantHandler(domain ports.DomainPort) *RestaurantHandler {
 	return &RestaurantHandler{domain: domain}
 }
 
@@ -283,8 +283,6 @@ func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 			return
 		}
 		// Get menuItem based on restaurantId and menuItemId
-
-		
 
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"message": "Menu item selected successfully}`))

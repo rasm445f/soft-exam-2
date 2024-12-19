@@ -6,7 +6,7 @@ import (
 
 	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
-	"github.com/rasm445f/soft-exam-2/domain"
+	"github.com/rasm445f/soft-exam-2/ports"
 )
 
 type SelectItemParams struct {
@@ -24,7 +24,7 @@ type MenuItemSelection struct {
 	Quantity     int     `json:"quantity" example:"2"`
 }
 
-func SelectMenuBroker(selectionParams SelectItemParams, ctx context.Context, domain *domain.RestaurantDomain) error {
+func SelectMenuBroker(selectionParams SelectItemParams, ctx context.Context, domain ports.DomainPort) error {
 	var menuSelectionParams = generated.GetMenuItemByRestaurantAndIdParams{
 		Restaurantid: selectionParams.RestaurantId,
 		ID:           selectionParams.ItemId,
