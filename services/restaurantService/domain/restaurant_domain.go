@@ -9,11 +9,12 @@ import (
 
 type RestaurantDomain struct {
 	repo *generated.Queries
+	broker Broker
 }
 
 // NewRestaurantDomain initializes the domain layer
-func NewRestaurantDomain(repo *generated.Queries) *RestaurantDomain {
-	return &RestaurantDomain{repo: repo}
+func NewRestaurantDomain(repo *generated.Queries, broker Broker) *RestaurantDomain {
+	return &RestaurantDomain{repo: repo, broker: broker}
 }
 
 func (d *RestaurantDomain) GetAllRestaurantsDomain(ctx context.Context) ([]generated.Restaurant, error) {
@@ -127,3 +128,12 @@ func (d *RestaurantDomain) FilterRestaurantsByCategoryDomain(ctx context.Context
 	}
 	return restaurants, nil
 }
+
+
+// func (d *RestaurantDomain) PublishMenuItemSelection(ctx context.Context, queue string, event Event) error {
+// 	err := d.broker.Publish(ctx, queue, event)
+// 	if err != nil {
+// 		return errors.New("failed to publish menu item selection")
+// 	}
+// 	return nil
+// }

@@ -284,6 +284,8 @@ func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 		}
 		// Get menuItem based on restaurantId and menuItemId
 
+		
+
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"message": "Menu item selected successfully}`))
 	}
