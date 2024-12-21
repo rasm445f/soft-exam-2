@@ -15,7 +15,7 @@ WHERE restaurantid = $1 AND id = $2;
 
 -- name: FetchMenuItemsByRestaurantId :many
 SELECT id, restaurantid, name, price, description
-from menuitem
+FROM menuitem
 WHERE restaurantid = $1;
 
 -- name: CreateZipCode :exec

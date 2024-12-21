@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
@@ -62,13 +63,20 @@ func (h *RestaurantHandler) GetRestaurantById() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		restaurantIdStr := r.PathValue("restaurantId")
-		if restaurantIdStr == "" {
-			http.Error(w, "Missing restaurantId query parameter", http.StatusBadRequest)
+		// restaurantIdStr := r.PathValue("restaurantId")
+		// if restaurantIdStr == "" {
+		// 	http.Error(w, "Missing restaurantId query parameter", http.StatusBadRequest)
+		// 	return
+		// }
+
+		urlPath := r.URL.Path
+		pathParts := strings.Split(urlPath, "/")
+		if len(pathParts) < 4 || pathParts[3] == "" {
+			http.Error(w, "Missing restaurantId in URL path", http.StatusBadRequest)
 			return
 		}
 
-		restaurantId, err := strconv.Atoi(restaurantIdStr)
+		restaurantId, err := strconv.Atoi(pathParts[3])
 		if err != nil {
 			http.Error(w, "Invalid Restaurant ID", http.StatusBadRequest)
 			return
@@ -103,7 +111,13 @@ func (h *RestaurantHandler) GetMenuItemsByRestaurant() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		restaurantIdStr := r.PathValue("restaurantId")
+		// restaurantIdStr := r.PathValue("restaurantId")
+		// if restaurantIdStr == "" {
+		// 	http.Error(w, "Missing restaurantId path parameter", http.StatusBadRequest)
+		// 	return
+		// }
+		
+		restaurantIdStr := r.URL.Path[len("/api/restaurants/"):len(r.URL.Path)-len("/menu-items")]
 		if restaurantIdStr == "" {
 			http.Error(w, "Missing restaurantId path parameter", http.StatusBadRequest)
 			return
@@ -228,7 +242,14 @@ func (h *RestaurantHandler) FilterRestaurantByCategory() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		category := r.PathValue("category")
+		// category := r.PathValue("category")
+		// if category == "" {
+		// 	http.Error(w, "Missing category path parameter", http.StatusBadRequest)
+		// 	return
+		// }
+
+		// Extract the category from the request URL path
+		category := r.URL.Path[len("/api/filter/"):]
 		if category == "" {
 			http.Error(w, "Missing category path parameter", http.StatusBadRequest)
 			return
