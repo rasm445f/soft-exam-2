@@ -45,7 +45,6 @@ func TestGetAllRestaurantsDomain(t *testing.T) {
 		rows := pgxmock.NewRows([]string{"id", "name", "rating", "category", "address", "zip_code"}).
 			AddRow(int32(1), "Pizza Paradise", float64Ptr(4.5), stringPtr("Pizza"), stringPtr("Main Street 123"), int32Ptr(2800)).
 			AddRow(int32(2), "Sushi World", float64Ptr(4.8), stringPtr("Sushi"), stringPtr("Second Street 456"), int32Ptr(2900))
-
 		mock.ExpectQuery(`SELECT\s+r\.id,\s+r\.name,\s+r\.rating,\s+r\.category,\s+r\.address,\s+r\.zip_code\s+FROM\s+restaurant\s+r\s+JOIN\s+zipcode\s+a\s+ON\s+r\.zip_code\s+=\s+a\.zip_code`).
 			WillReturnRows(rows)
 		
@@ -107,5 +106,44 @@ func TestGetAllRestaurantsDomain(t *testing.T) {
 		if err := mock.ExpectationsWereMet(); err != nil {
 			t.Errorf("unmet mock expectations: %v", err)
 		}
+	})
+}
+
+func TestGetRestaurantByIdDomain(t *testing.T) {
+	mock, _, domain := SetupTestMocks(t)
+	defer CloseMocks(mock)
+
+	t.Run("Valid ID", func(t *testing.T) {
+		// Arrange
+		row := pgxmock.NewRows([]string{"id", "name", "rating", "category", "address", "zip_code"}).
+			AddRow(int32(1), "Pizza Paradise", float64Ptr(4.5), stringPtr("Pizza"), stringPtr("Main Street 123"), int32Ptr(2800))
+		mock.ExpectQuery(`SELECT\s+r\.id,\s+r\.name,\s+r\.rating,\s+r\.category,\s+r\.address,\s+r\.zip_code\s+FROM\s+restaurant\s+r\s+WHERE\s+r\.id\s+=\s+\$1`).
+			WithArgs(int32Ptr(1)).
+			WillReturnRows(row)
+
+		// Act
+		got, err := domain.GetRestaurantByIdDomain(context.Background(), int32(1))
+
+		// Assert
+		want := []generated.Restaurant{
+			{ID: 1, Name: "Pizza Paradise", Rating: float64Ptr(4.5), Category: stringPtr("Pizza"), Address: stringPtr("Main Street 123"), ZipCode: int32Ptr(2800)},
+		}
+
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if !reflect.DeepEqual(got, want) {
+			t.Errorf("got %+v, want %+v", got, want)
+		}
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet mock expectations: %v", err)
+		}
+	})
+
+	t.Run("Invalid ID", func(t *testing.T) {
+		// Arrange
+		mock.ExpectQuery(`SELECT\s+r\.id,\s+r\.name,\s+r\.rating,\s+r\.category,\s+r\.address,\s+r\.zip_code\s+FROM\s+restaurant\s+r\s+WHERE\s+r\.id\s+=\s+\$1`).
+			WithArgs(int32Ptr(1)).
+			WillReturnError(context.DeadlineExceeded)
 	})
 }
