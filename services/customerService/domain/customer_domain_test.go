@@ -9,146 +9,197 @@ import (
 	"github.com/rasm445f/soft-exam-2/db/generated"
 )
 
-// Helper functions to create pointers for literals
-func intPtr(i int32) *int32 {
+// Assuming you have these helper functions and domain constructors
+// in the same package, or imported from a helper file:
+func SetupTestMocks(t *testing.T) (pgxmock.PgxPoolIface, *generated.Queries, *CustomerDomain) {
+	mock, err := pgxmock.NewPool()
+	if err != nil {
+		t.Fatalf("failed to create pgxmock pool: %v", err)
+	}
+
+	queries := generated.New(mock)
+	domain := NewCustomerDomain(queries)
+
+	return mock, queries, domain
+}
+
+func CloseMocks(mock pgxmock.PgxPoolIface) {
+	mock.Close()
+}
+
+func int32Ptr(i int32) *int32 {
 	return &i
 }
+
+func float64Ptr(f float64) *float64 {
+	return &f
+}
+
 func stringPtr(s string) *string {
 	return &s
 }
 
+// ----------------------------------------------------------------------------
+// CustomerDomain Tests
+// ----------------------------------------------------------------------------
+
 func TestGetAllCustomersDomain(t *testing.T) {
+	mock, _, customerDomain := SetupTestMocks(t)
+	defer CloseMocks(mock)
 
-	// Initialize pgxmock
-	mock, err := pgxmock.NewConn()
-	if err != nil {
-		t.Fatalf("failed to create pgxmock: %v", err)
-	}
-	defer mock.Close(context.Background())
+	t.Run("Valid Data", func(t *testing.T) {
+		// Arrange
+		// Use your actual query string here
+		expectedQuery := `SELECT 
+            c.id,
+            c.name,
+            c.email,
+            c.phonenumber,
+            c.password,
+            a.street_address AS street_address,
+            z.zip_code,
+            z.city
+        FROM customer c
+        LEFT JOIN address a ON c.addressid = a.id
+        LEFT JOIN zipcode z ON a.zip_code = z.zip_code
+        ORDER BY c.name`
 
-	// Define the exact query to match
-	expectedQuery := `SELECT 
-        c.id,
-        c.name,
-        c.email,
-        c.phonenumber,
-        c.password,
-        a.street_address AS street_address,
-        z.zip_code,
-        z.city
-    FROM customer c
-    LEFT JOIN address a ON c.addressid = a.id
-    LEFT JOIN zipcode z ON a.zip_code = z.zip_code
-    ORDER BY c.name`
+		rows := pgxmock.NewRows([]string{
+			"id", "name", "email", "phonenumber", "password", "street_address", "zip_code", "city",
+		}).
+			AddRow(
+				int32(1),
+				stringPtr("Alice Wonderland"),
+				stringPtr("alice@example.com"),
+				stringPtr("1234567890"),
+				stringPtr("somehashedpass"),
+				stringPtr("123 Main St"),
+				int32Ptr(12345),
+				stringPtr("ExampleCity"),
+			).
+			AddRow(
+				int32(2),
+				stringPtr("Bob Builder"),
+				stringPtr("bob@example.com"),
+				stringPtr("0987654321"),
+				stringPtr("anotherhashedpass"),
+				stringPtr("456 Elm St"),
+				int32Ptr(67890),
+				stringPtr("OtherCity"),
+			)
 
-	// Define mock data with pointers where required
-	mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
-		WillReturnRows(
-			pgxmock.NewRows([]string{
-				"id", "name", "email", "phonenumber", "password", "street_address", "zip_code", "city",
-			}).
-				AddRow(
-					int32(1),
-					stringPtr("John Doe"),             // Name as *string
-					stringPtr("john.doe@example.com"), // Email as *string
-					stringPtr("1234567890"),           // Phone number as *string
-					stringPtr("hashedpassword"),       // Password as *string
-					stringPtr("123 Main St"),          // Street address as *string
-					intPtr(12345),                     // Zip code as *int32
-					stringPtr("SomeCity"),             // City as *string
-				).
-				AddRow(
-					int32(2),
-					stringPtr("Jane Smith"),             // Name as *string
-					stringPtr("jane.smith@example.com"), // Email as *string
-					stringPtr("0987654321"),             // Phone number as *string
-					stringPtr("hashedpassword"),         // Password as *string
-					stringPtr("456 Elm St"),             // Street address as *string
-					intPtr(67890),                       // Zip code as *int32
-					stringPtr("OtherCity"),              // City as *string
-				),
-		)
+		// Expect query and return rows
+		mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WillReturnRows(rows)
 
-	// Create sqlc Queries instance
-	queries := generated.New(mock)
+		// Act
+		got, err := customerDomain.GetAllCustomersDomain(context.Background())
 
-	// Create the domain instance
-	customerDomain := NewCustomerDomain(queries)
+		// Assert
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(got) != 2 {
+			t.Errorf("expected 2 customers, got %d", len(got))
+		}
 
-	// Call the method under test
-	customers, err := customerDomain.GetAllCustomersDomain(context.Background())
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	}
+		// (Optional) Example: check specific fields
+		// want := []generated.Customer{ ... }
+		// if !reflect.DeepEqual(got, want) { ... }
 
-	// Assert the results
-	if len(customers) != 2 {
-		t.Errorf("expected 2 customers, got %d", len(customers))
-	}
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet mock expectations: %v", err)
+		}
+	})
 
-	// Ensure all expectations were met
-	if err := mock.ExpectationsWereMet(); err != nil {
-		t.Errorf("there were unfulfilled expectations: %v", err)
-	}
+	t.Run("No Data", func(t *testing.T) {
+		// Arrange
+		expectedQuery := `SELECT 
+            c.id,
+            c.name,
+            c.email,
+            c.phonenumber,
+            c.password,
+            a.street_address AS street_address,
+            z.zip_code,
+            z.city
+        FROM customer c
+        LEFT JOIN address a ON c.addressid = a.id
+        LEFT JOIN zipcode z ON a.zip_code = z.zip_code
+        ORDER BY c.name`
+
+		// Return an empty result set
+		emptyRows := pgxmock.NewRows([]string{
+			"id", "name", "email", "phonenumber", "password", "street_address", "zip_code", "city",
+		})
+
+		mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).WillReturnRows(emptyRows)
+
+		// Act
+		got, err := customerDomain.GetAllCustomersDomain(context.Background())
+
+		// Assert
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(got) != 0 {
+			t.Errorf("expected 0 customers, got %d", len(got))
+		}
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet mock expectations: %v", err)
+		}
+	})
+
+	t.Run("Database Error", func(t *testing.T) {
+		// Arrange
+		expectedQuery := `SELECT 
+            c.id,
+            c.name,
+            c.email,
+            c.phonenumber,
+            c.password,
+            a.street_address AS street_address,
+            z.zip_code,
+            z.city
+        FROM customer c
+        LEFT JOIN address a ON c.addressid = a.id
+        LEFT JOIN zipcode z ON a.zip_code = z.zip_code
+        ORDER BY c.name`
+
+		mock.ExpectQuery(regexp.QuoteMeta(expectedQuery)).
+			WillReturnError(context.DeadlineExceeded)
+
+		// Act
+		got, err := customerDomain.GetAllCustomersDomain(context.Background())
+
+		// Assert
+		if err == nil {
+			t.Fatalf("expected an error but got nil")
+		}
+		if got != nil {
+			t.Errorf("expected nil result, got %+v", got)
+		}
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet mock expectations: %v", err)
+		}
+	})
 }
 
-func TestCreateCustomer(t *testing.T) {
-	mock, err := pgxmock.NewConn()
-	if err != nil {
-		t.Fatalf("failed to create pgxmock: %v", err)
-	}
-	defer mock.Close(context.Background())
+func TestCreateCustomerDomain(t *testing.T) {
+	mock, _, customerDomain := SetupTestMocks(t)
+	defer CloseMocks(mock)
 
-	queries := generated.New(mock)
-	customerDomain := NewCustomerDomain(queries)
-
-	// Test Case 1: Invalid Email
-	t.Run("Invalid Email", func(t *testing.T) {
+	t.Run("Valid Email & Password", func(t *testing.T) {
+		// Arrange
 		params := generated.CreateCustomerParams{
 			StreetAddress: stringPtr("123 Main St"),
-			ZipCode:       intPtr(12345),
-			Name:          stringPtr("John Doe"),
-			Email:         stringPtr("invalid-email"),
+			ZipCode:       int32Ptr(12345),
+			Name:          stringPtr("Charlie Chaplin"),
+			Email:         stringPtr("charlie@example.com"),
 			Phonenumber:   stringPtr("1234567890"),
 			Password:      stringPtr("Password1!"),
 		}
 
-		err := customerDomain.CreateCustomerDomain(context.Background(), params)
-
-		if err == nil || err.Error() != "invalid email format" {
-			t.Errorf("expected error: invalid email format, got: %v", err)
-		}
-	})
-
-	// Test Case 2: Invalid Password
-	t.Run("Invalid Password", func(t *testing.T) {
-		params := generated.CreateCustomerParams{
-			StreetAddress: stringPtr("123 Main St"),
-			ZipCode:       intPtr(12345),
-			Name:          stringPtr("John Doe"),
-			Email:         stringPtr("john.doe@example.com"),
-			Phonenumber:   stringPtr("1234567890"),
-			Password:      stringPtr("pass"),
-		}
-
-		err := customerDomain.CreateCustomerDomain(context.Background(), params)
-
-		if err == nil || err.Error() != "password must be at least 8 characters long" {
-			t.Errorf("expected error: password must be at least 8 characters long, got: %v", err)
-		}
-	})
-
-	// Test Case 3: Valid Email and Password
-	t.Run("Valid Email and Password", func(t *testing.T) {
-		params := generated.CreateCustomerParams{
-			StreetAddress: stringPtr("123 Main St"),
-			ZipCode:       intPtr(12345),
-			Name:          stringPtr("John Doe"),
-			Email:         stringPtr("john.doe@example.com"),
-			Phonenumber:   stringPtr("1234567890"),
-			Password:      stringPtr("Password1!"),
-		}
-
+		// Expect the INSERT with proper arguments
 		mock.ExpectExec(regexp.QuoteMeta(`WITH new_address AS (
             INSERT INTO address (street_address, zip_code)
             VALUES ($1, $2)
@@ -166,14 +217,62 @@ func TestCreateCustomer(t *testing.T) {
 			).
 			WillReturnResult(pgxmock.NewResult("INSERT", 1))
 
+		// Act
 		err := customerDomain.CreateCustomerDomain(context.Background(), params)
 
+		// Assert
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-
 		if err := mock.ExpectationsWereMet(); err != nil {
-			t.Errorf("unfulfilled expectations: %v", err)
+			t.Errorf("unmet mock expectations: %v", err)
+		}
+	})
+
+	t.Run("Invalid Email", func(t *testing.T) {
+		// Arrange
+		params := generated.CreateCustomerParams{
+			StreetAddress: stringPtr("123 Main St"),
+			ZipCode:       int32Ptr(12345),
+			Name:          stringPtr("Invalid Email Person"),
+			Email:         stringPtr("not-an-email"),
+			Phonenumber:   stringPtr("1234567890"),
+			Password:      stringPtr("Password1!"),
+		}
+
+		// Act
+		err := customerDomain.CreateCustomerDomain(context.Background(), params)
+
+		// Assert
+		if err == nil {
+			t.Fatalf("expected invalid email error, got nil")
+		}
+		// You can check the exact error message if you throw custom errors
+		if err.Error() != "invalid email format" {
+			t.Errorf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("Invalid Password", func(t *testing.T) {
+		// Arrange
+		params := generated.CreateCustomerParams{
+			StreetAddress: stringPtr("123 Main St"),
+			ZipCode:       int32Ptr(12345),
+			Name:          stringPtr("Weak Password Person"),
+			Email:         stringPtr("weak.pass@example.com"),
+			Phonenumber:   stringPtr("1234567890"),
+			Password:      stringPtr("123"), // obviously too short
+		}
+
+		// Act
+		err := customerDomain.CreateCustomerDomain(context.Background(), params)
+
+		// Assert
+		if err == nil {
+			t.Fatalf("expected invalid password error, got nil")
+		}
+		if err.Error() != "password must be at least 8 characters long" {
+			t.Errorf("unexpected error: %v", err)
 		}
 	})
 }
