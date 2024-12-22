@@ -3,8 +3,10 @@ package domain
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"testing"
 
+	"github.com/go-redis/redis/v8"
 	"github.com/go-redis/redismock/v8"
 	"github.com/rasm445f/soft-exam-2/db"
 )
@@ -109,6 +111,169 @@ func TestAddItemDomain(t *testing.T) {
 		err := domain.AddItemDomain(context.Background(), itemParams)
 		if err == nil {
 			t.Errorf("expected error: %v", err)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+}
+
+func TestUpdateCartDomain(t *testing.T) {
+	redisDb, mock := redismock.NewClientMock()
+	defer redisDb.Close()
+
+	repo := db.NewShoppingCartRepository(redisDb)
+	domain := NewShoppingCartDomain(repo)
+
+	cart := &db.ShoppingCart{
+		CustomerId:   123,
+		RestaurantId: 456,
+		Items: []db.ShoppingCartItem{
+			{
+				Id:       1,
+				Name:     "Sample Item",
+				Price:    30.0,
+				Quantity: 2,
+			},
+		},
+		TotalAmount: 60.0,
+		VatAmount:   12.0,
+	}
+
+	cartData, err := json.Marshal(cart)
+	if err != nil {
+		t.Fatalf("unexpected error marshalling cart: %v", err)
+	}
+
+	t.Run("update item quantity", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).SetVal(string(cartData))
+
+		// Modify item quantity
+		updatedQuantity := 3
+		cart.Items[0].Quantity = updatedQuantity
+		cart.TotalAmount = cart.Items[0].Price * float64(updatedQuantity)
+		cart.VatAmount = cart.TotalAmount * 0.20
+
+		updatedCartData, err := json.Marshal(cart)
+		if err != nil {
+			t.Fatalf("unexpected error marshalling cart: %v", err)
+		}
+
+		mock.ExpectSet(cartKey, updatedCartData, 0).SetVal("OK")
+
+		err = domain.UpdateCartDomain(context.Background(), 123, 1, updatedQuantity)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	t.Run("remove item from cart", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).SetVal(string(cartData))
+
+		// Remove item
+		cart.Items = []db.ShoppingCartItem{}
+		cart.TotalAmount = 0
+		cart.VatAmount = 0
+
+		updatedCartData, err := json.Marshal(cart)
+		if err != nil {
+			t.Fatalf("unexpected error marshalling cart: %v", err)
+		}
+
+		mock.ExpectSet(cartKey, updatedCartData, 0).SetVal("OK")
+
+		err = domain.UpdateCartDomain(context.Background(), 123, 1, 0)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+}
+
+func TestViewCartDomain(t *testing.T) {
+	redisDb, mock := redismock.NewClientMock()
+	defer redisDb.Close()
+
+	repo := db.NewShoppingCartRepository(redisDb)
+	domain := NewShoppingCartDomain(repo)
+
+	cart := &db.ShoppingCart{
+		CustomerId:   123,
+		RestaurantId: 456,
+		Items: []db.ShoppingCartItem{
+			{
+				Id:       1,
+				Name:     "Sample Item",
+				Price:    30.0,
+				Quantity: 2,
+			},
+		},
+		TotalAmount: 60.0,
+		VatAmount:   12.0,
+	}
+
+	cartData, err := json.Marshal(cart)
+	if err != nil {
+		t.Fatalf("unexpected error marshalling cart: %v", err)
+	}
+
+	t.Run("view existing cart", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).SetVal(string(cartData))
+
+		result, err := domain.ViewCartDomain(context.Background(), 123)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+
+		if result.CustomerId != cart.CustomerId || result.TotalAmount != cart.TotalAmount {
+			t.Errorf("expected %v, got %v", cart, result)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	t.Run("view non-existing cart", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).RedisNil()
+
+		_, err := domain.ViewCartDomain(context.Background(), 123)
+		if err == nil {
+			t.Errorf("expected error, got nil")
+		}
+
+		if !errors.Is(err, redis.Nil) {
+			t.Errorf("expected redis.Nil, got %v", err)
+		}
+	})
+}
+
+func TestClearCartDomain(t *testing.T) {
+	redisDb, mock := redismock.NewClientMock()
+	defer redisDb.Close()
+
+	repo := db.NewShoppingCartRepository(redisDb)
+	domain := NewShoppingCartDomain(repo)
+
+	t.Run("successfully clear cart", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectDel(cartKey).SetVal(1)
+
+		err := domain.ClearCartDomain(context.Background(), 123)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
 		}
 
 		if err := mock.ExpectationsWereMet(); err != nil {

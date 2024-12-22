@@ -13,10 +13,10 @@ import (
 )
 
 type ShoppingCartHandler struct {
-	domain *domain.ShoppingCartDomain
+	domain domain.ShoppingCartPort
 }
 
-func NewShoppingCartHandler(domain *domain.ShoppingCartDomain) *ShoppingCartHandler {
+func NewShoppingCartHandler(domain domain.ShoppingCartPort) *ShoppingCartHandler {
 	return &ShoppingCartHandler{domain: domain}
 }
 
@@ -77,14 +77,16 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 		ctx := r.Context()
 
 		customerIdStr := r.PathValue("customerId")
+		fmt.Printf("customerId: %v\n", customerIdStr)
 		itemIdstr := r.PathValue("itemId")
+		fmt.Printf("itemid: %v \n", itemIdstr)
 		customerId, err := strconv.Atoi(customerIdStr)
 		if err != nil {
 			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
 		}
 		itemId, err := strconv.Atoi(itemIdstr)
 		if err != nil {
-			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
+			http.Error(w, "Malformed item_id", http.StatusBadRequest)
 		}
 
 		var req UpdateQuantityRequest
