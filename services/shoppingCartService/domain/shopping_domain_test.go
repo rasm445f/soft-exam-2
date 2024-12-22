@@ -104,13 +104,30 @@ func TestAddItemDomain(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 	})
+
 	t.Run("check quantity", func(t *testing.T) {
 		itemParams.Quantity = 0
 
 		// should return error when quantity is set to 0
-		err := domain.AddItemDomain(context.Background(), itemParams)
-		if err == nil {
-			t.Errorf("expected error: %v", err)
+		got := domain.AddItemDomain(context.Background(), itemParams)
+		want := "quantity must be greater than 0"
+		if got.Error() != want {
+			t.Errorf("want '%v' got '%v'", want, got)
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("unmet expectations: %s", err)
+		}
+	})
+
+	t.Run("check negative quantity", func(t *testing.T) {
+		itemParams.Quantity = -1
+
+		// should return error when quantity is set to -1
+		got := domain.AddItemDomain(context.Background(), itemParams)
+		want := "quantity must be greater than 0"
+		if got.Error() != want {
+			t.Errorf("want '%v' got '%v'", want, got)
 		}
 
 		if err := mock.ExpectationsWereMet(); err != nil {
