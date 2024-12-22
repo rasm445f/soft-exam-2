@@ -4,6 +4,9 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -38,7 +41,14 @@ func (m *MockShoppingCartDomain) ViewCartDomain(ctx context.Context, customerId 
 	if m.ViewCartDomainFunc != nil {
 		return m.ViewCartDomainFunc(ctx, customerId)
 	}
-	return nil, nil
+	cart := db.ShoppingCart{
+		CustomerId:   customerId,
+		RestaurantId: 1,
+		TotalAmount:  20,
+		VatAmount:    4,
+		Items:        []db.ShoppingCartItem{},
+	}
+	return &cart, nil
 }
 
 func (m *MockShoppingCartDomain) ClearCartDomain(ctx context.Context, customerId int) error {
@@ -49,13 +59,7 @@ func (m *MockShoppingCartDomain) ClearCartDomain(ctx context.Context, customerId
 }
 
 func TestAddItem(t *testing.T) {
-	mockDomain := &MockShoppingCartDomain{
-		// Actually dont need to specify since the function is defined above
-		// AddItemDomainFunc: func(ctx context.Context, params domain.AddItemParams) error {
-		// 	return nil
-		// },
-	}
-
+	mockDomain := &MockShoppingCartDomain{}
 	handler := NewShoppingCartHandler(mockDomain)
 
 	t.Run("status 201", func(t *testing.T) {
@@ -86,6 +90,54 @@ func TestAddItem(t *testing.T) {
 		}
 	})
 
+	t.Run("invalid request body", func(t *testing.T) {
+		reqBody := `{"itemID":123` // malformed JSON
+		r := httptest.NewRequest(http.MethodPost, "/add-item", bytes.NewBuffer([]byte(reqBody)))
+		w := httptest.NewRecorder()
+
+		handler.AddItem().ServeHTTP(w, r)
+
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("expected status %v, got %v", http.StatusBadRequest, w.Code)
+		}
+
+		expectedBody := "Invalid request body\n"
+		if w.Body.String() != expectedBody {
+			t.Errorf("expected body %q, got %q", expectedBody, w.Body.String())
+		}
+	})
+
+	t.Run("domain error", func(t *testing.T) {
+		mockDomain := &MockShoppingCartDomain{
+			AddItemDomainFunc: func(ctx context.Context, params domain.AddItemParams) error {
+				return errors.New("some domain error")
+			},
+		}
+		handler := NewShoppingCartHandler(mockDomain)
+
+		item := domain.AddItemParams{
+			CustomerId:   123,
+			RestaurantId: 456,
+			Name:         "ting",
+			Price:        1,
+			Quantity:     1,
+		}
+
+		itemJSON, _ := json.Marshal(item)
+		r := httptest.NewRequest(http.MethodPost, "/add-item", bytes.NewBuffer([]byte(itemJSON)))
+		w := httptest.NewRecorder()
+
+		handler.AddItem().ServeHTTP(w, r)
+
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("expected status %v, got %v", http.StatusBadRequest, w.Code)
+		}
+
+		expectedBody := "some domain error\n"
+		if w.Body.String() != expectedBody {
+			t.Errorf("expected body %q, got %q", expectedBody, w.Body.String())
+		}
+	})
 }
 
 func TestUpdateCartHandler(t *testing.T) {
@@ -109,10 +161,8 @@ func TestUpdateCartHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
 
 	// Create a new HTTP request
-	req, err := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(updateRequestJSON))
-	if err != nil {
-		t.Error(err)
-	}
+	// req, _ := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(updateRequestJSON))
+	req := httptest.NewRequest(http.MethodPatch, "/", bytes.NewBuffer(updateRequestJSON))
 	req.SetPathValue("customerId", "123")
 	req.SetPathValue("itemId", "456")
 	req.Header.Set("Content-Type", "application/json")
@@ -123,6 +173,51 @@ func TestUpdateCartHandler(t *testing.T) {
 	got := rec.Result().StatusCode
 	want := http.StatusOK
 	// Assertions
+	if got != want {
+		t.Fatalf("expected status %v, got %v", want, got)
+	}
+}
+
+func TestViewCart(t *testing.T) {
+	mockDomain := &MockShoppingCartDomain{}
+	handler := NewShoppingCartHandler(mockDomain)
+	rec := httptest.NewRecorder()
+
+	// Create a new HTTP request
+	req, _ := http.NewRequest(http.MethodGet, "", nil)
+	req.SetPathValue("customerId", "123")
+	handler.ViewCart().ServeHTTP(rec, req)
+
+	// Assertions
+	got := rec.Result().StatusCode
+	want := http.StatusOK
+	if got != want {
+		t.Fatalf("expected status %v, got %v", want, got)
+	}
+
+	// TODO: check the body
+	body, err := io.ReadAll(rec.Result().Body)
+	if err != nil {
+		t.Error(err)
+	}
+	defer rec.Result().Body.Close()
+
+	fmt.Println("ting", string(body))
+}
+
+func TestClearCart(t *testing.T) {
+	mockDomain := &MockShoppingCartDomain{}
+	handler := NewShoppingCartHandler(mockDomain)
+	rec := httptest.NewRecorder()
+
+	// Create a new HTTP request
+	req, _ := http.NewRequest(http.MethodDelete, "", nil)
+	req.SetPathValue("customerId", "123")
+	handler.ClearCart().ServeHTTP(rec, req)
+
+	// Assertions
+	got := rec.Result().StatusCode
+	want := http.StatusOK
 	if got != want {
 		t.Fatalf("expected status %v, got %v", want, got)
 	}

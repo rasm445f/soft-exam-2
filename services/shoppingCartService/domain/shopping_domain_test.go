@@ -173,6 +173,25 @@ func TestUpdateCartDomain(t *testing.T) {
 		}
 	})
 
+	t.Run("negative quantity", func(t *testing.T) {
+		got := domain.UpdateCartDomain(context.Background(), 123, 1, -1)
+		want := "quantity cannot be negative"
+		if got.Error() != want {
+			t.Errorf("want '%v' got '%v'", want, got)
+		}
+	})
+
+	t.Run("non-existing itemId", func(t *testing.T) {
+		cartKey := "cart:123"
+		mock.ExpectGet(cartKey).SetVal(string(cartData))
+
+		got := domain.UpdateCartDomain(context.Background(), 123, 69, 2)
+		want := "item not found in cart"
+		if got.Error() != want {
+			t.Errorf("want '%v' got '%v'", want, got)
+		}
+	})
+
 	t.Run("remove item from cart", func(t *testing.T) {
 		cartKey := "cart:123"
 		mock.ExpectGet(cartKey).SetVal(string(cartData))
