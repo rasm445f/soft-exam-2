@@ -3,15 +3,13 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"strings"
 	"testing"
 
 	// "github.com/jackc/pgx/v5/pgconn"
-	"github.com/rasm445f/soft-exam-2/broker"
+
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
 
@@ -62,7 +60,7 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/restaurants", nil)
 		rec := httptest.NewRecorder()
-
+		
 		// Act
 		handler.GetAllRestaurants()(rec, req)
 
@@ -128,6 +126,7 @@ func TestGetRestaurantByIdHandler(t *testing.T) {
 		// Create a request and simulate the expected path
 		req := httptest.NewRequest(http.MethodGet, "/api/restaurants/1", nil)
 		rec := httptest.NewRecorder()
+		req.SetPathValue("restaurantId", "1")
 
 		// Act
 		handler.GetRestaurantById()(rec, req)
@@ -146,6 +145,7 @@ func TestGetRestaurantByIdHandler(t *testing.T) {
 		// Create a request and simulate the expected path
 		req := httptest.NewRequest(http.MethodGet, "/api/restaurants/99", nil)
 		rec := httptest.NewRecorder()
+		req.SetPathValue("restaurantId", "99")
 
 		// Act
 		handler.GetRestaurantById()(rec, req)
@@ -172,6 +172,7 @@ func TestGetMenuItemsByRestaurantHandler(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/restaurants/1/menu-items", nil)
 		rec := httptest.NewRecorder()
+		req.SetPathValue("restaurantId", "1")
 
 		// Act
 		handler.GetMenuItemsByRestaurant()(rec, req)
@@ -211,6 +212,7 @@ func TestFilterRestaurantByCategoryHandler(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/filter/Pizza", nil)
 		rec := httptest.NewRecorder()
+		req.SetPathValue("category", "Pizza")
 
 		// Act
 		handler.FilterRestaurantByCategory()(rec, req)
