@@ -93,7 +93,7 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 			return
 		}
 		if err := h.domain.UpdateCartDomain(ctx, customerId, itemId, req.Quantity); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)

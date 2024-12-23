@@ -141,11 +141,7 @@ func TestAddItem(t *testing.T) {
 }
 
 func TestUpdateCartHandler(t *testing.T) {
-	mockDomain := &MockShoppingCartDomain{
-		// UpdateCartDomainFunc: func(ctx context.Context, customerId, itemID, quantity int) error {
-		// 	return nil
-		// },
-	}
+	mockDomain := &MockShoppingCartDomain{}
 	handler := NewShoppingCartHandler(mockDomain)
 
 	// Test data
@@ -157,25 +153,66 @@ func TestUpdateCartHandler(t *testing.T) {
 		t.Error(err)
 	}
 
-	// Create a ResponseRecorder
-	rec := httptest.NewRecorder()
+	t.Run("update cart", func(t *testing.T) {
+		// Create a ResponseRecorder
+		rec := httptest.NewRecorder()
+		// Create a new HTTP request
+		// req, _ := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(updateRequestJSON))
+		req := httptest.NewRequest(http.MethodPatch, "/", bytes.NewBuffer(updateRequestJSON))
+		req.SetPathValue("customerId", "123")
+		req.SetPathValue("itemId", "456")
+		req.Header.Set("Content-Type", "application/json")
 
-	// Create a new HTTP request
-	// req, _ := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(updateRequestJSON))
-	req := httptest.NewRequest(http.MethodPatch, "/", bytes.NewBuffer(updateRequestJSON))
-	req.SetPathValue("customerId", "123")
-	req.SetPathValue("itemId", "456")
-	req.Header.Set("Content-Type", "application/json")
+		// call the handler function with the recorder and request
+		handler.UpdateCart().ServeHTTP(rec, req)
 
-	// call the handler function with the recorder and request
-	handler.UpdateCart().ServeHTTP(rec, req)
+		got := rec.Result().StatusCode
+		want := http.StatusOK
+		// Assertions
+		if got != want {
+			t.Fatalf("want status %v, got %v", want, got)
+		}
+	})
+	t.Run("malformed path values", func(t *testing.T) {
+		// Create a ResponseRecorder
+		rec := httptest.NewRecorder()
+		req := httptest.NewRequest(http.MethodPatch, "/", bytes.NewBuffer(updateRequestJSON))
+		req.SetPathValue("customerId", "somerandomtext")
+		req.SetPathValue("itemId", "moretext")
+		req.Header.Set("Content-Type", "application/json")
 
-	got := rec.Result().StatusCode
-	want := http.StatusOK
-	// Assertions
-	if got != want {
-		t.Fatalf("expected status %v, got %v", want, got)
-	}
+		// call the handler function with the recorder and request
+		handler.UpdateCart().ServeHTTP(rec, req)
+
+		got := rec.Result().StatusCode
+		want := http.StatusBadRequest
+		// Assertions
+		if got != want {
+			t.Fatalf("want status %v, got %v", want, got)
+		}
+
+	})
+	t.Run("malformed json body", func(t *testing.T) {
+		reqBody := `{"itemID":123` // malformed JSON
+		// Create a ResponseRecorder
+		rec := httptest.NewRecorder()
+		// Create a new HTTP request
+		// req, _ := http.NewRequest(http.MethodPatch, "", bytes.NewBuffer(updateRequestJSON))
+		req := httptest.NewRequest(http.MethodPatch, "/", bytes.NewBuffer([]byte(reqBody)))
+		req.SetPathValue("customerId", "123")
+		req.SetPathValue("itemId", "456")
+		req.Header.Set("Content-Type", "application/json")
+
+		// call the handler function with the recorder and request
+		handler.UpdateCart().ServeHTTP(rec, req)
+
+		got := rec.Result().StatusCode
+		want := http.StatusBadRequest
+		// Assertions
+		if got != want {
+			t.Fatalf("want status %v, got %v", want, got)
+		}
+	})
 }
 
 func TestViewCart(t *testing.T) {
