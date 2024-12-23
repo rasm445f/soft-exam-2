@@ -11,6 +11,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db"
 	"github.com/rasm445f/soft-exam-2/domain"
 )
@@ -258,4 +259,43 @@ func TestClearCart(t *testing.T) {
 	if got != want {
 		t.Fatalf("expected status %v, got %v", want, got)
 	}
+}
+
+func TestConsumeMenuItem(t *testing.T) {
+	mockDomain := &MockShoppingCartDomain{}
+	handler := NewShoppingCartHandler(mockDomain)
+	// setup broker and simulate published message to consume
+	broker.InitRabbitMQ()
+	defer broker.CloseRabbitMQ()
+
+	menuItemSelection := domain.AddItemParams{
+		CustomerId:   1,
+		RestaurantId: 1,
+		Name:         "pizza",
+		Price:        20,
+		Quantity:     1,
+	}
+
+	event := broker.Event{
+		Type:    broker.MenuItemSelected,
+		Payload: menuItemSelection,
+	}
+	err := broker.Publish("menu_item_selected_queue", event)
+	if err != nil {
+		t.Error(err)
+	}
+
+	rec := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodGet, "", nil)
+	handler.ConsumeMenuItem().ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
+	}
+	got, _ := io.ReadAll(rec.Body)
+	want := `{"message": "Menu item added to cart successfully}`
+	if string(got) != want {
+		t.Errorf("expected body %q, got %q", want, string(got))
+	}
+
 }
