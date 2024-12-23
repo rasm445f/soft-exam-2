@@ -8,6 +8,20 @@ import (
 	"github.com/rasm445f/soft-exam-2/db"
 )
 
+type ShoppingCartPort interface {
+	// AddItemDomain adds an item to the shopping cart.
+	AddItemDomain(ctx context.Context, itemParams AddItemParams) error
+
+	// UpdateCartDomain updates the quantity of an item in the cart.
+	UpdateCartDomain(ctx context.Context, customerId, itemID, quantity int) error
+
+	// ViewCartDomain retrieves the shopping cart for a customer.
+	ViewCartDomain(ctx context.Context, customerId int) (*db.ShoppingCart, error)
+
+	// ClearCartDomain clears the shopping cart for a customer.
+	ClearCartDomain(ctx context.Context, customerId int) error
+}
+
 type ShoppingCartDomain struct {
 	repo *db.ShoppingCartRepository
 }

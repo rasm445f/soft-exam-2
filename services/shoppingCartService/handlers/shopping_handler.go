@@ -13,10 +13,10 @@ import (
 )
 
 type ShoppingCartHandler struct {
-	domain *domain.ShoppingCartDomain
+	domain domain.ShoppingCartPort
 }
 
-func NewShoppingCartHandler(domain *domain.ShoppingCartDomain) *ShoppingCartHandler {
+func NewShoppingCartHandler(domain domain.ShoppingCartPort) *ShoppingCartHandler {
 	return &ShoppingCartHandler{domain: domain}
 }
 
@@ -84,7 +84,7 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 		}
 		itemId, err := strconv.Atoi(itemIdstr)
 		if err != nil {
-			http.Error(w, "Malformed customer_id", http.StatusBadRequest)
+			http.Error(w, "Malformed item_id", http.StatusBadRequest)
 		}
 
 		var req UpdateQuantityRequest
@@ -93,7 +93,7 @@ func (h *ShoppingCartHandler) UpdateCart() http.HandlerFunc {
 			return
 		}
 		if err := h.domain.UpdateCartDomain(ctx, customerId, itemId, req.Quantity); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 		w.WriteHeader(http.StatusOK)
