@@ -65,7 +65,7 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		// Act
-		handler.GetAllRestaurants()(rec, req)
+		handler.GetAllRestaurants().ServeHTTP(rec, req)
 
 		// Assert
 		want := []generated.Restaurant{
@@ -98,7 +98,7 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		// Act
-		handler.GetAllRestaurants()(rec, req)
+		handler.GetAllRestaurants().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusInternalServerError {
@@ -132,7 +132,7 @@ func TestGetRestaurantByIdHandler(t *testing.T) {
 		req.SetPathValue("restaurantId", "1")
 
 		// Act
-		handler.GetRestaurantById()(rec, req)
+		handler.GetRestaurantById().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusOK {
@@ -151,7 +151,7 @@ func TestGetRestaurantByIdHandler(t *testing.T) {
 		req.SetPathValue("restaurantId", "99")
 
 		// Act
-		handler.GetRestaurantById()(rec, req)
+		handler.GetRestaurantById().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusNotFound {
@@ -178,7 +178,7 @@ func TestGetMenuItemsByRestaurantHandler(t *testing.T) {
 		req.SetPathValue("restaurantId", "1")
 
 		// Act
-		handler.GetMenuItemsByRestaurant()(rec, req)
+		handler.GetMenuItemsByRestaurant().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusOK {
@@ -191,7 +191,7 @@ func TestGetMenuItemsByRestaurantHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		// Act
-		handler.GetMenuItemsByRestaurant()(rec, req)
+		handler.GetMenuItemsByRestaurant().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusBadRequest {
@@ -218,7 +218,7 @@ func TestFilterRestaurantByCategoryHandler(t *testing.T) {
 		req.SetPathValue("category", "Pizza")
 
 		// Act
-		handler.FilterRestaurantByCategory()(rec, req)
+		handler.FilterRestaurantByCategory().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusOK {
@@ -231,7 +231,7 @@ func TestFilterRestaurantByCategoryHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		// Act
-		handler.FilterRestaurantByCategory()(rec, req)
+		handler.FilterRestaurantByCategory().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusBadRequest {
@@ -271,7 +271,7 @@ WHERE restaurantid = \$1 AND id = \$2`).
 	req := httptest.NewRequest(http.MethodPost, "/api/restaurants/menu/select", bytes.NewBuffer(itemJSON))
 	rec := httptest.NewRecorder()
 
-	handler.SelectMenuItem()(rec, req)
+	handler.SelectMenuItem().ServeHTTP(rec, req)
 	if rec.Code != http.StatusOK {
 		t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
 	}
