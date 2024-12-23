@@ -139,7 +139,7 @@ func (q *Queries) FetchAllRestaurants(ctx context.Context) ([]Restaurant, error)
 
 const fetchMenuItemsByRestaurantId = `-- name: FetchMenuItemsByRestaurantId :many
 SELECT id, restaurantid, name, price, description
-from menuitem
+FROM menuitem
 WHERE restaurantid = $1
 `
 
