@@ -14,7 +14,7 @@ func SetupTestMocks(t *testing.T) (pgxmock.PgxPoolIface, *generated.Queries, *Re
 	if err != nil {
 		t.Fatalf("failed to create pgxmock pool: %v", err)
 	}
-	
+
 	queries := generated.New(mock)
 	domain := NewRestaurantDomain(queries)
 
@@ -47,7 +47,7 @@ func TestGetAllRestaurantsDomain(t *testing.T) {
 			AddRow(int32(2), "Sushi World", float64Ptr(4.8), stringPtr("Sushi"), stringPtr("Second Street 456"), int32Ptr(2900))
 		mock.ExpectQuery(`SELECT\s+r\.id,\s+r\.name,\s+r\.rating,\s+r\.category,\s+r\.address,\s+r\.zip_code\s+FROM\s+restaurant\s+r\s+JOIN\s+zipcode\s+a\s+ON\s+r\.zip_code\s+=\s+a\.zip_code`).
 			WillReturnRows(rows)
-		
+
 		// Act
 		got, err := domain.GetAllRestaurantsDomain(context.Background())
 
@@ -71,7 +71,7 @@ func TestGetAllRestaurantsDomain(t *testing.T) {
 	t.Run("No Restaurants", func(t *testing.T) {
 		rows := pgxmock.NewRows([]string{"id", "name", "rating", "category", "address", "zip_code"})
 		mock.ExpectQuery(`SELECT\s+r\.id,\s+r\.name,\s+r\.rating,\s+r\.category,\s+r\.address,\s+r\.zip_code\s+FROM\s+restaurant\s+r\s+JOIN\s+zipcode\s+a\s+ON\s+r\.zip_code\s+=\s+a\.zip_code`).
-		WillReturnRows(rows)
+			WillReturnRows(rows)
 
 		// Act
 		got, err := domain.GetAllRestaurantsDomain(context.Background())
@@ -92,7 +92,7 @@ func TestGetAllRestaurantsDomain(t *testing.T) {
 
 	t.Run("Database Error", func(t *testing.T) {
 		mock.ExpectQuery(`SELECT\s+r\.id,\s+r\.name,\s+r\.rating,\s+r\.category,\s+r\.address,\s+r\.zip_code\s+FROM\s+restaurant\s+r\s+JOIN\s+zipcode\s+a\s+ON\s+r\.zip_code\s+=\s+a\.zip_code`).
-		WillReturnError(context.DeadlineExceeded)
+			WillReturnError(context.DeadlineExceeded)
 
 		// Act
 		got, err := domain.GetAllRestaurantsDomain(context.Background())
@@ -146,14 +146,13 @@ func TestGetRestaurantByIdDomain(t *testing.T) {
 	})
 
 	t.Run("Invalid Restaurant ID", func(t *testing.T) {
-		got, err := domain.GetRestaurantByIdDomain(context.Background(), int32(0))
+		_, got := domain.GetRestaurantByIdDomain(context.Background(), int32(0))
+		want := "invalid restaurant id"
 
-		if err == nil {
-			t.Errorf("expected nil, got nil")
+		if got.Error() != want {
+			t.Errorf("want '%v' got '%v'", want, got)
 		}
-		if got != nil {
-			t.Errorf("expected nil, got: %+v", got)
-		}
+
 	})
 
 	t.Run("Non-Existent ID", func(t *testing.T) {
@@ -162,7 +161,6 @@ func TestGetRestaurantByIdDomain(t *testing.T) {
 			WillReturnError(context.DeadlineExceeded)
 
 		got, err := domain.GetRestaurantByIdDomain(context.Background(), int32(999))
-
 
 		if err == nil || err.Error() != "restaurant not found" {
 			t.Fatalf("expected error 'restaurant not found' got: %v", err)
@@ -227,7 +225,7 @@ func TestGetMenuItemsByRestaurantIdDomain(t *testing.T) {
 			t.Errorf("unmet mock expectations: %v", err)
 		}
 	})
-	
+
 	t.Run("Database Error", func(t *testing.T) {
 		mock.ExpectQuery(`SELECT id, restaurantid, name, price, description FROM menuitem WHERE restaurantid = \$1`).
 			WithArgs(int32(1)).
@@ -262,7 +260,7 @@ func TestGetMenuItemsByRestaurantAndIdDomain(t *testing.T) {
 		// Act
 		params := generated.GetMenuItemByRestaurantAndIdParams{
 			Restaurantid: int32(1),
-			ID: int32(1),
+			ID:           int32(1),
 		}
 		got, err := domain.GetMenuItemByRestaurantAndIdDomain(context.Background(), params)
 
@@ -293,7 +291,7 @@ func TestGetMenuItemsByRestaurantAndIdDomain(t *testing.T) {
 
 		params := generated.GetMenuItemByRestaurantAndIdParams{
 			Restaurantid: int32(1),
-			ID: int32(99),
+			ID:           int32(99),
 		}
 		got, err := domain.GetMenuItemByRestaurantAndIdDomain(context.Background(), params)
 
@@ -312,7 +310,7 @@ func TestGetMenuItemsByRestaurantAndIdDomain(t *testing.T) {
 func TestGetAllCategoriesDomain(t *testing.T) {
 	mock, _, domain := SetupTestMocks(t)
 	defer CloseMocks(mock)
-	
+
 	t.Run("Valid Categories Data", func(t *testing.T) {
 		// Arrange mock data
 		rows := pgxmock.NewRows([]string{"category"}).
@@ -320,7 +318,7 @@ func TestGetAllCategoriesDomain(t *testing.T) {
 			AddRow(stringPtr("Sushi"))
 		mock.ExpectQuery(`SELECT DISTINCT category FROM restaurant WHERE category IS NOT NULL ORDER BY category`).
 			WillReturnRows(rows)
-		
+
 		// Act
 		got, err := domain.GetAllCategoriesDomain(context.Background())
 
@@ -405,7 +403,7 @@ func TestFilterRestaurantsByCategoryDomain(t *testing.T) {
 			t.Errorf("unmet mock expectations: %v", err)
 		}
 	})
-	
+
 	t.Run("Database Error", func(t *testing.T) {
 		mock.ExpectQuery(`SELECT id, name, rating, category, address, zip_code FROM restaurant WHERE category ILIKE \$1`).
 			WithArgs(stringPtr("NonExistent")).
@@ -421,4 +419,3 @@ func TestFilterRestaurantsByCategoryDomain(t *testing.T) {
 		}
 	})
 }
-

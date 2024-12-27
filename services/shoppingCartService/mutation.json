@@ -1,0 +1,301 @@
+{
+  "go_module": "github.com/rasm445f/soft-exam-2",
+  "files": [
+    {
+      "file_name": "db/commands.go",
+      "mutations": [
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 32,
+          "column": 9
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 15,
+          "column": 9
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 22,
+          "column": 57
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 17,
+          "column": 16
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 48,
+          "column": 18
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 43,
+          "column": 9
+        }
+      ]
+    },
+    {
+      "file_name": "db/db_conn.go",
+      "mutations": [
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 16,
+          "column": 15
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 19,
+          "column": 15
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 29,
+          "column": 12
+        }
+      ]
+    },
+    {
+      "file_name": "domain/shopping_domain.go",
+      "mutations": [
+        {
+          "type": "ARITHMETIC_BASE",
+          "status": "KILLED",
+          "line": 45,
+          "column": 34
+        },
+        {
+          "type": "ARITHMETIC_BASE",
+          "status": "KILLED",
+          "line": 47,
+          "column": 36
+        },
+        {
+          "type": "CONDITIONALS_BOUNDARY",
+          "status": "KILLED",
+          "line": 52,
+          "column": 25
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 52,
+          "column": 25
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 57,
+          "column": 9
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 64,
+          "column": 16
+        },
+        {
+          "type": "ARITHMETIC_BASE",
+          "status": "KILLED",
+          "line": 70,
+          "column": 29
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 89,
+          "column": 9
+        },
+        {
+          "type": "CONDITIONALS_BOUNDARY",
+          "status": "KILLED",
+          "line": 84,
+          "column": 14
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 84,
+          "column": 14
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 96,
+          "column": 23
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 97,
+          "column": 16
+        },
+        {
+          "type": "ARITHMETIC_BASE",
+          "status": "KILLED",
+          "line": 99,
+          "column": 53
+        }
+      ]
+    },
+    {
+      "file_name": "handlers/shopping_handler.go",
+      "mutations": [
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 40,
+          "column": 56
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 45,
+          "column": 52
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 82,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 86,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 91,
+          "column": 55
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 95,
+          "column": 83
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 119,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 124,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 130,
+          "column": 58
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 154,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 158,
+          "column": 60
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 187,
+          "column": 11
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 239,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 245,
+          "column": 66
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 252,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 264,
+          "column": 10
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 180,
+          "column": 18
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 205,
+          "column": 53
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "KILLED",
+          "line": 195,
+          "column": 55
+        }
+      ]
+    },
+    {
+      "file_name": "main.go",
+      "mutations": [
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 20,
+          "column": 9
+        },
+        {
+          "type": "CONDITIONALS_NEGATION",
+          "status": "NOT COVERED",
+          "line": 58,
+          "column": 9
+        }
+      ]
+    }
+  ],
+  "test_efficacy": 100,
+  "mutations_coverage": 79.06976744186046,
+  "mutants_total": 34,
+  "mutants_killed": 34,
+  "mutants_lived": 0,
+  "mutants_not_viable": 0,
+  "mutants_not_covered": 9,
+  "elapsed_time": 7.502967316,
+  "mutator_statistics": {
+    "arithmetic_base": 4,
+    "conditionals_negation": 37,
+    "conditionals_boundary": 2
+  }
+}
