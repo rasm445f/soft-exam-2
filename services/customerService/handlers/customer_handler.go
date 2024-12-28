@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -11,10 +12,10 @@ import (
 )
 
 type CustomerHandler struct {
-	domain *domain.CustomerDomain
+	domain domain.CustomerPort
 }
 
-func NewCustomerHandler(domain *domain.CustomerDomain) *CustomerHandler {
+func NewCustomerHandler(domain domain.CustomerPort) *CustomerHandler {
 	return &CustomerHandler{domain: domain}
 }
 
@@ -227,7 +228,7 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 		err = h.domain.UpdateCustomerDomain(ctx, customerUpdates)
 		// Update the customer information in the database
 		if err != nil {
-			if err.Error() == "customer not found" {
+			if err == sql.ErrNoRows {
 				http.Error(w, "Customer not found", http.StatusNotFound)
 			} else {
 				http.Error(w, "Failed to update customer", http.StatusInternalServerError)
