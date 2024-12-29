@@ -11,6 +11,15 @@ import (
 	"github.com/rasm445f/soft-exam-2/mailer"
 )
 
+type CustomerPort interface {
+	GetAllCustomersDomain(ctx context.Context) ([]generated.GetAllCustomersRow, error)
+	GetCustomerByIdDomain(ctx context.Context, id int32) (generated.GetCustomerByIDRow, error)
+	DeleteCustomerDomain(ctx context.Context, id int32) error
+	CreateCustomerDomain(ctx context.Context, customerParams generated.CreateCustomerParams) error
+	UpdateCustomerDomain(ctx context.Context, customerParams generated.UpdateCustomerParams) error
+	UpdateAddress(ctx context.Context, addressParams generated.UpdateAddressParams) error
+}
+
 type CustomerDomain struct {
 	Queries *generated.Queries
 }

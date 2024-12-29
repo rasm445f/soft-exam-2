@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -11,10 +12,10 @@ import (
 )
 
 type CustomerHandler struct {
-	domain *domain.CustomerDomain
+	domain domain.CustomerPort
 }
 
-func NewCustomerHandler(domain *domain.CustomerDomain) *CustomerHandler {
+func NewCustomerHandler(domain domain.CustomerPort) *CustomerHandler {
 	return &CustomerHandler{domain: domain}
 }
 
@@ -190,8 +191,8 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		ctx := r.Context()
 
-		idStr := r.PathValue("id")
-		id, err := strconv.ParseInt(idStr, 10, 64)
+		idStr := r.PathValue("id")                 //source of tainted data
+		id, err := strconv.ParseInt(idStr, 10, 64) //works as validation of tainted data
 		if err != nil {
 			http.Error(w, "Invalid customer ID", http.StatusBadRequest)
 			log.Println("Error parsing customer ID:", err)
@@ -199,8 +200,8 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 		}
 
 		// Decode the incoming JSON request into a map to capture all fields
-		var updatePayload map[string]interface{}
-		if err := json.NewDecoder(r.Body).Decode(&updatePayload); err != nil {
+		var updatePayload map[string]interface{}                               //source of tainted data
+		if err := json.NewDecoder(r.Body).Decode(&updatePayload); err != nil { //works as validation of tainted data
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			log.Println("Error decoding request body:", err)
 			return
@@ -227,7 +228,7 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 		err = h.domain.UpdateCustomerDomain(ctx, customerUpdates)
 		// Update the customer information in the database
 		if err != nil {
-			if err.Error() == "customer not found" {
+			if err == sql.ErrNoRows {
 				http.Error(w, "Customer not found", http.StatusNotFound)
 			} else {
 				http.Error(w, "Failed to update customer", http.StatusInternalServerError)
@@ -262,6 +263,6 @@ func (h *CustomerHandler) UpdateCustomer() http.HandlerFunc {
 		// Return a success response
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Customer updated successfully"}`))
+		w.Write([]byte(`{"message": "Customer updated successfully"}`)) //returning json data therfore not a sink
 	}
 }
