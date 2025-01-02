@@ -3,6 +3,7 @@ package domain
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/rasm445f/soft-exam-2/db/generated"
 )
@@ -42,6 +43,7 @@ func (d *RestaurantDomain) GetRestaurantByIdDomain(ctx context.Context, restaura
 	}
 
 	row, err := d.repo.GetRestaurantById(ctx, restaurantId)
+	fmt.Printf("Query executed for ID: %d\n", restaurantId)
 	if err != nil {
 		return nil, errors.New("restaurant not found")
 	}

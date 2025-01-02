@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	// "github.com/jackc/pgx/v5/pgconn"
+
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
 
@@ -59,7 +60,7 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/restaurants", nil)
 		rec := httptest.NewRecorder()
-
+		
 		// Act
 		handler.GetAllRestaurants()(rec, req)
 
@@ -106,6 +107,132 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 		}
 		if err := mock.ExpectationsWereMet(); err != nil {
 			t.Errorf("unmet mock expectations: %v", err)
+		}
+	})
+}
+
+func TestGetRestaurantByIdHandler(t *testing.T) {
+	mock, handler := SetupTestMocks(t)
+	defer CloseMocks(mock)
+
+	t.Run("Valid Restaurant ID", func(t *testing.T) {
+		// Arrange
+		row := pgxmock.NewRows([]string{"id", "name", "rating", "category", "address", "zip_code"}).
+			AddRow(int32(1), "Pizza Paradise", float64Ptr(4.5), stringPtr("Pizza"), stringPtr("Main Street 123"), int32Ptr(2800))
+		mock.ExpectQuery(`SELECT id, name, rating, category, address, zip_code FROM restaurant WHERE id = \$1`).
+			WithArgs(int32(1)).
+			WillReturnRows(row)
+
+		// Create a request and simulate the expected path
+		req := httptest.NewRequest(http.MethodGet, "/api/restaurants/1", nil)
+		rec := httptest.NewRecorder()
+		req.SetPathValue("restaurantId", "1")
+
+		// Act
+		handler.GetRestaurantById()(rec, req)
+
+		// Assert
+		if rec.Code != http.StatusOK{
+			t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
+		}
+	})
+
+	t.Run("Non-Existent Restaurant ID", func(t *testing.T) {
+		// Arrange
+		mock.ExpectQuery(`SELECT id, name, rating, category, address, zip_code FROM restaurant WHERE id = \$1`).
+			WithArgs(int32(99))
+
+		// Create a request and simulate the expected path
+		req := httptest.NewRequest(http.MethodGet, "/api/restaurants/99", nil)
+		rec := httptest.NewRecorder()
+		req.SetPathValue("restaurantId", "99")
+
+		// Act
+		handler.GetRestaurantById()(rec, req)
+
+		// Assert
+		if rec.Code != http.StatusNotFound {
+			t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
+		}
+	})
+}
+
+func TestGetMenuItemsByRestaurantHandler(t *testing.T) {
+	mock, handler := SetupTestMocks(t)
+	defer CloseMocks(mock)
+
+	t.Run("Valid Restaurant ID", func(t *testing.T) {
+		// Arrange
+		rows := pgxmock.NewRows([]string{"id", "restaurantid", "name", "price", "description"}).
+			AddRow(int32(1), int32(1), "Cheese Pizza", float64(12.5), stringPtr("Delicious cheese pizza")).
+			AddRow(int32(2), int32(1), "Veggie Pizza", float64(10.0), stringPtr("Healthy veggie pizza"))
+		mock.ExpectQuery(`SELECT id, restaurantid, name, price, description FROM menuitem WHERE restaurantid = \$1`).
+			WithArgs(int32(1)).
+			WillReturnRows(rows)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/restaurants/1/menu-items", nil)
+		rec := httptest.NewRecorder()
+		req.SetPathValue("restaurantId", "1")
+
+		// Act
+		handler.GetMenuItemsByRestaurant()(rec, req)
+
+		// Assert
+		if rec.Code != http.StatusOK {
+			t.Fatalf("hot status %d, want %d", rec.Code, http.StatusOK)
+		}
+	})
+
+	t.Run("Invalid Restaurant Id for getting MenuItems", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/restaurants/abc/menu-items", nil)
+		rec := httptest.NewRecorder()
+
+		// Act
+		handler.GetMenuItemsByRestaurant()(rec, req)
+
+		// Assert
+		if rec.Code != http.StatusBadRequest {
+			t.Fatalf("got status %d, want %d", rec.Code, http.StatusBadRequest)
+		}
+	})
+}
+
+func TestFilterRestaurantByCategoryHandler(t *testing.T) {
+	mock, handler := SetupTestMocks(t)
+	defer CloseMocks(mock)
+
+	t.Run("Filter Restaurant by Category", func(t *testing.T) {
+		// Arrange
+		rows := pgxmock.NewRows([]string{"id", "name", "rating", "category", "address", "zip_code"}).
+			AddRow(int32(1), "Pizza Paradise", float64Ptr(4.5), stringPtr("Pizza"), stringPtr("Main Street 123"), int32Ptr(2800)).
+			AddRow(int32(2), "Sushi World", float64Ptr(4.8), stringPtr("Pizza"), stringPtr("Second Street 456"), int32Ptr(2900))
+		mock.ExpectQuery(`SELECT id, name, rating, category, address, zip_code FROM restaurant WHERE category ILIKE \$1`).
+			WithArgs(stringPtr("Pizza")).
+			WillReturnRows(rows)
+
+		req := httptest.NewRequest(http.MethodGet, "/api/filter/Pizza", nil)
+		rec := httptest.NewRecorder()
+		req.SetPathValue("category", "Pizza")
+
+		// Act
+		handler.FilterRestaurantByCategory()(rec, req)
+
+		// Assert
+		if rec.Code != http.StatusOK {
+			t.Fatalf("hot status %d, want %d", rec.Code, http.StatusOK)
+		}
+	})
+
+	t.Run("Invalid Category", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodGet, "/api/filter/", nil)
+		rec := httptest.NewRecorder()
+
+		// Act
+		handler.FilterRestaurantByCategory()(rec, req)
+
+		// Assert
+		if rec.Code != http.StatusBadRequest {
+			t.Fatalf("got status %d, want %d", rec.Code, http.StatusBadRequest)
 		}
 	})
 }
