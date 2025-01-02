@@ -32,7 +32,7 @@ jobs:
               RABBITMQ_DEFAULT_USER: guest
               RABBITMQ_DEFAULT_PASS: guest
             ports:
-              - 5672
+              - 5672:5672
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -48,8 +48,6 @@ jobs:
 
       - name: Run Tests, Vet, and Staticcheck
         working-directory: services/${{ matrix.service }}
-        env:
-          RABBITMQ_HOST: rabbitmq
         run: |
           go test ./...
           go vet ./...
