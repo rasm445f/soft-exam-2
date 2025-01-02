@@ -5,6 +5,7 @@ up:
 	docker-compose -f services/shoppingCartService/docker-compose.yml up -d
 	docker-compose -f broker/docker-compose.yml up -d
 	docker-compose -f apiGateway/docker-compose.yml up -d
+	docker-compose -f monitoring/docker-compose.yml up -d
 
 down:
 	docker-compose -f services/customerService/docker-compose.yml down
@@ -13,6 +14,7 @@ down:
 	docker-compose -f services/shoppingCartService/docker-compose.yml down
 	docker-compose -f broker/docker-compose.yml down
 	docker-compose -f apiGateway/docker-compose.yml down
+	docker-compose -f monitoring/docker-compose.yml down
 
 
 
