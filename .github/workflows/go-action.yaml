@@ -48,6 +48,8 @@ jobs:
 
       - name: Run Tests, Vet, and Staticcheck
         working-directory: services/${{ matrix.service }}
+        env:
+          RABBITMQ_HOST: rabbitmq
         run: |
           go test ./...
           go vet ./...

@@ -1,7 +1,10 @@
 package broker
 
 import (
+	"fmt"
 	"log"
+	"os"
+
 	"github.com/rabbitmq/amqp091-go"
 )
 
@@ -9,8 +12,14 @@ var conn *amqp091.Connection
 var channel *amqp091.Channel
 
 func InitRabbitMQ() {
+	rabbitMQHost := os.Getenv("RABBITMQ_HOST")
+	if rabbitMQHost == "" {
+		rabbitMQHost = "localhost" // Default to localhost for local runs
+	}
 	var err error
-	conn, err = amqp091.Dial("amqp://guest:guest@localhost:5672/")
+	rabbitMQURL := fmt.Sprintf("amqp://guest:guest@%s:5672/", rabbitMQHost)
+
+	conn, err = amqp091.Dial(rabbitMQURL)
 	if err != nil {
 		log.Fatalf("Failed to connect to RabbitMQ: %v", err)
 	}
@@ -33,3 +42,4 @@ func CloseRabbitMQ() {
 		_ = conn.Close()
 	}
 }
+
