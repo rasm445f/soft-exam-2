@@ -209,6 +209,8 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 
 			log.Printf("Successfully added MenuItem to shopping cart: %+v", item)
 		})
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"message": "Menu item added to cart successfully}`))
 	}
 }
 

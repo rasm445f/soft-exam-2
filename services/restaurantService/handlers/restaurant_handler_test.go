@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -10,6 +12,7 @@ import (
 
 	// "github.com/jackc/pgx/v5/pgconn"
 
+	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	"github.com/rasm445f/soft-exam-2/domain"
 
@@ -22,7 +25,7 @@ func SetupTestMocks(t *testing.T) (pgxmock.PgxPoolIface, *RestaurantHandler) {
 	if err != nil {
 		t.Fatalf("failed to create pgxmock pool: %v", err)
 	}
-	
+
 	queries := generated.New(mock)
 	restaurantDomain := domain.NewRestaurantDomain(queries)
 	handler := NewRestaurantHandler(restaurantDomain)
@@ -60,9 +63,9 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/restaurants", nil)
 		rec := httptest.NewRecorder()
-		
+
 		// Act
-		handler.GetAllRestaurants()(rec, req)
+		handler.GetAllRestaurants().ServeHTTP(rec, req)
 
 		// Assert
 		want := []generated.Restaurant{
@@ -93,9 +96,9 @@ func TestGetAllRestaurantsHandler(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/api/restaurants", nil)
 		rec := httptest.NewRecorder()
-	
+
 		// Act
-		handler.GetAllRestaurants()(rec, req)
+		handler.GetAllRestaurants().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusInternalServerError {
@@ -129,10 +132,10 @@ func TestGetRestaurantByIdHandler(t *testing.T) {
 		req.SetPathValue("restaurantId", "1")
 
 		// Act
-		handler.GetRestaurantById()(rec, req)
+		handler.GetRestaurantById().ServeHTTP(rec, req)
 
 		// Assert
-		if rec.Code != http.StatusOK{
+		if rec.Code != http.StatusOK {
 			t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
 		}
 	})
@@ -148,7 +151,7 @@ func TestGetRestaurantByIdHandler(t *testing.T) {
 		req.SetPathValue("restaurantId", "99")
 
 		// Act
-		handler.GetRestaurantById()(rec, req)
+		handler.GetRestaurantById().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusNotFound {
@@ -175,7 +178,7 @@ func TestGetMenuItemsByRestaurantHandler(t *testing.T) {
 		req.SetPathValue("restaurantId", "1")
 
 		// Act
-		handler.GetMenuItemsByRestaurant()(rec, req)
+		handler.GetMenuItemsByRestaurant().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusOK {
@@ -188,7 +191,7 @@ func TestGetMenuItemsByRestaurantHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		// Act
-		handler.GetMenuItemsByRestaurant()(rec, req)
+		handler.GetMenuItemsByRestaurant().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusBadRequest {
@@ -215,7 +218,7 @@ func TestFilterRestaurantByCategoryHandler(t *testing.T) {
 		req.SetPathValue("category", "Pizza")
 
 		// Act
-		handler.FilterRestaurantByCategory()(rec, req)
+		handler.FilterRestaurantByCategory().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusOK {
@@ -228,11 +231,53 @@ func TestFilterRestaurantByCategoryHandler(t *testing.T) {
 		rec := httptest.NewRecorder()
 
 		// Act
-		handler.FilterRestaurantByCategory()(rec, req)
+		handler.FilterRestaurantByCategory().ServeHTTP(rec, req)
 
 		// Assert
 		if rec.Code != http.StatusBadRequest {
 			t.Fatalf("got status %d, want %d", rec.Code, http.StatusBadRequest)
 		}
 	})
+}
+
+// integration test
+func TestSelectMenuItem(t *testing.T) {
+	mock, handler := SetupTestMocks(t)
+	defer CloseMocks(mock)
+
+	//instantiate broker
+	broker.InitRabbitMQ()
+	defer broker.CloseRabbitMQ()
+
+	rows := pgxmock.NewRows([]string{"id", "restaurantid", "name", "price", "description"}).
+		AddRow(int32(1), int32(1), "Cheese Pizza", float64(12.5), stringPtr("Delicious cheese pizza")).
+		AddRow(int32(2), int32(1), "Veggie Pizza", float64(10.0), stringPtr("Healthy veggie pizza"))
+
+	mock.ExpectQuery(`
+SELECT id, restaurantid, name, price, description
+FROM menuitem
+WHERE restaurantid = \$1 AND id = \$2`).
+		WithArgs(int32(1), int32(1)).
+		WillReturnRows(rows)
+	// create test item
+	item := SelectItemParams{
+		CustomerId:   1,
+		RestaurantId: 1,
+		ItemId:       1,
+		Quantity:     1,
+	}
+
+	itemJSON, _ := json.Marshal(item)
+	req := httptest.NewRequest(http.MethodPost, "/api/restaurants/menu/select", bytes.NewBuffer(itemJSON))
+	rec := httptest.NewRecorder()
+
+	handler.SelectMenuItem().ServeHTTP(rec, req)
+	if rec.Code != http.StatusOK {
+		t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
+	}
+	got, _ := io.ReadAll(rec.Body)
+	want := `{"message": "Menu item selected successfully}`
+	if string(got) != want {
+		t.Errorf("expected body %q, got %q", want, string(got))
+	}
 }

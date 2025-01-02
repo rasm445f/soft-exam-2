@@ -81,4 +81,4 @@ test-cover-html:
 	go tool cover -html=coverage.out
 
 test-mutation:
-	gremlins r
+	gremlins unleash --output=mutation.json
