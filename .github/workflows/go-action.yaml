@@ -28,6 +28,9 @@ jobs:
     services:
           rabbitmq:
             image: rabbitmq:3.8
+            env:
+              RABBITMQ_DEFAULT_USER: guest
+              RABBITMQ_DEFAULT_PASS: guest
             ports:
               - 5672
     steps:
