@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
 	httpSwagger "github.com/swaggo/http-swagger/v2"
 
@@ -13,6 +14,7 @@ import (
 	_ "github.com/rasm445f/soft-exam-2/docs"
 	"github.com/rasm445f/soft-exam-2/domain"
 	"github.com/rasm445f/soft-exam-2/handlers"
+	"github.com/rasm445f/soft-exam-2/metrics"
 )
 
 func run() (http.Handler, error) {
@@ -28,6 +30,7 @@ func run() (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	// Routes
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
 	mux.HandleFunc("POST /api/shopping", shoppingHandler.AddItem())
 	mux.HandleFunc("PATCH /api/shopping/{customerId}/{itemId}", shoppingHandler.UpdateCart())
@@ -38,7 +41,8 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("POST /api/shopping/publish/{customerId}", shoppingHandler.PublishShoppingCart())
 
 	//CORS stuff
-	handler := cors.Default().Handler(mux)
+	metrics := metrics.MetricsMiddleware(mux)
+	handler := cors.Default().Handler(metrics)
 
 	//test change for cicd
 	return handler, nil

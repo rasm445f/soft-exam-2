@@ -5,12 +5,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rasm445f/soft-exam-2/broker"
 	"github.com/rasm445f/soft-exam-2/db"
 	"github.com/rasm445f/soft-exam-2/db/generated"
 	_ "github.com/rasm445f/soft-exam-2/docs"
 	"github.com/rasm445f/soft-exam-2/domain"
 	"github.com/rasm445f/soft-exam-2/handlers"
+	"github.com/rasm445f/soft-exam-2/metrics"
 	"github.com/rs/cors"
 
 	httpSwagger "github.com/swaggo/http-swagger/v2"
@@ -30,6 +32,7 @@ func run() (http.Handler, error) {
 	mux := http.NewServeMux()
 
 	// Routes
+	mux.Handle("/metrics", promhttp.Handler())
 	mux.HandleFunc("GET /api/docs/", httpSwagger.WrapHandler)
 	mux.HandleFunc("GET /api/restaurants", restaurantHandler.GetAllRestaurants())
 	mux.HandleFunc("GET /api/restaurants/{restaurantId}", restaurantHandler.GetRestaurantById())
@@ -41,7 +44,8 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("POST /api/restaurants/menu/select", restaurantHandler.SelectMenuItem())
 
 	//CORS stuff
-	handler := cors.Default().Handler(mux)
+	metrics := metrics.MetricsMiddleware(mux)
+	handler := cors.Default().Handler(metrics)
 
 	return handler, err
 }
