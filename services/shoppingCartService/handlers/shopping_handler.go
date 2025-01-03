@@ -210,7 +210,7 @@ func (h *ShoppingCartHandler) ConsumeMenuItem() http.HandlerFunc {
 			log.Printf("Successfully added MenuItem to shopping cart: %+v", item)
 		})
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Menu item added to cart successfully}`))
+		w.Write([]byte(`{"message": "Menu item added to cart successfully"}`))
 	}
 }
 
@@ -270,6 +270,6 @@ func (h *ShoppingCartHandler) PublishShoppingCart() http.HandlerFunc {
 		// h.domain.ClearCart(ctx, customerId)
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Shopping Cart published and selected to Order successfully}`))
+		w.Write([]byte(`{"message": "Shopping Cart published and selected to Order successfully"}`))
 	}
 }
