@@ -44,6 +44,9 @@ func System(t *testing.T) {
 	}
 	req1.Header.Set("Content-Type", "application/json")
 	resp1, err := client.Do(req1)
+	if err != nil {
+		t.Fatalf("Unexpected error")
+	}
 	if resp1.StatusCode != http.StatusCreated {
 		t.Errorf("got %v want %v", resp1.StatusCode, http.StatusCreated)
 	}
@@ -259,8 +262,17 @@ func System(t *testing.T) {
 	// delete customer, shoppingcart and order
 	time.Sleep(5 * time.Second)
 	req9, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8081/api/customer/%d", customerID), nil)
+	if err != nil {
+		t.Fatalf("failed to delete customer: %v", err)
+	}
 	req10, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8084/api/shopping/%d", customerID), nil)
+	if err != nil {
+		t.Fatalf("failed to delete shopping cart: %v", err)
+	}
 	req11, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8082/api/orders/%d", orderId), nil)
+	if err != nil {
+		t.Fatalf("failed to delete order: %v", err)
+	}
 	_, err = client.Do(req9)
 	if err != nil {
 		t.Fatalf("failed to delete customer: %v", err)
