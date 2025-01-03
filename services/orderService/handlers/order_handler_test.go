@@ -1,11 +1,11 @@
 package handlers
 
-//TODO: implement system test
 import (
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"testing"
 	"time"
@@ -22,7 +22,8 @@ type Customer struct {
 	Addressid   *int32  `json:"addressid"`
 }
 
-func TestSystem(t *testing.T) {
+// not called TestSystem so it is not ran in ci/cd
+func System(t *testing.T) {
 	// make sure all the services are running first
 	client := &http.Client{}
 
@@ -176,7 +177,7 @@ func TestSystem(t *testing.T) {
 	}
 
 	// check newly created order
-	time.Sleep(5 * time.Second) // maybe not needed
+	time.Sleep(5 * time.Second)
 	var orders []generated.Order
 	req7, _ := http.NewRequest(http.MethodGet, "http://localhost:8082/api/orders", nil)
 	resp7, err := client.Do(req7)
@@ -204,26 +205,59 @@ func TestSystem(t *testing.T) {
 
 	order := orders[0]
 
-	// fmt.Println("order", order)
-	orderJSON, err := json.MarshalIndent(order, "", "  ")
-	if err != nil {
-		fmt.Printf("failed to marshal order: %v\n", err)
-	} else {
-		fmt.Println("Order:", string(orderJSON))
-	}
 	// assertions
+	roundedTotalAmount := math.Round(order.Totalamount*100) / 100
+	roundedVatAmount := math.Round(order.Vatamount*100) / 100
+	if roundedTotalAmount == 25.98 {
+		t.Fatalf("got: %f want: 25.98", roundedTotalAmount)
+	}
+	if roundedVatAmount == 5.2 {
+		t.Fatalf("got: %f want 5.2", roundedVatAmount)
+	}
+	if order.Status != "Pending" {
+		t.Fatalf("got: %v want \"Pending\"", order.Status)
+	}
+
+	// fmt.Println("order", order)
+	// orderJSON, err := json.MarshalIndent(order, "", "  ")
+	// if err != nil {
+	// 	fmt.Printf("failed to marshal order: %v\n", err)
+	// } else {
+	// 	fmt.Println("Order:", string(orderJSON))
+	// }
 
 	// // calculate bonus for order
 	orderId := orders[0].ID
-	// req8, _ := http.NewRequest(http.MethodPost, "", nil)
+	// var orderWithBonus []generated.Order
+	// req8, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8082/api/order/bonus/%v", orderId), nil)
+	// resp8, err := client.Do(req8)
+	// if err != nil {
+	// 	t.Fatalf("failed to calculate bonus for order: %v", err)
+	// }
+	// defer resp8.Body.Close()
 	//
-
-	// check order again by id
-	// // assert that the created order looks right
-	// req8.Body
+	// // Read the response body
+	// body, err = io.ReadAll(resp8.Body)
+	// if err != nil {
+	// 	t.Fatalf("failed to read response body: %v", err)
+	// }
+	//
+	// // Unmarshal the JSON response into the orders slice
+	// err = json.Unmarshal(body, &orderWithBonus)
+	// if err != nil {
+	// 	t.Fatalf("failed to unmarshal response body into order struct: %v", err)
+	// }
+	//
+	// orderJSON, err := json.MarshalIndent(orderWithBonus, "", "  ")
+	// if err != nil {
+	// 	fmt.Printf("failed to marshal order: %v\n", err)
+	// } else {
+	// 	fmt.Println("Order:", string(orderJSON))
+	// }
 
 	// cleanup
 	// delete customer, shoppingcart and order
+	time.Sleep(5 * time.Second)
 	req9, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8081/api/customer/%d", customerID), nil)
 	req10, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8084/api/shopping/%d", customerID), nil)
 	req11, err := http.NewRequest(http.MethodDelete, fmt.Sprintf("http://localhost:8082/api/orders/%d", orderId), nil)
