@@ -293,7 +293,7 @@ func TestConsumeMenuItem(t *testing.T) {
 		t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
 	}
 	got, _ := io.ReadAll(rec.Body)
-	want := `{"message": "Menu item added to cart successfully}`
+	want := `{"message": "Menu item added to cart successfully"}`
 	if string(got) != want {
 		t.Errorf("expected body %q, got %q", want, string(got))
 	}
