@@ -41,8 +41,16 @@ func run() (http.Handler, error) {
 	mux.HandleFunc("POST /api/shopping/publish/{customerId}", shoppingHandler.PublishShoppingCart())
 
 	//CORS stuff
+	corsHandler := cors.New(cors.Options{
+		AllowedOrigins:   []string{"*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		AllowCredentials: true,
+		Debug:            true,
+	})
+
 	metrics := metrics.MetricsMiddleware(mux)
-	handler := cors.Default().Handler(metrics)
+	handler := corsHandler.Handler(metrics)
 
 	//test change for cicd
 	return handler, nil

@@ -321,6 +321,6 @@ func (h *RestaurantHandler) SelectMenuItem() http.HandlerFunc {
 		}
 
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte(`{"message": "Menu item selected successfully}`))
+		w.Write([]byte(`{"message": "Menu item selected successfully"}`))
 	}
 }

@@ -376,9 +376,7 @@ func (h *OrderHandler) ConsumeOrder() http.HandlerFunc {
 		// Respond to the client
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]string{
-			"message": "Order consumption started",
-		})
+		w.Write([]byte(`{"message": "Order consumption started"}`))
 	}
 }
 

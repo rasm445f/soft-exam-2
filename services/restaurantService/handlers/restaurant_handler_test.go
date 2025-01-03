@@ -276,7 +276,7 @@ WHERE restaurantid = \$1 AND id = \$2`).
 		t.Fatalf("got status %d, want %d", rec.Code, http.StatusOK)
 	}
 	got, _ := io.ReadAll(rec.Body)
-	want := `{"message": "Menu item selected successfully}`
+	want := `{"message": "Menu item selected successfully"}`
 	if string(got) != want {
 		t.Errorf("expected body %q, got %q", want, string(got))
 	}
