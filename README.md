@@ -17,7 +17,7 @@ TODO: docker compose to setup and run whole project
 7. Run `make migrate-up` to setup the database with the tables etc. specified in the `db/migration/` folder.
 8. Run `make run` to start the server.
 9. Check the server is running by visiting `http://localhost:8080/` in your browser.
-10. you can now test the endpoints using the swagger documentation at `http://localhost:8080/api/docs`
+10.   you can now test the endpoints using the swagger documentation at `http://localhost:8080/api/docs`
 
 ---
 
@@ -25,43 +25,43 @@ TODO: docker compose to setup and run whole project
 
 ### Version Control Platform:
 
-- Git - Github
+-  Git - Github
 
 ### Text Editing and Development Environment:
 
-- VSCode / Neovim
-- DBeaver
-- Redis Insight
-- Swagger
+-  VSCode / Neovim
+-  DBeaver
+-  Redis Insight
+-  Swagger
 
 ### General Online Research Tools:
 
-- Stack Overflow
-- MDN Web Docs
-- Golang Docs
+-  Stack Overflow
+-  MDN Web Docs
+-  Golang Docs
 
 ## Development Stack
 
 ### Backend Development:
 
-- Golang
+-  Golang
 
 ### Database Management:
 
-- PostgreSQL
-- Redis
+-  PostgreSQL
+-  Redis
 
 ### Development Tools:
 
-- Docker
-- Docker Compose
+-  Docker
+-  Docker Compose
 
 ### CI/CD Pipeline:
 
-- GitHub Actions:
-  - static code analysis
-  - run tests
-  - create docker images
+-  GitHub Actions:
+   -  static code analysis
+   -  run tests
+   -  create docker images
 
 ---
 
@@ -69,23 +69,23 @@ TODO: docker compose to setup and run whole project
 
 Entities
 
-- Customer: The user that places an order.
-- DeliveryAgent: The person that delivers the food.
-- Feedback: Includes a rating for the food, the overall experience and the individual delivery person
-- Fee: Restaurants pay a fee to MTOGO for using the service and a variable share of the total order value before VAT (moms) based on order size, from a base of 6% for orders below 101 DKK to 3% for orders over 1.000DKK.
-- Restaurant: A business that prepares food ordered through MTOGO.
-- Menu: A list of food items offered by a restaurant.
-- Bonus: An additional payment given to a delivery agent based on performance factors like customer reviews and timely delivery.
-- Order: A food request made by a customer through the MTOGO platform.
+-  Customer: The user that places an order.
+-  DeliveryAgent: The person that delivers the food.
+-  Feedback: Includes a rating for the food, the overall experience and the individual delivery person
+-  Fee: Restaurants pay a fee to MTOGO for using the service and a variable share of the total order value before VAT (moms) based on order size, from a base of 6% for orders below 101 DKK to 3% for orders over 1.000DKK.
+-  Restaurant: A business that prepares food ordered through MTOGO.
+-  Menu: A list of food items offered by a restaurant.
+-  Bonus: An additional payment given to a delivery agent based on performance factors like customer reviews and timely delivery.
+-  Order: A food request made by a customer through the MTOGO platform.
 
 Coding
 
-- Services: Referring to Microservices.
+-  Services: Referring to Microservices.
 
 Preparation
 
-- Project Board: The Kanban project board where we keep track of all tasks and pull requests.
-- User Stories: The tasks/issues to be completed.
+-  Project Board: The Kanban project board where we keep track of all tasks and pull requests.
+-  User Stories: The tasks/issues to be completed.
 
 ## Definition of Done
 
@@ -99,8 +99,7 @@ Preparation
 
 ## Project structure:
 
-TODO: C4 diagrams, Domain diagram, bounded context diagram, eer diagram,
-sequence diagram, rabbitmq(sequence diagram)
+TODO: C4 diagrams, Domain diagram, bounded context diagram, eer diagram, sequence diagram, rabbitmq(sequence diagram)
 
 TODO: add classdiagram here
 
@@ -144,84 +143,80 @@ Each microservices follow this general structure within their own folders:
 
 ## Requirements
 
-TODO: screenshots of kanban board
-TOOD: example usestory, enabler story
+TODO: screenshots of kanban board TOOD: example usestory, enabler story
 
 <!-- Functionality -->
 <!-- User stories, Security -->
 
-For non-functional requirements we have use the FURPS model.
-FURPS:
+For non-functional requirements we have use the FURPS model. FURPS:
 
 **Usability:**
 
-- UI Adaptation:
+-  UI Adaptation:
 
-  - Since there’s no dedicated frontend, the system’s UI will consist of Swagger. Swagger’s interface provides a structured way to interact with the API endpoints but is not intended for end-users like customers, restaurant owners, or delivery agents.
+   -  Since there’s no dedicated frontend, the system’s UI will consist of Swagger. Swagger’s interface provides a structured way to interact with the API endpoints but is not intended for end-users like customers, restaurant owners, or delivery agents.
 
-- API Documentation:
+-  API Documentation:
 
-  - Clear and detailed Swagger documentation becomes essential, as this will serve as the primary UI.
-  - Each endpoint should be accompanied by comprehensive explanations, examples, and use cases. Descriptions should be provided for:
-  - Required and optional parameters
-  - Expected responses, including error codes and message
-  - Example requests and responses
+   -  Clear and detailed Swagger documentation becomes essential, as this will serve as the primary UI.
+   -  Each endpoint should be accompanied by comprehensive explanations, examples, and use cases. Descriptions should be provided for:
+   -  Required and optional parameters
+   -  Expected responses, including error codes and message
+   -  Example requests and responses
 
-- Access and Security Documentation:
+-  Access and Security Documentation:
 
-  - Since the usability interface is Swagger, ensuring secure and smooth access is critical.
-  - Detailed instructions on how to authenticate.
-  - Error messages.
+   -  Since the usability interface is Swagger, ensuring secure and smooth access is critical.
+   -  Detailed instructions on how to authenticate.
+   -  Error messages.
 
 **Reliability**
 
-- Error Handling and Recovery:
+-  Error Handling and Recovery:
 
-  - Ensuring that orders are not lost in the event of a failure and providing clear error messages to users.
+   -  Ensuring that orders are not lost in the event of a failure and providing clear error messages to users.
 
-- Scalability:
+-  Scalability:
 
-  - The system should scale to support up to 1.500.000 customers and 18.000.000 orders over the next five years.
+   -  The system should scale to support up to 1.500.000 customers and 18.000.000 orders over the next five years.
 
-- Data Accuracy:
+-  Data Accuracy:
 
-  - Ensuring that order data, pricing, and customer information are consistently accurate.
+   -  Ensuring that order data, pricing, and customer information are consistently accurate.
 
 **Performance**
 
-- Performance Testing:
+-  Performance Testing:
 
-  - We will use Grafana k6 for load testing to ensure stability.
+   -  We will use Grafana k6 for load testing to ensure stability.
 
-- Scalable architecture:
+-  Scalable architecture:
 
-  - Mainly Microservice based architecture to ensure separations of concerns and loose coupling for easy integration of new features or improvements to old.
+   -  Mainly Microservice based architecture to ensure separations of concerns and loose coupling for easy integration of new features or improvements to old.
 
-- Optimization:
+-  Optimization:
 
-  - Multiple databases for services that benefit. Mainly use sql queries for faster query time compared to using an ORM.
+   -  Multiple databases for services that benefit. Mainly use sql queries for faster query time compared to using an ORM.
 
 **Supportability**
 
-- Error Logging and Monitoring:
+-  Error Logging and Monitoring:
 
-  - Golang has built-in logging tools log and log/slog that we will be using for logging.
+   -  Golang has built-in logging tools log and log/slog that we will be using for logging.
 
-- Configuration Management:
+-  Configuration Management:
 
-  - Config files for easy adaptation of environments.
+   -  Config files for easy adaptation of environments.
 
-- Documentation:
+-  Documentation:
 
-  - Comprehensive documentation for the developer team, covering aspects like API endpoints, architecture diagrams, and testing protocols.
+   -  Comprehensive documentation for the developer team, covering aspects like API endpoints, architecture diagrams, and testing protocols.
 
 ## Branching Strategy
 
 We will follow the GitHub Flow branching strategy:
 
-The main branch will always contain the most up-to-date deployable code.
-Developers will create feature branches from the main branch to work on individual user stories or tasks.
-Once a feature or task is complete, a pull request will be opened to merge the changes into the main branch.
+The main branch will always contain the most up-to-date deployable code. Developers will create feature branches from the main branch to work on individual user stories or tasks. Once a feature or task is complete, a pull request will be opened to merge the changes into the main branch.
 
 ## Agile strategy
 
@@ -233,31 +228,31 @@ We will use Test Driven Development since it ensures the quality of our code.
 
 **Feedback:**
 
-- Test-Driven Development
-- The Planning Game
-- Pair Programming
+-  Test-Driven Development
+-  The Planning Game
+-  Pair Programming
 
 **Continual Process:**
 
-- Continuous Integration
+-  Continuous Integration
 
 **Code Understanding:**
 
-- Simple Design
-- Collective Code Ownership
-- System Metaphor
-- Coding Standard
-  - Go provide go fmt which format the code. We will use the default settings for consistency.
-  - Indentation: Tab
-  - Endpoints: Using Dashes
-  - Testing
-    1. Arrange (want/expected)
-    2. Act (got/actual)
-    3. Assert
+-  Simple Design
+-  Collective Code Ownership
+-  System Metaphor
+-  Coding Standard
+   -  Go provide go fmt which format the code. We will use the default settings for consistency.
+   -  Indentation: Tab
+   -  Endpoints: Using Dashes
+   -  Testing
+      1. Arrange (want/expected)
+      2. Act (got/actual)
+      3. Assert
 
 **Work Conditions:**
 
-- 40-hour Week
+-  40-hour Week
 
 ---
 
@@ -267,22 +262,21 @@ The purpose of this strategy design is to provide a high-level approach and scop
 
 Additionally, we will use the SQALE Method (Software Quality Assessment based on Lifecycle Expectations) into our strategy. The SQALE Method will help us make sure our code is not only functional but also written with high quality. We will focus on the following key aspects:
 
-- **Changeability**: How easily code can be updated or modified when changes are needed.
-- **Maintainability**: How much effort it takes to find and fix bugs and to keep the code working properly over time.
-- **Portability**: The ability to use the code across different platforms, systems, or applications, without needing significant changes.
-- **Reusability**: The potential to reuse the code in different parts of the project or in other projects.
-- **Technical Debt**: The cost and effort needed to improve the code or fix problems, and whether external assistance might be required to address these issues.
+-  **Changeability**: How easily code can be updated or modified when changes are needed.
+-  **Maintainability**: How much effort it takes to find and fix bugs and to keep the code working properly over time.
+-  **Portability**: The ability to use the code across different platforms, systems, or applications, without needing significant changes.
+-  **Reusability**: The potential to reuse the code in different parts of the project or in other projects.
+-  **Technical Debt**: The cost and effort needed to improve the code or fix problems, and whether external assistance might be required to address these issues.
 
 ## Scope
 
 The testing will cover the following functionalities of the MTOGO application:
 
-- User registration and account authentication
-- Menu and item management by restaurants
-- Order placement and cancellation
-- Creation and removal of Restaurants
-- Adding and removing items in shopping cart
-- Reviews and ratings submission by users
+-  User registration
+-  View Restaurant menu and its items
+-  Order placement and cancellation
+-  Adding and removing items in shopping cart
+-  Rating submissions by users
 
 ### Test Approach
 
@@ -290,41 +284,41 @@ Our test approach includes a combination of different testing approaches to ensu
 
 **Unit Tests**
 
-- **Definition:**
+-  **Definition:**
 
-  - Unit Testing will be used to test individual components or functions in isolation.
+   -  Unit Testing will be used to test individual components or functions in isolation.
 
-- **Approach:**
-  - Some of the practices we will be using are mock objects and maintaining high test coverage.
-  - Focus is to test small pieces of functionality, such as methods or functions, to ensure they behave as expected.
-  - Practices will include using mock objects and maintaining high test coverage.
+-  **Approach:**
+   -  Some of the practices we will be using are mock objects and maintaining high test coverage.
+   -  Focus is to test small pieces of functionality, such as methods or functions, to ensure they behave as expected.
+   -  Practices will include using mock objects and maintaining high test coverage.
 
 **Integration Tests**
 
-- **Definition:**
+-  **Definition:**
 
-  - Integration Testing will be used to test how different components or systems work together.
+   -  Integration Testing will be used to test how different components or systems work together.
 
-- **Approach:**
-  - Some of the practices we will be using are stubs to replace actual HTTP requests with simulated ones. This allows us to test the endpoint without needing to set up the real client.
-  - The scenarios we will be testing are interactions between services, databases, and APIs.
+-  **Approach:**
+   -  Some of the practices we will be using are stubs to replace actual HTTP requests with simulated ones. This allows us to test the endpoint without needing to set up the real client.
+   -  The scenarios we will be testing are interactions between services, databases, and APIs.
 
 **Mutation Test**
 
-- Mutation Testing will be used to evaluate the effectiveness of the tests, since it intentionally introduces small changes into the code and checks if the existing tests can detect these changes.
+-  Mutation Testing will be used to evaluate the effectiveness of the tests, since it intentionally introduces small changes into the code and checks if the existing tests can detect these changes.
 
 **Load Test**
 
-- **Definition:**
+-  **Definition:**
 
-  - To validate the system's performance, stability, and scalability under expected peak loads.
+   -  To validate the system's performance, stability, and scalability under expected peak loads.
 
-- **Approach:**
-  - We will do load testing on a cloud-hosted and local instance of the application.
+-  **Approach:**
+   -  We will do load testing on a cloud-hosted and local instance of the application.
 
 **Static Code Analysis**
 
-- Static Code Analysis will be used to examine code without executing it to find potential vulnerabilities, code smells, or adherence to coding standards.
+-  Static Code Analysis will be used to examine code without executing it to find potential vulnerabilities, code smells, or adherence to coding standards.
 
 **Reporting**
 
@@ -332,63 +326,63 @@ Test results and coverage will be documented and analyzed. Mutation testing will
 
 **Test Strategy Goals**
 
-The goal with this strategy is to ensure a sound and quality-focused application with a test coverage of 70-80%. The application must be able to handle 5,000 requests on our localhost and 1,500,000 requests when hosted on the web.
+The goal with this strategy is to ensure a sound and quality-focused application with a test coverage of 60-70%. The application must be able to handle 500 requests on our localhost.
 
 ## Test Plan
 
 **Approach:**
 
-- **TDD:** We will use Test-Driven Development to ensure quality at each stage of development. For each feature, tests will be written first to establish behavior, followed by implementing the code to pass these tests.
+-  **TDD:** We will use Test-Driven Development to ensure quality at each stage of development. For each feature, tests will be written first to establish behavior, followed by implementing the code to pass these tests.
 
 **File Organization:**
 
-- **Test File Structure:**
+-  **Test File Structure:**
 
-  - In alignment with Go’s idiomatic practices, test files will reside alongside the code files they validate. For instance:
+   -  In alignment with Go’s idiomatic practices, test files will reside alongside the code files they validate. For instance:
 
-    - `calculator.go`
-    - `calculator_test.go`
+      -  `restaurant.go`
+      -  `restaurant_test.go`
 
-  - This organization will facilitate ease of testing and maintenance, providing a clear mapping between code and its respective tests.
+   -  This organization will facilitate ease of testing and maintenance, providing a clear mapping between code and its respective tests.
 
 **Tools for Testing:**
 
-- Unit and Integration Testing:
+-  Unit and Integration Testing:
 
-  - **Go Testing Library:** We will use the Go standard library’s testing package to define `got` (actual) and `want` (expected) results, loosely following the structure from [Learn Go with Tests](https://quii.gitbook.io/learn-go-with-tests).
+   -  **Go Testing Library:** We will use the Go standard library’s testing package to define `got` (actual) and `want` (expected) results, loosely following the structure from [Learn Go with Tests](https://quii.gitbook.io/learn-go-with-tests).
 
-  - **Mocking:** `github.com/DATA-DOG/go-sqlmock` will be used for database mocking in unit tests, allowing us to isolate business logic without involving the actual database.
+   -  **Mocking:** `github.com/DATA-DOG/go-sqlmock` will be used for database mocking in unit tests, allowing us to isolate business logic without involving the actual database.
 
-- Mutation Testing:
+-  Mutation Testing:
 
-  - **Gremlins:** [Gremlins](https://github.com/go-gremlins/gremlins) will introduce small code mutations to ensure test robustness. Mutation testing will run periodically to assess test coverage quality and detect gaps in testing.
+   -  **Gremlins:** [Gremlins](https://github.com/go-gremlins/gremlins) will introduce small code mutations to ensure test robustness. Mutation testing will run periodically to assess test coverage quality and detect gaps in testing.
 
-- Load Testing:
+-  Load Testing:
 
-  - **k6:** [k6](https://github.com/grafana/k6) will validate the system’s ability to handle peak loads both locally and in a cloud environment. Load testing will specifically target thresholds of 5,000 users on localhost and 1.5 million users in production-like conditions.
+   -  **k6:** [k6](https://github.com/grafana/k6) will validate the system’s ability to handle peak loads both locally and in a cloud environment. Load testing will specifically target thresholds of 500 users on localhost in production-like conditions.
 
-- Static Code Analysis:
+-  Static Code Analysis:
 
-  - **Staticcheck:** [Staticcheck](https://staticcheck.dev/) will be used for enhanced static code analysis, helping to identify code smells, potential vulnerabilities, and adherence to coding standards.
+   -  **Staticcheck:** [Staticcheck](https://staticcheck.dev/) will be used for enhanced static code analysis, helping to identify code smells, potential vulnerabilities, and adherence to coding standards.
 
-  - **Taint Analysis:** Staticcheck’s built-in taint analysis will further validate code security by identifying unsafe data handling practices.
+   -  **Taint Analysis:** Staticcheck’s built-in taint analysis will further validate code security by identifying unsafe data handling practices.
 
-- Design Patterns:
+-  Design Patterns:
 
-  - Design Patterns will be incorporated in testing and code design to ensure modularity and testability.
+   -  Design Patterns will be incorporated in testing and code design to ensure modularity and testability.
 
-- CI/CD Integration:
+-  CI/CD Integration:
 
-  - Pipeline Configuration:
+   -  Pipeline Configuration:
 
-    - **Automated Test Execution:**
+      -  **Automated Test Execution:**
 
-      - `go test` will run automatically on every commit and pull request, covering both unit and integration tests.
+         -  `go test` will run automatically on every commit and pull request, covering both unit and integration tests.
 
-    - **Static Analysis:**
-      - `staticcheck` will be executed on each build to maintain high standards in code quality.
+      -  **Static Analysis:**
+         -  `staticcheck` will be executed on each build to maintain high standards in code quality.
 
-- Reporting:
+-  Reporting:
 
-  - Automated test results and static analysis reports will be generated, allowing us to monitor coverage and code quality continuously.
-  - Load and mutation test reports will be generated for regular review.
+   -  Automated test results and static analysis reports will be generated, allowing us to monitor coverage and code quality continuously.
+   -  Load and mutation test reports will be generated for regular review.
