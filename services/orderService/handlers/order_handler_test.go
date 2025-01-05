@@ -27,7 +27,7 @@ func System(t *testing.T) {
 	// make sure all the services are running first
 	client := &http.Client{}
 
-	// create a customer
+	// Step 1: Create a customer
 	customerPayload := `{
 		"email": "test@test.dk",
 		"name": "string",
@@ -37,7 +37,7 @@ func System(t *testing.T) {
 		"zip_code": 2800
 	}`
 
-	// // Create the request
+	// Step 2: Create the request
 	req1, err := http.NewRequest(http.MethodPost, "http://localhost:8081/api/customer", bytes.NewBuffer([]byte(customerPayload)))
 	if err != nil {
 		t.Fatalf("failed to create request: %v", err)
@@ -51,7 +51,7 @@ func System(t *testing.T) {
 		t.Errorf("got %v want %v", resp1.StatusCode, http.StatusCreated)
 	}
 
-	// select all customers (will be the newly created one since no other exist)
+	// Step 3: Select all customers (will be the newly created one since no other exist)
 	var customers []Customer
 	req2, _ := http.NewRequest(http.MethodGet, "http://localhost:8081/api/customer", nil)
 	resp2, err := client.Do(req2)
@@ -73,7 +73,7 @@ func System(t *testing.T) {
 
 	customerID := customers[0].ID
 
-	// restaurant selectitem
+	// Step 4: Restaurant SelectItem
 	payload := fmt.Sprintf(`{
   		"customerId": %d,
   		"id": 1,
@@ -104,7 +104,7 @@ func System(t *testing.T) {
 		t.Fatalf("Unexpected response body: got %s, want %s", responseStr, expectedMessage)
 	}
 
-	// shoppingcart consume
+	// Step 5: Shoppingcart Consume
 	req4, _ := http.NewRequest(http.MethodGet, "http://localhost:8084/api/shopping/consume", nil)
 	resp4, err := client.Do(req4)
 	if err != nil {
@@ -128,7 +128,7 @@ func System(t *testing.T) {
 		t.Fatalf("Unexpected response body: got %s, want %s", responseStr, expectedMessage)
 	}
 
-	// shoppingcart publish
+	// Step 6: Shoppingcart Publish
 	payload = `{
 	  "comment": "No vegetables on the pizza."
 	}`
@@ -155,7 +155,7 @@ func System(t *testing.T) {
 		t.Fatalf("Unexpected response body: got %s, want %s", responseStr, expectedMessage)
 	}
 
-	// order consume
+	// Step 7: Order Consume
 	req6, _ := http.NewRequest(http.MethodGet, "http://localhost:8082/api/order/consume", nil)
 	resp6, err := client.Do(req6)
 	if err != nil {
@@ -179,7 +179,7 @@ func System(t *testing.T) {
 		t.Fatalf("Unexpected response body: got %s, want %s", responseStr, expectedMessage)
 	}
 
-	// check newly created order
+	// Step 8: Check newly created order
 	time.Sleep(5 * time.Second)
 	var orders []generated.Order
 	req7, _ := http.NewRequest(http.MethodGet, "http://localhost:8082/api/orders", nil)
@@ -221,42 +221,8 @@ func System(t *testing.T) {
 		t.Fatalf("got: %v want \"Pending\"", order.Status)
 	}
 
-	// fmt.Println("order", order)
-	// orderJSON, err := json.MarshalIndent(order, "", "  ")
-	// if err != nil {
-	// 	fmt.Printf("failed to marshal order: %v\n", err)
-	// } else {
-	// 	fmt.Println("Order:", string(orderJSON))
-	// }
-
-	// // calculate bonus for order
+	// Calculate bonus for order
 	orderId := orders[0].ID
-	// var orderWithBonus []generated.Order
-	// req8, _ := http.NewRequest(http.MethodGet, fmt.Sprintf("http://localhost:8082/api/order/bonus/%v", orderId), nil)
-	// resp8, err := client.Do(req8)
-	// if err != nil {
-	// 	t.Fatalf("failed to calculate bonus for order: %v", err)
-	// }
-	// defer resp8.Body.Close()
-	//
-	// // Read the response body
-	// body, err = io.ReadAll(resp8.Body)
-	// if err != nil {
-	// 	t.Fatalf("failed to read response body: %v", err)
-	// }
-	//
-	// // Unmarshal the JSON response into the orders slice
-	// err = json.Unmarshal(body, &orderWithBonus)
-	// if err != nil {
-	// 	t.Fatalf("failed to unmarshal response body into order struct: %v", err)
-	// }
-	//
-	// orderJSON, err := json.MarshalIndent(orderWithBonus, "", "  ")
-	// if err != nil {
-	// 	fmt.Printf("failed to marshal order: %v\n", err)
-	// } else {
-	// 	fmt.Println("Order:", string(orderJSON))
-	// }
 
 	// cleanup
 	// delete customer, shoppingcart and order
