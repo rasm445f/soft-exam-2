@@ -70,3 +70,7 @@ env-all:
 	cp services/restaurantService/.env.example services/restaurantService/.env
 	cp services/shoppingCartService/.env.example services/shoppingCartService/.env
 
+load-test:
+	@echo "Loading data..."
+	k6 run --out json=loadTesting/visualization/results.json loadTesting/loadtest.js
+	
