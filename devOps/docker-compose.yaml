@@ -1,0 +1,260 @@
+version: "3.9"
+
+services:
+  # Customer Service and its database
+  customer-db:
+    container_name: customer-db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: customer
+      PGDATA: /data/postgres
+    volumes:
+      - customer_db:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  customer-service:
+    image: ghcr.io/rasm445f/customerservice:latest
+    environment:
+      DBSTRING: host=customer-db port=5432 user=postgres password=test dbname=customer sslmode=disable
+    ports:
+      - "8081:8081"
+    depends_on:
+      customer-db:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  # Shopping Cart Service and Redis
+  redis:
+    container_name: shoppingcart-db
+    image: redis:alpine
+    environment:
+      - REDIS_PASSWORD=test
+    command: ["redis-server", "--requirepass", "test"]
+    ports:
+      - "6379:6379"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  shopping-cart-service:
+    image: ghcr.io/rasm445f/shoppingcartservice:latest
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: test
+    ports:
+      - "8084:8084"
+    depends_on:
+      redis:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  # Order Service and its database
+  order-db:
+    container_name: order-db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: order
+      PGDATA: /data/postgres
+    volumes:
+      - order_db:/data/postgres
+    ports:
+      - "5433:5432"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  order-service:
+    image: ghcr.io/rasm445f/orderservice:latest
+    environment:
+      DBSTRING: host=order-db port=5432 user=postgres password=test dbname=order sslmode=disable
+    ports:
+      - "8082:8082"
+    depends_on:
+      order-db:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  # Restaurant Service and its database
+  restaurant-db:
+    container_name: restaurant-db
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: restaurant
+      PGDATA: /data/postgres
+    volumes:
+      - restaurant_db:/data/postgres
+    ports:
+      - "5434:5432"
+    networks:
+      - app_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  restaurant-service:
+    image: ghcr.io/rasm445f/restaurantservice:latest
+    environment:
+      DBSTRING: host=restaurant-db port=5432 user=postgres password=test dbname=restaurant sslmode=disable
+    ports:
+      - "8083:8083"
+    depends_on:
+      restaurant-db:
+        condition: service_healthy
+    networks:
+      - app_network
+
+  # Customer Service Migrations
+  customer-migrations:
+    container_name: customer-migrations
+    build:
+      context: ../services/customerService/db/migrations
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: customer-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: test
+      DB_NAME: customer
+      DB_SSLMODE: disable
+    depends_on:
+      customer-db:
+        condition: service_healthy
+    networks:
+      - app_network
+    profiles:
+      - migrations
+
+  # Order Service Migrations
+  order-migrations:
+    container_name: order-migrations
+    build:
+      context: ../services/orderService/db/migrations
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: order-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: test
+      DB_NAME: order
+      DB_SSLMODE: disable
+    depends_on:
+      order-db:
+        condition: service_healthy
+    networks:
+      - app_network
+    profiles:
+      - migrations
+
+  # Restaurant Service Migrations
+  restaurant-migrations:
+    container_name: restaurant-migrations
+    build:
+      context: ../services/restaurantService/db/migrations
+      dockerfile: Dockerfile
+    environment:
+      DB_HOST: restaurant-db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: test
+      DB_NAME: restaurant
+      DB_SSLMODE: disable
+    depends_on:
+      restaurant-db:
+        condition: service_healthy
+    networks:
+      - app_network
+    profiles:
+      - migrations
+
+  # Message Broker
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - app_network
+
+  # API Gateway
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: swagger-ui
+    ports:
+      - "8080:8080"
+    volumes:
+      - ../services/customerService/docs:/usr/share/nginx/html/api/customerService
+      - ../services/orderService/docs:/usr/share/nginx/html/api/orderService
+      - ../services/restaurantService/docs:/usr/share/nginx/html/api/restaurantService
+      - ../services/shoppingCartService/docs:/usr/share/nginx/html/api/shoppingCartService
+    environment:
+      URLS: >
+        [
+          { url: "/api/customerService/swagger.json", name: "Customer Service" },
+          { url: "/api/orderService/swagger.json", name: "Order Service" },
+          { url: "/api/restaurantService/swagger.json", name: "Restaurant Service" },
+          { url: "/api/shoppingCartService/swagger.json", name: "Shopping Cart Service" }
+        ]
+    networks:
+      - app_network
+
+  # Monitoring
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ../monitoring/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - app_network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    depends_on:
+      - prometheus
+    networks:
+      - app_network
+
+networks:
+  app_network:
+    driver: bridge
+
+volumes:
+  customer_db:
+  order_db:
+  restaurant_db:
+  grafana_data:
